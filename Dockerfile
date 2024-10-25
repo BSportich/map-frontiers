@@ -27,7 +27,8 @@ RUN catkin config  --extend /opt/ros/noetic \
     && catkin build voxblox_ros 
 
 # # Source the setup.bash so that the package is available in the environment
-RUN echo "source /catkin_ws/devel/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/catkin_ws/devel/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
-# Set the entrypoint
-ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/noetic/setup.bash && source /catkin_ws/devel/setup.bash && exec bash"]
+# # Set the entrypoint
+CMD ["bash", "-c"]
