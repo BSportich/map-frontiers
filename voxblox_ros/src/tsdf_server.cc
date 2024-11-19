@@ -406,7 +406,7 @@ bool TsdfServer::getNextPointcloudFromQueue(
   // LOG(INFO) << "from frame " << (*pointcloud_msg)->header.frame_id;
   // std::string sensor_frame_ = "vehicle";
   if (transformer_.lookupTransform(
-          sensor_frame_, world_frame_, (*pointcloud_msg)->header.stamp,
+          (*pointcloud_msg)->header.frame_id, world_frame_, (*pointcloud_msg)->header.stamp,
           T_G_C)) {
     queue->pop();
     return true;
