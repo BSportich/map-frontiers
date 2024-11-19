@@ -1,0 +1,18 @@
+<launch>
+  <param name="use_sim_time" value="true" />
+  <arg name="process_every_nth_frame" default="1" />
+
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
+
+  <!-- Run voxblox_node-->
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/all_pointclouds"/>
+    <!-- If sensor_frame is not set, the tf us -->
+    <param name="~sensor_frame"           value=""/>
+    <rosparam file="$(find voxblox_ros)/cfg/param/mai_param.yaml"/>
+    <rosparam file="$(find voxblox_ros)/cfg/calib/mai_calib.yaml"/>
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
+  </node>
+
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/mai_25cm.rviz" />
+</launch>
