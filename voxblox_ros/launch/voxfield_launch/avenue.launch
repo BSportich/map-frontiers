@@ -9,6 +9,8 @@
     <remap from="pointcloud" to="/all_pointclouds"/>
     <!-- If sensor_frame is not set, the tf us -->
     <param name="~sensor_frame"           value=""/>
+    <!-- TODO: This parameter should always be bigger than the number of drone used in the simulation otherwise some pointclouds msgs will be lost -->
+    <param name="pointcloud_queue_size"           value="3"/>
     <rosparam file="$(find voxblox_ros)/cfg/param/mai_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/mai_calib.yaml"/>
     <param name="robot_model_file" value="$(arg robot_model_file)"/>
