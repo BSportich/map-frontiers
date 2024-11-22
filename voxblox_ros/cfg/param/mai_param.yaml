@@ -70,6 +70,8 @@ intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, i
 # publishing settings
 publish_traversable: false
 publish_pointclouds: false
+publish_tsdf_map: true
+publish_esdf_map: true
 publish_slices: true
 publish_robot_model: true
 slice_level: 0.0
