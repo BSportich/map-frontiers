@@ -451,7 +451,7 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
   *pointcloud_msg = queue->front();
 
   if (transformer_.lookupTransform(
-          sensor_frame_, world_frame_, (*pointcloud_msg)->header.stamp,
+          (*pointcloud_msg)->header.frame_id, world_frame_, (*pointcloud_msg)->header.stamp,
           T_G_C)) {
     queue->pop();
     return true;
@@ -472,7 +472,7 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
 
 void NpTsdfServer::insertPointcloud(
     const sensor_msgs::PointCloud2::Ptr& pointcloud_msg_in) {
-  if (pointcloud_msg_in->header.stamp - last_msg_time_ptcloud_ >
+  if (pointcloud_msg_in->header.stamp - last_msg_time_ptcloud_ >=
       min_time_between_msgs_) {
     last_msg_time_ptcloud_ = pointcloud_msg_in->header.stamp;
     // So we have to process the queue anyway... Push this back.
