@@ -65,7 +65,7 @@ private:
 
 
 public:
-    NBV_Selector();
+    //NBV_Selector();
     NBV_Selector(const ViewGenerator& vg, FloatingPoint voxel_size, size_t voxels_per_side, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
@@ -83,22 +83,22 @@ public:
     ~NBV_Selector();
 };
 
-NBV_Selector::NBV_Selector(const ViewGenerator& vg, FloatingPoint voxel_size, size_t voxels_per_side, int team_id, std::vector<int> robot_team): 
+NBV_Selector::NBV_Selector(const ViewGenerator& vg, FloatingPoint voxel_size, size_t voxels_per_side, int team_id, std::vector<int> robot_team) 
 {
     
     //initialization
     int vs = 1;
     m_team_id = team_id ;
     m_team_size = robot_team.size() ;
-    m_team( robot_team );
-    m_team_pos();
+    m_team = robot_team;
+    // m_team_pos();
     m_availability = AVAILABLE;
 
     //map
-    m_map = voxbloxmap::VoxbloxMap(voxel_size, voxels_per_side);
+    m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
 
     //modules
-    m_view_generator(vg);
+    // m_view_generator(vg);
 
     //frontiers
     frontiers();

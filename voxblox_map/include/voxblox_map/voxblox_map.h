@@ -24,6 +24,7 @@ namespace voxblox_map {
 // Voxblox as a map representation
 class VoxbloxMap {
  public:
+  VoxbloxMap(){}
   explicit VoxbloxMap(FloatingPoint voxel_size, size_t voxels_per_side);  // NOLINT // !!! : collision radius is unique here. It should be unique for each robot, to correct // TO CHANGE
 
   // check collision for a single pose
