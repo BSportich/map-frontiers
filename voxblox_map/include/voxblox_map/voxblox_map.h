@@ -75,8 +75,8 @@ class VoxbloxMap {
   
 private:
   // esdf server that contains the map, subscribe to external ESDF/TSDF updates
-  std::shared_ptr<EsdfMap> esdf_map_pointer ; // std::shared_ptr<const EsdfMap>
-  std::shared_ptr<TsdfMap> tsdf_map_pointer ; // std::shared_ptr<const TsdfMap>
+  std::shared_ptr<voxblox::EsdfMap> esdf_map_pointer ; // std::shared_ptr<const EsdfMap>
+  std::shared_ptr<voxblox::TsdfMap> tsdf_map_pointer ; // std::shared_ptr<const TsdfMap>
 
   // cache constants
   double c_voxel_size_;

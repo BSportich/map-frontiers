@@ -25,14 +25,14 @@ namespace map {
 
 VoxbloxMap::VoxbloxMap(FloatingPoint voxel_size, size_t voxels_per_side): {
 
-    layer_tsdf = Layer<TsdfVoxel>(voxel_size, voxels_per_size);
-    layer_esdf = Layer<EsdfVoxel>(voxel_size, voxels_per_size);
+    layer_tsdf = Layer<voxblox::TsdfVoxel>(voxel_size, voxels_per_size);
+    layer_esdf = Layer<voxblox::EsdfVoxel>(voxel_size, voxels_per_size);
 
     esdf_map_pointer = nullptr;
     tsdf_map_pointer = nullptr;
 
-    esdf_map_pointer = EsdfMap(layer_esdf);
-    tsdf_map_pointer = TsdfMap(layer_tsdf);
+    esdf_map_pointer = voxblox::EsdfMap(layer_esdf);
+    tsdf_map_pointer = voxblox::TsdfMap(layer_tsdf);
 
     m_distance_threshold = 0;
     m_confidence_threshold = 0 ;

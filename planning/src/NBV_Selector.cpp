@@ -196,7 +196,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
   timing::Timer receive_map_timer("map/receive_tsdf");
 
   bool success =
-      deserializeMsgToLayer<TsdfVoxel>(layer_msg, m_map.get_tsdf_map_pointer()->getTsdfLayerPtr());
+      voxblox::deserializeMsgToLayer<voxblox::TsdfVoxel>(layer_msg, m_map.get_tsdf_map_pointer()->getTsdfLayerPtr());
 
   if (!success) {
     ROS_ERROR_THROTTLE(10, "Got an invalid TSDF map message!");
@@ -212,7 +212,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
   timing::Timer receive_map_timer("map/receive_esdf");
 
   bool success =
-      deserializeMsgToLayer<EsdfVoxel>(layer_msg, m_map.get_esdf_map_pointer()->getEsdfLayerPtr());
+      voxblox::deserializeMsgToLayer<voxblox::EsdfVoxel>(layer_msg, m_map.get_esdf_map_pointer()->getEsdfLayerPtr());
 
   if (!success) {
     ROS_ERROR_THROTTLE(10, "Got an invalid ESDF map message!");
