@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(map_frontiers)
+project(voxblox_map)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -8,20 +8,24 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 add_definitions(-std=c++14 -Wall -Wextra)
 
+####################
+# SET SOURCE FILES #
+####################
+
+set("${PROJECT_NAME}_SRCS"
+  src/voxblox_map.cpp
+)
+
 #############
 # LIBRARIES #
 #############
 
-############
-# BINARIES #
-############
-
-cs_add_executable(NBV_Selector
-  src/NBV_Selector.cpp
+cs_add_library(${PROJECT_NAME}
+  ${${PROJECT_NAME}_SRCS}
 )
-target_link_libraries(NBV_Selector ${PROJECT_NAME})
 
 ##########
 # EXPORT #
 ##########
 cs_install()
+cs_export(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include)
