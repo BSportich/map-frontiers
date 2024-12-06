@@ -16,7 +16,7 @@
 
 typedef float FloatingPoint;
 
-namespace map {
+namespace voxblox_map {
 
 //BIG NOTE : TRY TO CONST AS MUCH AS POSSIBLE METHODS
 //TO CHANGE GET DISTANCE AND GET WEIGHT BOTH RETURN  IF VOXEL DOES NOT EXIST
@@ -63,8 +63,8 @@ class VoxbloxMap {
   const static unsigned char UNSURE_FREE = 4; // NOLINT 
   
   
-  std::shared_ptr<EsdfMap> get_esdf_map_pointer(){ return esdf_map_pointer ; }
-  std::shared_ptr<TsdfMap> get_tsdf_map_pointer(){ return tsdf_map_pointer ; }
+  std::shared_ptr<voxblox::EsdfMap> get_esdf_map_pointer(){ return esdf_map_pointer ; }
+  std::shared_ptr<voxblox::TsdfMap> get_tsdf_map_pointer(){ return tsdf_map_pointer ; }
   double get_voxel_size();
   double get_block_size();
   double get_maximum_weight();
@@ -75,8 +75,11 @@ class VoxbloxMap {
   
 private:
   // esdf server that contains the map, subscribe to external ESDF/TSDF updates
-  std::shared_ptr<EsdfMap> esdf_map_pointer ; // std::shared_ptr<const EsdfMap>
-  std::shared_ptr<TsdfMap> tsdf_map_pointer ; // std::shared_ptr<const TsdfMap>
+  std::shared_ptr<voxblox::EsdfMap> esdf_map_pointer ; // std::shared_ptr<const EsdfMap>
+  std::shared_ptr<voxblox::TsdfMap> tsdf_map_pointer ; // std::shared_ptr<const TsdfMap>
+
+  std::shared_ptr< voxblox::Layer<voxblox::TsdfVoxel> > layer_tsdf_ ;
+  std::shared_ptr< voxblox::Layer<voxblox::EsdfVoxel> > layer_esdf_ ;
 
   // cache constants
   double c_voxel_size_;
