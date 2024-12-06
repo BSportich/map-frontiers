@@ -78,6 +78,9 @@ private:
   std::shared_ptr<voxblox::EsdfMap> esdf_map_pointer ; // std::shared_ptr<const EsdfMap>
   std::shared_ptr<voxblox::TsdfMap> tsdf_map_pointer ; // std::shared_ptr<const TsdfMap>
 
+  std::shared_ptr< voxblox::Layer<voxblox::TsdfVoxel> > layer_tsdf_ ;
+  std::shared_ptr< voxblox::Layer<voxblox::EsdfVoxel> > layer_esdf_ ;
+
   // cache constants
   double c_voxel_size_;
   double c_block_size_;
