@@ -15,9 +15,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone the ROS package from GitHub
-RUN git clone --single-branch --branch dev/avenue https://github.com/BSportich/map-frontiers.git \
+RUN git clone --single-branch --branch test/avenue https://github.com/BSportich/map-frontiers.git \
     && wstool init . /opt/catkin_ws/src/map-frontiers/voxfield_https.rosinstall \
     && wstool update
+
+# Hacky hack
+RUN mkdir /opt/catkin_ws/devel/.private/voxblox_map/include/
 
 # Go back to the workspace root
 WORKDIR /opt/catkin_ws/
