@@ -19,15 +19,16 @@ RUN git clone --single-branch --branch test/avenue https://github.com/BSportich/
     && wstool init . /opt/catkin_ws/src/map-frontiers/voxfield_https.rosinstall \
     && wstool update
 
-# Hacky hack
-RUN mkdir /opt/catkin_ws/devel/.private/voxblox_map/include/
-
 # Go back to the workspace root
 WORKDIR /opt/catkin_ws/
 
 # Initialize and build the Catkin workspace
 RUN catkin config  --extend /opt/ros/noetic \
     && catkin build voxblox_ros 
+
+# # Hacky hack
+RUN mkdir -p /opt/catkin_ws/devel/.private/voxblox_map/include/ \
+    && catkin build map_frontiers
 
 # # Source the setup.bash so that the package is available in the environment
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc

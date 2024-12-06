@@ -31,8 +31,8 @@ VoxbloxMap::VoxbloxMap(FloatingPoint voxel_size, size_t voxels_per_side) {
     esdf_map_pointer = nullptr;
     tsdf_map_pointer = nullptr;
 
-    esdf_map_pointer.reset(new voxblox::EsdfMap(layer_esdf));
-    tsdf_map_pointer.reset(new voxblox::TsdfMap(layer_tsdf));
+    esdf_map_pointer.reset(new voxblox::EsdfMap(layer_esdf_));
+    tsdf_map_pointer.reset(new voxblox::TsdfMap(layer_tsdf_));
 
     m_distance_threshold = 0;
     m_confidence_threshold = 0 ;
