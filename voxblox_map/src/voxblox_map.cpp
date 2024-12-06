@@ -25,8 +25,8 @@ namespace map {
 
 VoxbloxMap::VoxbloxMap(FloatingPoint voxel_size, size_t voxels_per_side): {
 
-    layer_tsdf = Layer<voxblox::TsdfVoxel>(voxel_size, voxels_per_size);
-    layer_esdf = Layer<voxblox::EsdfVoxel>(voxel_size, voxels_per_size);
+    layer_tsdf = voxblox::Layer<voxblox::TsdfVoxel>(voxel_size, voxels_per_size);
+    layer_esdf = voxblox::Layer<voxblox::EsdfVoxel>(voxel_size, voxels_per_size);
 
     esdf_map_pointer = nullptr;
     tsdf_map_pointer = nullptr;
@@ -157,3 +157,5 @@ double VoxbloxMap::getVoxelWeight_TSDF(const Eigen::Vector3d& point) {
 
 // get the maximum allowed weight (return 0 if using uncapped weights)
 double VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }
+
+}

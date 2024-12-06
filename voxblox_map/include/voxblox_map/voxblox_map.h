@@ -63,8 +63,8 @@ class VoxbloxMap {
   const static unsigned char UNSURE_FREE = 4; // NOLINT 
   
   
-  std::shared_ptr<EsdfMap> get_esdf_map_pointer(){ return esdf_map_pointer ; }
-  std::shared_ptr<TsdfMap> get_tsdf_map_pointer(){ return tsdf_map_pointer ; }
+  std::shared_ptr<voxblox::EsdfMap> get_esdf_map_pointer(){ return esdf_map_pointer ; }
+  std::shared_ptr<voxblox::TsdfMap> get_tsdf_map_pointer(){ return tsdf_map_pointer ; }
   double get_voxel_size();
   double get_block_size();
   double get_maximum_weight();
