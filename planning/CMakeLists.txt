@@ -12,6 +12,10 @@ add_definitions(-std=c++14 -Wall -Wextra)
 # LIBRARIES #
 #############
 
+cs_add_library(${PROJECT_NAME}
+  src/NBV_Selector.cpp
+)
+
 ############
 # BINARIES #
 ############
@@ -25,3 +29,4 @@ target_link_libraries(NBV_Selector ${PROJECT_NAME})
 # EXPORT #
 ##########
 cs_install()
+#cs_export()
