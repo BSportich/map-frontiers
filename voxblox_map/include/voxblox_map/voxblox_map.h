@@ -16,7 +16,7 @@
 
 typedef float FloatingPoint;
 
-namespace map {
+namespace voxblox_map {
 
 //BIG NOTE : TRY TO CONST AS MUCH AS POSSIBLE METHODS
 //TO CHANGE GET DISTANCE AND GET WEIGHT BOTH RETURN  IF VOXEL DOES NOT EXIST

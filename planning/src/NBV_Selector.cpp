@@ -7,7 +7,7 @@
 #include "std_msgs/String.h"
 
 #include <voxblox_map/voxblox_map.h>
-
+#include <voxblox_msgs/Layer.h>
 
 struct Frontier
 {
@@ -30,7 +30,7 @@ class NBV_Selector
 {
 private:
     /* data */
-    VoxbloxMap m_map;
+    voxblox_map::VoxbloxMap m_map;
 
 
     ViewGenerator m_view_generator;
@@ -95,7 +95,7 @@ NBV_Selector::NBV_Selector(const ViewGenerator& vg, FloatingPoint voxel_size, si
     m_availability = AVAILABLE;
 
     //map
-    m_map = VoxbloxMap(voxel_size, voxels_per_side);
+    m_map = voxbloxmap::VoxbloxMap(voxel_size, voxels_per_side);
 
     //modules
     m_view_generator(vg);
@@ -155,11 +155,11 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
   if ( m_frontier6 ) {
     for (int i = 0; i < 6; ++i) {
       voxel_state = m_map->getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
-      if (voxel_state == VoxbloxMap::UNKNOWN) {
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         continue;
       }
       if (m_surface_frontiers ) {
-        return voxel_state == VoxbloxMap::OCCUPIED;
+        return voxel_state == voxblox_map::VoxbloxMap::OCCUPIED;
       } else {
         return true;
       }
@@ -167,11 +167,11 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
   } else {
     for (int i = 0; i < 26; ++i) {
       voxel_state = m_map->getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
-      if (voxel_state == VoxbloxMap::UNKNOWN) {
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         continue;
       }
       if ( m_surface_frontiers ) {
-        return voxel_state == VoxbloxMap::OCCUPIED;
+        return voxel_state == voxblox_map::VoxbloxMap::OCCUPIED;
       } else {
         return true;
       }

@@ -2,7 +2,7 @@
 
 //#include "active_3d_planning_core/data/system_constraints.h"
 
-namespace map {
+namespace voxblox_map {
 
 
 
