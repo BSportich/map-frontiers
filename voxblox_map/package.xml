@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>map_frontiers</name>
+  <name>voxblox_map</name>
   <version>0.0.0</version>
-  <description>Map frontiers</description>
+  <description>Voxblox map</description>
 
   <maintainer email="yuepan@student.ethz.ch">Yue Pan</maintainer>
 
@@ -20,7 +20,6 @@
   <depend>sensor_msgs</depend>
   <depend>tf</depend>
   <depend>voxblox</depend>
-  <depend>voxblox_map</depend>
   <depend>voxblox_msgs</depend>
   <depend>voxblox_rviz_plugin</depend>
 </package>
