@@ -88,7 +88,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 {
     n = nh;
     //initialization
-    int vs = 1;
+    int vs = 1;  // voxel temp variable
     m_team_id = team_id ;
     m_team_size = robot_team.size() ;
     m_team = robot_team;
@@ -113,10 +113,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //ros initialization
     // ros::init(argc, argv, "NBV_selector_node robot ");
-    sub_map_tsdf = n.subscribe("tsdf_map_out", 1000, &NBV_Selector::tSDFCallback, this);
-    sub_map_esdf = n.subscribe("esdf_map_out", 1000, &NBV_Selector::eSDFCallback, this);
-    sub_pos = n.subscribe("pos", 1000, &NBV_Selector::posCallback, this);
-    pub_goal = n.advertise<std_msgs::String>("pos_goal", 1000); //to redefine msg type
+    sub_map_tsdf = n.subscribe("tsdf_map_out", 10, &NBV_Selector::tSDFCallback, this);
+    sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
+    sub_pos = n.subscribe("pos", 20, &NBV_Selector::posCallback, this);
+    pub_goal = n.advertise<std_msgs::String>("pos_goal", 20); //to redefine msg type
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
