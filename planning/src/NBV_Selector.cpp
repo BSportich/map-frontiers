@@ -99,8 +99,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //taken for default value in the code of tsdf_map.h and esdf_map.h
     FloatingPoint voxel_size = 0.2;  // in m
     size_t voxels_per_side = 16u;
-    n.param("voxel_size", voxel_size); 
-    n.param("voxels_per_side", voxels_per_side);
+    n.param("voxel_size", voxel_size, voxel_size);
+    n.param("voxels_per_side", voxels_per_side, voxels_per_side);
 
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
