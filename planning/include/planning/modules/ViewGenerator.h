@@ -1,3 +1,4 @@
+#pragma once
 
 #include <String>
 
@@ -36,3 +37,4 @@ ViewGenerator::~ViewGenerator()
 {
 }
 
+#endif
