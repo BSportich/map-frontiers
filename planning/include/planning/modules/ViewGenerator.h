@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <String>
+//#include <string>
 
 struct Frontier
 {
@@ -37,4 +37,3 @@ ViewGenerator::~ViewGenerator()
 {
 }
 
-#endif

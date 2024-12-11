@@ -106,7 +106,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     n.param("voxel_size", voxel_size, voxel_size);
     n.param("voxels_per_side", voxels_per_side, voxels_per_side);
 
-    worldframe_ = "world";
+    world_frame_ = "world";
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
 
@@ -122,7 +122,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
     sub_pos = n.subscribe("pos", 20, &NBV_Selector::posCallback, this);
     pub_goal = n.advertise<std_msgs::String>("pos_goal", 20); //to redefine msg type
-    pub_pointcloud = n_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
+    pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
 
     if(m_frontier6 == true){
@@ -216,7 +216,7 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
   createDistancePointcloudFromTsdfLayer(
       m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_d);
   pointcloud_d.header.frame_id = world_frame_;
-  tsdf_pointcloud_pub_.publish(pointcloud_d);
+  pub_pointcloud.publish(pointcloud_d);
 
   // // Create a pointcloud with gradient direction = intensity.
   // pcl::PointCloud<pcl::PointXYZI> pointcloud_g;
