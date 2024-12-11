@@ -1,6 +1,6 @@
 #pragma once
 
-#include <String>
+//#include <String>
 
 struct Frontier
 {
@@ -25,7 +25,7 @@ public:
     ViewGenerator(/* args */);
     ~ViewGenerator();
 
-    std::string method_type;
+    //std::string method_type;
     
 };
 
