@@ -84,7 +84,7 @@ public:
     ~NBV_Selector();
 };
 
-NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, FloatingPoint voxel_size, size_t voxels_per_side, int team_id, std::vector<int> robot_team)
+NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team)
 {
     n = nh;
     //initialization
@@ -94,6 +94,13 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_team = robot_team;
     // m_team_pos();
     m_availability = AVAILABLE;
+
+    // Get ros params
+    //taken for default value in the code of tsdf_map.h and esdf_map.h
+    FloatingPoint voxel_size = 0.2;  // in m
+    size_t voxels_per_side = 16u;
+    n.param("voxel_size", voxel_size); 
+    n.param("voxels_per_side", voxels_per_side);
 
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
@@ -235,12 +242,10 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
     ViewGenerator vg = ViewGenerator();
-    FloatingPoint voxel_size = 0.2; //taken for default value in the code of tsdf_map.h and esdf_map.h
-    size_t voxels_per_side = 16u ; // taken from default value in the code of tsdf_map.h and esdf_map.h
     int team_id = 1;
     std::vector<int> robot_team ; 
     robot_team.push_back(team_id);
-    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, vg, voxel_size, voxels_per_side, team_id,  robot_team);
+    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, vg, team_id,  robot_team);
     ros::spin();
     return 0;
 }
