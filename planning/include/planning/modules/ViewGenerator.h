@@ -2,20 +2,20 @@
 
 //#include <string>
 
-struct Frontier
-{
-    //position
-    int x;
-    int y;
-    int z;
+// struct Frontier
+// {
+//     //position
+//     int x;
+//     int y;
+//     int z;
 
-    //orientation
-    int q_w ;
-    int q_x;
-    int q_y;
-    int q_z;
+//     //orientation
+//     int q_w ;
+//     int q_x;
+//     int q_y;
+//     int q_z;
 
-};
+// };
 
 class ViewGenerator
 {
