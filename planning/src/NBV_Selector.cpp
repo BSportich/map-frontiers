@@ -67,7 +67,7 @@ private:
 
 public:
     NBV_Selector();
-    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, FloatingPoint voxel_size, size_t voxels_per_side, int team_id, std::vector<int> robot_team);
+    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
 
