@@ -214,7 +214,7 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
   // Create a pointcloud with distance = intensity.
   pcl::PointCloud<pcl::PointXYZI> pointcloud_d;
   createDistancePointcloudFromTsdfLayer(
-      m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_d);
+      *m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_d);
   pointcloud_d.header.frame_id = world_frame_;
   pub_pointcloud.publish(pointcloud_d);
 
