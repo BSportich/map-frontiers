@@ -2,6 +2,14 @@
   <param name="use_sim_time" value="true" />
   <arg name="process_every_nth_frame" default="1" />
 
+  <arg name="voxel_size" default="0.25" />
+  <arg name="voxels_per_side" default="16" />
+
+  <include file="$(find map_frontiers)/launch/NBV_selector.launch">
+    <arg name="voxel_size" value="$(arg voxel_size)"/>
+    <arg name="voxels_per_side" value="$(arg voxels_per_side)"/>
+  </include>
+
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
 
   <!-- Run voxblox_node-->
