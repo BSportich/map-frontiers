@@ -7,6 +7,7 @@
 #include "std_msgs/String.h"
 #include "voxblox/utils/timing.h"
 #include "voxblox_ros/conversions.h"
+#include "voxblox_ros/ptcloud_vis.h"
 #include <voxblox_map/voxblox_map.h>
 #include <voxblox_msgs/Layer.h>
 
@@ -32,7 +33,7 @@ class NBV_Selector
 private:
     /* data */
     voxblox_map::VoxbloxMap m_map;
-
+    std::string world_frame_;
 
     ViewGenerator m_view_generator;
     std::vector<Frontier> frontiers;
@@ -48,6 +49,7 @@ private:
     ros::Subscriber sub_map_esdf;
     ros::Subscriber sub_pos;
     ros::Publisher pub_goal;
+    ros::Publisher pub_pointcloud;
 
     //team analysis
     int m_team_size;
@@ -70,6 +72,8 @@ public:
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
+
+    void publishAllUpdatedTsdfVoxels() ;
 
 
     //Tests functions
@@ -102,6 +106,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     n.param("voxel_size", voxel_size, voxel_size);
     n.param("voxels_per_side", voxels_per_side, voxels_per_side);
 
+    worldframe_ = "world";
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
 
@@ -117,6 +122,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
     sub_pos = n.subscribe("pos", 20, &NBV_Selector::posCallback, this);
     pub_goal = n.advertise<std_msgs::String>("pos_goal", 20); //to redefine msg type
+    pub_pointcloud = n_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
+          "test_point_cloud", 1, true);
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -193,11 +200,30 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 void NBV_Selector::updateFrontiers(){
 
     ROS_INFO("Updated frontiers: %lu found", frontiers.size());
+    
+    
 
 }
 
 NBV_Selector::~NBV_Selector()
 {
+}
+
+
+void NBV_Selector::publishAllUpdatedTsdfVoxels() {
+  // Create a pointcloud with distance = intensity.
+  pcl::PointCloud<pcl::PointXYZI> pointcloud_d;
+  createDistancePointcloudFromTsdfLayer(
+      m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_d);
+  pointcloud_d.header.frame_id = world_frame_;
+  tsdf_pointcloud_pub_.publish(pointcloud_d);
+
+  // // Create a pointcloud with gradient direction = intensity.
+  // pcl::PointCloud<pcl::PointXYZI> pointcloud_g;
+  // createGradientPointcloudFromTsdfLayer(
+  //     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_g);
+  // pointcloud_g.header.frame_id = world_frame_;
+  // gsdf_pointcloud_pub_.publish(pointcloud_g);
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
@@ -210,6 +236,14 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_ERROR_THROTTLE(10, "Got an invalid TSDF map message!");
   } else {
     ROS_INFO_ONCE("Got an TSDF map from ROS topic!");
+    publishAllUpdatedTsdfVoxels();
+    ROS_INFO_ONCE("Published pointclouds");
+
+    //SEND PROCEDURE
+    voxblox_msgs::Layer layer_msg;
+
+
+
     }
   
 
@@ -249,3 +283,5 @@ int main(int argc, char** argv) {
     ros::spin();
     return 0;
 }
+
+
