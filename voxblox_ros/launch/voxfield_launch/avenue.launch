@@ -3,7 +3,7 @@
   <arg name="process_every_nth_frame" default="1" />
 
   <arg name="voxel_size" default="0.25" />
-  <arg name="voxels_per_side" default="16" />
+  <arg name="voxels_per_side" default="8" />
 
   <include file="$(find map_frontiers)/launch/NBV_selector.launch">
     <arg name="voxel_size" value="$(arg voxel_size)"/>
@@ -19,8 +19,17 @@
     <param name="~sensor_frame"           value=""/>
     <!-- TODO: This parameter should always be bigger than the number of drone used in the simulation otherwise some pointclouds msgs will be lost -->
     <param name="pointcloud_queue_size"           value="3"/>
-    <rosparam file="$(find voxblox_ros)/cfg/param/mai_param.yaml"/>
-    <rosparam file="$(find voxblox_ros)/cfg/calib/mai_calib.yaml"/>
+    <rosparam file="$(find voxblox_ros)/cfg/param/avenue_param.yaml"/>
+    <rosparam file="$(find voxblox_ros)/cfg/calib/avenue_calib.yaml"/>
+    <!-- Have to set the following parameters manually but should be improved in ros 2 -->
+    <param name="voxel_size"           value="$(arg voxel_size)"/>
+    <param name="occ_voxel_size"           value="$(arg voxel_size)"/>
+    <param name="tsdf_voxel_size"           value="$(arg voxel_size)"/>
+    <param name="esdf_voxel_size"           value="$(arg voxel_size)"/>
+    <param name="voxels_per_side_in_block"           value="$(arg voxels_per_side)"/>
+    <param name="occ_voxels_per_side"           value="$(arg voxels_per_side)"/>
+    <param name="tsdf_voxels_per_side"           value="$(arg voxels_per_side)"/>
+    <param name="esdf_voxels_per_side"           value="$(arg voxels_per_side)"/>
     <param name="robot_model_file" value="$(arg robot_model_file)"/>
   </node>
 
