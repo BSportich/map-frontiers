@@ -103,8 +103,12 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //taken for default value in the code of tsdf_map.h and esdf_map.h
     double voxel_size = 0.2;  // in m
     int voxels_per_side = 16;
-    n.param("voxel_size", voxel_size, voxel_size);
-    n.param("voxels_per_side", voxels_per_side, voxels_per_side);
+
+    nh_private.param("voxel_size", voxel_size, voxel_size);
+    ROS_INFO("Received voxel_size: %f found", voxel_size);
+
+    nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
+    ROS_INFO("Received voxels_per_side: %lu found", voxels_per_side);
 
     world_frame_ = "world";
     //map
