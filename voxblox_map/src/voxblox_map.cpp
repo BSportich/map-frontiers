@@ -79,7 +79,7 @@ unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
   }
 }
 // get occupancy - use TSDF
-//getDisanceAtPosition unavailable in TSDF_map.h
+//getDistanceAtPosition unavailable in TSDF_map.h
 
 
 // get voxel size 

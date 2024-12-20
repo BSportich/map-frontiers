@@ -70,7 +70,7 @@ private:
 public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
-    void updateFrontiers();
+    //void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
@@ -197,13 +197,39 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 }
 
 
-void NBV_Selector::updateFrontiers(){
+// void NBV_Selector::updateFrontiers(){
 
-    ROS_INFO("Updated frontiers: %lu found", frontiers.size());
+//     ROS_INFO("Updated frontiers: %lu found", frontiers.size());
+
+//     BlockIndexList blocks;
+//     esdf_layer_->getAllAllocatedBlocks(&blocks);
+
+//     // Cache layer settings.
+//     size_t vps = esdf_layer_->voxels_per_side();
+//     size_t num_voxels_per_block = vps * vps * vps;
+
+//     for (const BlockIndex& index : blocks) {
+//     // Iterate over all voxels in said blocks.
+//     const Block<EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
+
+//       Point origin = block.origin();
+
+//       for (size_t linear_index = 0; linear_index < num_voxels_per_block;
+//           ++linear_index) {
+//         Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+//         const EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+
+
+//           block.voxel_size()
+//         double distance;
+//         if (voxel.observed) {
+//           distance = voxel.distance;
+
+//           Eigen::Vector3d(coord.x(), coord.y(), coord.z());
     
     
 
-}
+// }
 
 NBV_Selector::~NBV_Selector()
 {
@@ -233,7 +259,9 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
       voxblox::deserializeMsgToLayer<voxblox::TsdfVoxel>(layer_msg, m_map.get_tsdf_map_pointer()->getTsdfLayerPtr());
 
   if (!success) {
-    ROS_ERROR_THROTTLE(10, "Got an invalid TSDF map message!");
+    ROS_ERROR_THROTTLE(10, "MAP FRONTIERS : Got an invalid TSDF map message!");
+    LOG(ERROR) << "layer_msg voxel size = " << layer_msg.voxel_size << " map layer voxel size = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxel_size();
+    LOG(ERROR) << "layer_msg voxel per side = " << layer_msg.voxels_per_side << " map layer voxel per side = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
   } else {
     ROS_INFO_ONCE("Got an TSDF map from ROS topic!");
     publishAllUpdatedTsdfVoxels();
@@ -257,7 +285,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
       voxblox::deserializeMsgToLayer<voxblox::EsdfVoxel>(layer_msg, m_map.get_esdf_map_pointer()->getEsdfLayerPtr());
 
   if (!success) {
-    ROS_ERROR_THROTTLE(10, "Got an invalid ESDF map message!");
+    ROS_ERROR_THROTTLE(10, "MAP FRONTIERS : Got an invalid ESDF map message!");
   } else {
     ROS_INFO_ONCE("Got an ESDF map from ROS topic!");
     }
