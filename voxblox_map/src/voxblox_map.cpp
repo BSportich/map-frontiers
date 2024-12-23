@@ -25,18 +25,18 @@ namespace voxblox_map {
 
 VoxbloxMap::VoxbloxMap(FloatingPoint voxel_size, size_t voxels_per_side) {
 
-    layer_tsdf_.reset( new voxblox::Layer<voxblox::TsdfVoxel>(voxel_size, voxels_per_side) ) ;
-    layer_esdf_.reset(  new voxblox::Layer<voxblox::EsdfVoxel>(voxel_size, voxels_per_side) );
+    layer_tsdf_.reset(new voxblox::Layer<voxblox::TsdfVoxel>(voxel_size, voxels_per_side));
+    layer_esdf_.reset(new voxblox::Layer<voxblox::EsdfVoxel>(voxel_size, voxels_per_side));
 
     esdf_map_pointer = nullptr;
     tsdf_map_pointer = nullptr;
 
-    esdf_map_pointer.reset( new voxblox::EsdfMap(layer_esdf_) );
-    tsdf_map_pointer.reset( = new voxblox::TsdfMap(layer_tsdf_) );
+    esdf_map_pointer.reset(new voxblox::EsdfMap(layer_esdf_));
+    tsdf_map_pointer.reset(new voxblox::TsdfMap(layer_tsdf_));
 
     m_distance_threshold = 0;
     m_confidence_threshold = 0 ;
-    c_voxel_size_ = voxel_size_;
+    c_voxel_size_ = voxel_size;
     c_block_size_ = voxels_per_side;
 
 }
@@ -79,7 +79,7 @@ unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
   }
 }
 // get occupancy - use TSDF
-//getDisanceAtPosition unavailable in TSDF_map.h
+//getDistanceAtPosition unavailable in TSDF_map.h
 
 
 // get voxel size 
