@@ -37,6 +37,8 @@ private:
 
     ViewGenerator m_view_generator;
     std::vector<Frontier> frontiers;
+    std::vector<Eigen::Vector3d> frontiers_set ; 
+    pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
     bool m_frontier6;
     bool m_surface_frontiers;
     Frontier m_current_goal;
@@ -50,6 +52,7 @@ private:
     ros::Subscriber sub_pos;
     ros::Publisher pub_goal;
     ros::Publisher pub_pointcloud;
+    ros::Publisher pub_frontiers;
 
     //team analysis
     int m_team_size;
@@ -114,7 +117,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     // m_view_generator(vg);
 
     //frontiers
-    // frontiers();
+    frontiers_set = std::vector<Eigen::Vector3d>();
+    frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB> pointcloud(); 
+
+
 
     //ros initialization
     // ros::init(argc, argv, "NBV_selector_node robot ");
@@ -124,6 +130,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_goal = n.advertise<std_msgs::String>("pos_goal", 20); //to redefine msg type
     pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
+    pub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
+          "frontiers_point_cloud", 1, true);
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -197,39 +205,53 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 }
 
 
-// void NBV_Selector::updateFrontiers(){
+void NBV_Selector::updateFrontiers(){
 
-//     ROS_INFO("Updated frontiers: %lu found", frontiers.size());
+    ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
 
-//     BlockIndexList blocks;
-//     esdf_layer_->getAllAllocatedBlocks(&blocks);
+    BlockIndexList blocks;
+    esdf_layer_->getAllAllocatedBlocks(&blocks);
+    frontiers_pointcloud.clear();
 
-//     // Cache layer settings.
-//     size_t vps = esdf_layer_->voxels_per_side();
-//     size_t num_voxels_per_block = vps * vps * vps;
+    // Cache layer settings.
+    size_t vps = esdf_layer_->voxels_per_side();
+    size_t num_voxels_per_block = vps * vps * vps;
 
-//     for (const BlockIndex& index : blocks) {
-//     // Iterate over all voxels in said blocks.
-//     const Block<EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
+    for (const BlockIndex& index : blocks) {
+    // Iterate over all voxels in said blocks.
+    const Block<EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
 
-//       Point origin = block.origin();
+      Point origin = block.origin();
 
-//       for (size_t linear_index = 0; linear_index < num_voxels_per_block;
-//           ++linear_index) {
-//         Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
-//         const EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+      for (size_t linear_index = 0; linear_index < num_voxels_per_block;
+          ++linear_index) {
+        Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+        const EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+        Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
+        if ( isFrontierVoxel(coord_3d)){
+          frontiers_set.insert( coord_3d )
 
-//           block.voxel_size()
-//         double distance;
-//         if (voxel.observed) {
-//           distance = voxel.distance;
+          pcl::PointXYZRGB point;
+          point.x = coord.x();
+          point.y = coord.y();
+          point.z = coord.z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          frontiers_pointcloud.push_back(point);
+        }
 
-//           Eigen::Vector3d(coord.x(), coord.y(), coord.z());
+      }
+
+      ROS_INFO_ONCE("Frontiers updated!");
+
+    //block.voxel_size()
+    }
+
     
-    
 
-// }
+}
 
 NBV_Selector::~NBV_Selector()
 {
@@ -250,6 +272,12 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
   //     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_g);
   // pointcloud_g.header.frame_id = world_frame_;
   // gsdf_pointcloud_pub_.publish(pointcloud_g);
+}
+
+void NBV_Selector::publish_all_frontiers(){
+  frontiers_pointcloud.header.frame_id = world_frame_;
+  pub_frontiers.publish(frontiers_pointcloud);
+
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
@@ -288,6 +316,12 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_ERROR_THROTTLE(10, "MAP FRONTIERS : Got an invalid ESDF map message!");
   } else {
     ROS_INFO_ONCE("Got an ESDF map from ROS topic!");
+    ROS_INFO_ONCE("Frontiers updating ...");
+    updateFrontiers()
+    ROS_INFO_ONCE("Frontiers publishing ...");
+    publish_all_frontiers()
+    ROS_INFO_ONCE("Frontiers published !");
+
     }
   
 
