@@ -37,6 +37,8 @@ private:
 
     ViewGenerator m_view_generator;
     std::vector<Frontier> frontiers;
+    std::vector<Eigen::Vector3d> frontiers_set ; 
+    pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
     bool m_frontier6;
     bool m_surface_frontiers;
     Frontier m_current_goal;
@@ -50,6 +52,7 @@ private:
     ros::Subscriber sub_pos;
     ros::Publisher pub_goal;
     ros::Publisher pub_pointcloud;
+    ros::Publisher pub_frontiers;
 
     //team analysis
     int m_team_size;
@@ -70,10 +73,12 @@ private:
 public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
-    //void updateFrontiers();
+    void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
+    bool isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
+    void publish_all_frontiers();
 
 
     //Tests functions
@@ -103,8 +108,12 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //taken for default value in the code of tsdf_map.h and esdf_map.h
     double voxel_size = 0.2;  // in m
     int voxels_per_side = 16;
-    n.param("voxel_size", voxel_size, voxel_size);
-    n.param("voxels_per_side", voxels_per_side, voxels_per_side);
+
+    nh_private.param("voxel_size", voxel_size, voxel_size);
+    ROS_INFO("Received voxel_size: %f found", voxel_size);
+
+    nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
+    ROS_INFO("Received voxels_per_side: %i found", voxels_per_side);
 
     world_frame_ = "world";
     //map
@@ -114,7 +123,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     // m_view_generator(vg);
 
     //frontiers
-    // frontiers();
+    frontiers_set = std::vector<Eigen::Vector3d>();
+    frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
+
+
 
     //ros initialization
     // ros::init(argc, argv, "NBV_selector_node robot ");
@@ -124,6 +136,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_goal = n.advertise<std_msgs::String>("pos_goal", 20); //to redefine msg type
     pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
+    pub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
+          "frontiers_point_cloud", 1, true);
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -196,40 +210,120 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 
 }
 
+bool NBV_Selector::isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel){
+  unsigned char voxel_state;
+  unsigned char current_state;
+  bool is_surface = false;
+  bool close_unknown = false;
+  bool close_empty = false; 
+  if ( m_frontier6 ) {
 
-// void NBV_Selector::updateFrontiers(){
+    current_state = m_map.getVoxelState_ESDF(voxel);
+    if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
+      is_surface = true;
+    } 
+    else{
+      return false;
+    }
+    for (int i = 0; i < 6; ++i) {
 
-//     ROS_INFO("Updated frontiers: %lu found", frontiers.size());
+      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+        close_unknown = true;
+        continue;
+      }
+      if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+        close_empty = true;
+        continue;
+      }
+    }
 
-//     BlockIndexList blocks;
-//     esdf_layer_->getAllAllocatedBlocks(&blocks);
+    if(is_surface && close_unknown && close_empty){
+      return true;
+    }
+    return false;
+  } else {
 
-//     // Cache layer settings.
-//     size_t vps = esdf_layer_->voxels_per_side();
-//     size_t num_voxels_per_block = vps * vps * vps;
+    current_state = m_map.getVoxelState_ESDF(voxel);
+    if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
+      is_surface = true;
+    } 
+    else{
+      return false;
+    }
 
-//     for (const BlockIndex& index : blocks) {
-//     // Iterate over all voxels in said blocks.
-//     const Block<EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
-
-//       Point origin = block.origin();
-
-//       for (size_t linear_index = 0; linear_index < num_voxels_per_block;
-//           ++linear_index) {
-//         Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
-//         const EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+    for (int i = 0; i < 26; ++i) {
 
 
-//           block.voxel_size()
-//         double distance;
-//         if (voxel.observed) {
-//           distance = voxel.distance;
+      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+        close_unknown = true;
+        continue;
+      }
+      if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+        close_empty = true;
+        continue;
+      }
 
-//           Eigen::Vector3d(coord.x(), coord.y(), coord.z());
+    }
+
+
+    if(is_surface && close_unknown && close_empty){
+      return true;
+    }
+    return false;
+  }
+
+}
+
+
+void NBV_Selector::updateFrontiers(){
+
+    ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
+
+    voxblox::BlockIndexList blocks;
+    m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
+    frontiers_pointcloud.clear();
+
+    // Cache layer settings.
+    size_t vps = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->voxels_per_side();
+    size_t num_voxels_per_block = vps * vps * vps;
+
+    for (const voxblox::BlockIndex& index : blocks) {
+    // Iterate over all voxels in said blocks.
+    const voxblox::Block<voxblox::EsdfVoxel>& block = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getBlockByIndex(index);
+
+      voxblox::Point origin = block.origin();
+
+      for (size_t linear_index = 0; linear_index < num_voxels_per_block;
+          ++linear_index) {
+        voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+        const voxblox::EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+        Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
+
+        if ( isFrontierVoxel_ESDF(coord_3d)){
+          frontiers_set.push_back( coord_3d );
+
+          pcl::PointXYZRGB point;
+          point.x = coord.x();
+          point.y = coord.y();
+          point.z = coord.z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          frontiers_pointcloud.push_back(point);
+        }
+
+      }
+
+      ROS_INFO_ONCE("Frontiers updated!");
+
+    //block.voxel_size()
+    }
+
     
-    
 
-// }
+ }
 
 NBV_Selector::~NBV_Selector()
 {
@@ -250,6 +344,12 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
   //     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr(), &pointcloud_g);
   // pointcloud_g.header.frame_id = world_frame_;
   // gsdf_pointcloud_pub_.publish(pointcloud_g);
+}
+
+void NBV_Selector::publish_all_frontiers(){
+  frontiers_pointcloud.header.frame_id = world_frame_;
+  pub_frontiers.publish(frontiers_pointcloud);
+
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
@@ -288,6 +388,12 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_ERROR_THROTTLE(10, "MAP FRONTIERS : Got an invalid ESDF map message!");
   } else {
     ROS_INFO_ONCE("Got an ESDF map from ROS topic!");
+    ROS_INFO_ONCE("Frontiers updating ...");
+    updateFrontiers();
+    ROS_INFO_ONCE("Frontiers publishing ...");
+    publish_all_frontiers();
+    ROS_INFO_ONCE("Frontiers published !");
+
     }
   
 
