@@ -73,10 +73,11 @@ private:
 public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
-    //void updateFrontiers();
+    void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
+    void publish_all_frontiers()
 
 
     //Tests functions
@@ -118,7 +119,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
-    frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB> pointcloud(); 
+    frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
 
 
 
@@ -204,12 +205,78 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 
 }
 
+bool NBV_Selector::isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel){
+  unsigned char voxel_state;
+  unsigned_char current_state;
+  bool is_surface = false;
+  bool close_unknown = false;
+  bool close_empty = false; 
+  if ( m_frontier6 ) {
+
+    current_state = m_map.getVoxelState_ESDF(voxel);
+    if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
+      is_surface = true;
+    } 
+    else{
+      return false;
+    }
+    for (int i = 0; i < 6; ++i) {
+
+      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+        close_unknown = true;
+        continue;
+      }
+      if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+        close_empty = true;
+        continue;
+      }
+    }
+
+    if(is_surface && close_unknown && close_empty){
+      return true;
+    }
+    return false;
+  } else {
+
+    current_state = m_map.getVoxelState_ESDF(voxel);
+    if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
+      is_surface = true;
+    } 
+    else{
+      return false;
+    }
+
+    for (int i = 0; i < 26; ++i) {
+
+
+      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+        close_unknown = true;
+        continue;
+      }
+      if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+        close_empty = true;
+        continue;
+      }
+
+    }
+
+
+    if(is_surface && close_unknown && close_empty){
+      return true;
+    }
+    return false;
+  }
+
+}
+
 
 void NBV_Selector::updateFrontiers(){
 
     ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
 
-    BlockIndexList blocks;
+    voxblox::BlockIndexList blocks;
     esdf_layer_->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
 
@@ -219,18 +286,18 @@ void NBV_Selector::updateFrontiers(){
 
     for (const BlockIndex& index : blocks) {
     // Iterate over all voxels in said blocks.
-    const Block<EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
+    const Block<voxblox::EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
 
-      Point origin = block.origin();
+      voxblox::Point origin = block.origin();
 
       for (size_t linear_index = 0; linear_index < num_voxels_per_block;
           ++linear_index) {
-        Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
-        const EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+        voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+        const voxblox::EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        if ( isFrontierVoxel(coord_3d)){
-          frontiers_set.insert( coord_3d )
+        if ( isFrontierVoxel_ESDF(coord_3d)){
+          frontiers_set.push_back( coord_3d )
 
           pcl::PointXYZRGB point;
           point.x = coord.x();
@@ -317,9 +384,9 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
   } else {
     ROS_INFO_ONCE("Got an ESDF map from ROS topic!");
     ROS_INFO_ONCE("Frontiers updating ...");
-    updateFrontiers()
+    updateFrontiers();
     ROS_INFO_ONCE("Frontiers publishing ...");
-    publish_all_frontiers()
+    publish_all_frontiers();
     ROS_INFO_ONCE("Frontiers published !");
 
     }
