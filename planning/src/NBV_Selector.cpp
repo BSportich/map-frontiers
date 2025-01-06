@@ -74,11 +74,11 @@ public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
-    void publish_all_frontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
+    bool isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
-    void publish_all_frontiers()
+    void publish_all_frontiers();
 
 
     //Tests functions
@@ -113,7 +113,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     ROS_INFO("Received voxel_size: %f found", voxel_size);
 
     nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
-    ROS_INFO("Received voxels_per_side: %lu found", voxels_per_side);
+    ROS_INFO("Received voxels_per_side: %i found", voxels_per_side);
 
     world_frame_ = "world";
     //map
@@ -212,7 +212,7 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 
 bool NBV_Selector::isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel){
   unsigned char voxel_state;
-  unsigned_char current_state;
+  unsigned char current_state;
   bool is_surface = false;
   bool close_unknown = false;
   bool close_empty = false; 
