@@ -74,6 +74,7 @@ public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
+    void publish_all_frontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
@@ -277,16 +278,16 @@ void NBV_Selector::updateFrontiers(){
     ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
 
     voxblox::BlockIndexList blocks;
-    esdf_layer_->getAllAllocatedBlocks(&blocks);
+    m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
 
     // Cache layer settings.
-    size_t vps = esdf_layer_->voxels_per_side();
+    size_t vps = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->voxels_per_side();
     size_t num_voxels_per_block = vps * vps * vps;
 
-    for (const BlockIndex& index : blocks) {
+    for (const voxblox::BlockIndex& index : blocks) {
     // Iterate over all voxels in said blocks.
-    const Block<voxblox::EsdfVoxel>& block = esdf_layer_->getBlockByIndex(index);
+    const voxblox::Block<voxblox::EsdfVoxel>& block = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getBlockByIndex(index);
 
       voxblox::Point origin = block.origin();
 
@@ -297,7 +298,7 @@ void NBV_Selector::updateFrontiers(){
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
         if ( isFrontierVoxel_ESDF(coord_3d)){
-          frontiers_set.push_back( coord_3d )
+          frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;
           point.x = coord.x();

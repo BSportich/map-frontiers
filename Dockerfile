@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone the ROS package from GitHub
-RUN git clone --single-branch --branch dev/avenue https://github.com/BSportich/map-frontiers.git \
+RUN git clone --single-branch --branch paris_mix https://github.com/BSportich/map-frontiers.git \
     && wstool init . /opt/catkin_ws/src/map-frontiers/voxfield_https.rosinstall \
     && wstool update
 
@@ -25,6 +25,10 @@ WORKDIR /opt/catkin_ws/
 # Initialize and build the Catkin workspace
 RUN catkin config  --extend /opt/ros/noetic \
     && catkin build voxblox_ros 
+
+# # Hacky hack
+RUN mkdir -p /opt/catkin_ws/devel/.private/voxblox_map/include/ \
+    && catkin build map_frontiers
 
 # # Source the setup.bash so that the package is available in the environment
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
