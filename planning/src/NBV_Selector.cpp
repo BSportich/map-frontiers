@@ -232,10 +232,14 @@ bool NBV_Selector::isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel){
         close_unknown = true;
         continue;
       }
-      if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+      else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
         close_empty = true;
         continue;
+      } else {
+      return false;
       }
+
+
     }
 
     if(is_surface && close_unknown && close_empty){
@@ -260,9 +264,11 @@ bool NBV_Selector::isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel){
         close_unknown = true;
         continue;
       }
-      if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+      else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
         close_empty = true;
         continue;
+      } else {
+        return false;
       }
 
     }
@@ -301,7 +307,7 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        if ( isFrontierVoxel_ESDF(coord_3d)){
+        if ( isFrontierVoxel_ESDF_2(coord_3d)){
           frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;

@@ -1,29 +1,59 @@
 #pragma once
+#include <Eigen/Eigen>
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <voxblox_map/voxblox_map.h>
 
-//#include <string>
 
-// struct Frontier
-// {
-//     //position
-//     int x;
-//     int y;
-//     int z;
+struct ViewCandidate
+{
+    //position
+    int x;
+    int y;
+    int z;
 
-//     //orientation
-//     int q_w ;
-//     int q_x;
-//     int q_y;
-//     int q_z;
+    //orientation
+    int q_w ;
+    int q_x;
+    int q_y;
+    int q_z;
 
-// };
+    //origin of the generation
+    int o_x;
+    int o_y;
+    int o_z;
+
+};
 
 class ViewGenerator
 {
 private:
     /* data */
+    String m_method_type;
+    std::vector<ViewCandidate> view_candidates;
+    float m_distance_max; // max sampling distance from the frontiers
+    float m_distance_min; // min sampling distance from the frontiers
+    voxblox_map::VoxbloxMap m_map;
+
 public:
-    ViewGenerator(/* args */);
+    ViewGenerator(float distance_min, float distance_max, String method_type);
+    ViewGenerator();
     ~ViewGenerator();
+
+    void generateViews(std::vector<Eigen::Vector3d> frontiers_set);
+    void generateViews_sphere(std::vector<Eigen::Vector3d> frontiers_set);
+    void generateViews_echo(std::vector<Eigen::Vector3d> frontiers_set);
+    void generateViews_normals(std::vector<Eigen::Vector3d> frontiers_set);
+    void generateViews_gradients(std::vector<Eigen::Vector3d> frontiers_set);
+    
+
+    std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
+    String getMethod_type(){ return method-type; } ;
+
+
+
+    
 
     //std::string method_type;
     
