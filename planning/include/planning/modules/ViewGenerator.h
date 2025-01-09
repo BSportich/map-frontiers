@@ -49,7 +49,7 @@ public:
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
-    std::string getMethod_type(){ return method-type; } ;
+    std::string getMethod_type(){ return m_method_type; } ;
 
 
 
@@ -59,11 +59,4 @@ public:
     
 };
 
-ViewGenerator::ViewGenerator(/* args */)
-{
-}
-
-ViewGenerator::~ViewGenerator()
-{
-}
 
