@@ -59,4 +59,11 @@ public:
     
 };
 
+ViewGenerator::ViewGenerator(/* args */)
+{
+}
+
+ViewGenerator::~ViewGenerator()
+{
+}
 
