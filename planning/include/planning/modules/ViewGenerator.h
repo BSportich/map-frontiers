@@ -30,14 +30,14 @@ class ViewGenerator
 {
 private:
     /* data */
-    String m_method_type;
+    std::string m_method_type;
     std::vector<ViewCandidate> view_candidates;
     float m_distance_max; // max sampling distance from the frontiers
     float m_distance_min; // min sampling distance from the frontiers
     voxblox_map::VoxbloxMap m_map;
 
 public:
-    ViewGenerator(float distance_min, float distance_max, String method_type);
+    ViewGenerator(float distance_min, float distance_max, std::string method_type);
     ViewGenerator();
     ~ViewGenerator();
 
@@ -49,7 +49,7 @@ public:
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
-    String getMethod_type(){ return method-type; } ;
+    std::string getMethod_type(){ return method-type; } ;
 
 
 

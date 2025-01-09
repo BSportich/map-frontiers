@@ -6,7 +6,7 @@ ViewGenerator::ViewGenerator(float distance_min, float distance_max){
     ViewGenerator("sphere", distance_min, distance_max);
 }
 
-ViewGenerator::ViewGenerator(const String& method_name, float distance_min, float distance_max){
+ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max){
     m_method_type = method_name;
     m_distance_max = distance_max;
     m_distance_min = m_distance_min;
