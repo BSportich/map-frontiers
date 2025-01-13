@@ -65,6 +65,7 @@ bool VoxbloxMap::isObserved_ESDF(const Eigen::Vector3d& point) {
 
 
 // get occupancy - use ESDF
+//inappropriate !!! 
 unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
   double distance = 0.0;
   if (esdf_map_pointer->getDistanceAtPosition(point, &distance)) {
@@ -80,6 +81,22 @@ unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
 }
 // get occupancy - use TSDF
 //getDistanceAtPosition unavailable in TSDF_map.h
+
+//THIS FUNCTION SHOULD BE USED FOR FRONTIERS DETECTION !! 
+unsigned char VoxbloxMap::getVoxelState_TSDF(const Eigen::Vector3d& point) {
+  double distance = getVoxelDistance_TSDF(point);
+  double weight = getVoxelWeight_TSDF(point);
+  if (weight > 0.0) {
+    // This means the voxel is observed
+    if (distance < c_voxel_size_) {
+      return VoxbloxMap::OCCUPIED;
+    } else {
+      return VoxbloxMap::FREE;
+    }
+  } else {
+    return VoxbloxMap::UNKNOWN;
+  }
+}
 
 
 // get voxel size 

@@ -284,14 +284,14 @@ bool NBV_Selector::isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel){
 }
 
 
-bool NBV_Selector::isFrontierVoxel_ESDF_3(const Eigen::Vector3d& voxel){
+bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
   unsigned char voxel_state;
   unsigned char current_state;
   bool is_empty = false;
   bool close_unknown = false;
   bool close_occupied = false; 
 
-    current_state = m_map.getVoxelState_ESDF(voxel);
+    current_state = m_map.getVoxelState_TSDF(voxel);
     if( current_state == voxblox_map::VoxbloxMap::FREE){
       is_empty = true;
     } 
@@ -302,7 +302,7 @@ bool NBV_Selector::isFrontierVoxel_ESDF_3(const Eigen::Vector3d& voxel){
 
     for (int i = 0; i < 6; ++i) {
 
-      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         close_unknown = true;
       }
@@ -314,7 +314,7 @@ bool NBV_Selector::isFrontierVoxel_ESDF_3(const Eigen::Vector3d& voxel){
     for (int i = 6; i < 26; ++i) {
 
 
-      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
       if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
         close_occupied = true;
 
@@ -323,7 +323,8 @@ bool NBV_Selector::isFrontierVoxel_ESDF_3(const Eigen::Vector3d& voxel){
     }
 
 
-    if(is_empty && close_unknown && close_occupied){
+    //if(is_empty && close_unknown && close_occupied){
+    if(is_empty){
       return true;
     }
     return false;
@@ -356,7 +357,7 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        if ( isFrontierVoxel_ESDF_3(coord_3d)){
+        if ( isFrontierVoxel_TSDF_3(coord_3d)){
           frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;
