@@ -292,7 +292,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
   bool close_occupied = false; 
 
     current_state = m_map.getVoxelState_TSDF(voxel);
-    if( current_state == voxblox_map::VoxbloxMap::UNKNOWN){
+    if( current_state == voxblox_map::VoxbloxMap::FREE){
       return true;
     } 
     else{
