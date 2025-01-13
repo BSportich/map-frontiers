@@ -340,7 +340,7 @@ void NBV_Selector::updateFrontiers(){
     voxblox::BlockIndexList blocks;
     m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
-    frontiers_set.clear();
+    //frontiers_set.clear();
 
     // Cache layer settings.
     size_t vps = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->voxels_per_side();
