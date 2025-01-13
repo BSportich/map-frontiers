@@ -338,24 +338,24 @@ void NBV_Selector::updateFrontiers(){
     ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
 
     voxblox::BlockIndexList blocks;
-    m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
+    m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
     //frontiers_set.clear();
 
     // Cache layer settings.
-    size_t vps = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->voxels_per_side();
+    size_t vps = m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
     size_t num_voxels_per_block = vps * vps * vps;
 
     for (const voxblox::BlockIndex& index : blocks) {
     // Iterate over all voxels in said blocks.
-    const voxblox::Block<voxblox::EsdfVoxel>& block = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getBlockByIndex(index);
+    const voxblox::Block<voxblox::TsdfVoxel>& block = m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getBlockByIndex(index);
 
       voxblox::Point origin = block.origin();
 
       for (size_t linear_index = 0; linear_index < num_voxels_per_block;
           ++linear_index) {
         voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
-        const voxblox::EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+        const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
         if ( isFrontierVoxel_TSDF_3(coord_3d)){
