@@ -36,6 +36,7 @@ class VoxbloxMap {
 
   // get occupancy
   unsigned char getVoxelState_ESDF(const Eigen::Vector3d& point) ;
+  unsigned char getVoxelState_TSDF(const Eigen::Vector3d& point);
 
   // get voxel size
   double getVoxelSize() ;

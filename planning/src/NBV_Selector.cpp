@@ -76,7 +76,7 @@ public:
     void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
     bool isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel);
-    bool isFrontierVoxel_ESDF_3(const Eigen::Vector3d& voxel);
+    bool isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
     void publish_all_frontiers();
