@@ -323,8 +323,8 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
     }
 
 
-    //if(is_empty && close_unknown && close_occupied){
-    if(is_empty){
+    if(is_empty && close_unknown && close_occupied){
+    //if(is_empty){
       return true;
     }
     return false;
