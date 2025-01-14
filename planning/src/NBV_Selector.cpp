@@ -75,7 +75,7 @@ public:
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
-    bool isFrontierVoxel_ESDF_2(const Eigen::Vector3d& voxel);
+    bool isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel);
     bool isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
@@ -219,7 +219,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
   bool close_empty = false; 
   if ( m_frontier6 ) {
 
-    current_state = m_map.getVoxelState_ESDF(voxel);
+    current_state = m_map.getVoxelState_TSDF(voxel);
     if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
       is_surface = true;
     } 
