@@ -267,10 +267,10 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
 
     }
 
-    if(is_surface){
+    //if(is_surface){
     //if(is_surface && close_unknown && close_empty){
       return true;
-    }
+    //}
     return false;
   }
 
