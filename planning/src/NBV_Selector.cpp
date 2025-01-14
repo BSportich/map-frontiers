@@ -299,42 +299,42 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
       return false;
     }
 
-    // if( current_state == voxblox_map::VoxbloxMap::FREE){
-    //   is_empty = true;
-    // } 
-    // else{
-    //   return false;
-    // }
+    if( current_state == voxblox_map::VoxbloxMap::FREE){
+      is_empty = true;
+    } 
+    else{
+      return false;
+    }
 
 
-    // for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 6; ++i) {
 
-    //   voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
-    //   if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-    //     close_unknown = true;
-    //   }
-
-
-    // }
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+        close_unknown = true;
+      }
 
 
-    // for (int i = 6; i < 26; ++i) {
+    }
 
 
-    //   voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
-    //   if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
-    //     close_occupied = true;
-
-    //   } 
-
-    // }
+    for (int i = 6; i < 26; ++i) {
 
 
-    // if(is_empty && close_unknown && close_occupied){
-    // //if(is_empty){
-    //   return true;
-    // }
-    // return false;
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
+      if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
+        close_occupied = true;
+
+      } 
+
+    }
+
+
+    if(is_empty && close_unknown && close_occupied){
+    //if(is_empty){
+      return true;
+    }
+    return false;
   }
 
 
