@@ -104,6 +104,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_team = robot_team;
     // m_team_pos();
     m_availability = AVAILABLE;
+    m_frontier6 = false;
 
     // Get ros params
     //taken for default value in the code of tsdf_map.h and esdf_map.h
@@ -231,11 +232,9 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
       voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         close_unknown = true;
-        continue;
       }
       else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
         close_empty = true;
-        continue;
       } 
 
 
@@ -261,11 +260,9 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
       voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         close_unknown = true;
-        continue;
       }
       else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
         close_empty = true;
-        continue;
       } 
 
     }
