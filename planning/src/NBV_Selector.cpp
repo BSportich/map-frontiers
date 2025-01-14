@@ -236,9 +236,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
       else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
         close_empty = true;
         continue;
-      } else {
-      return false;
-      }
+      } 
 
 
     }
@@ -268,9 +266,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
       else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
         close_empty = true;
         continue;
-      } else {
-        return false;
-      }
+      } 
 
     }
 
