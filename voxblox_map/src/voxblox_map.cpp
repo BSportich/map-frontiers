@@ -86,7 +86,7 @@ unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
 unsigned char VoxbloxMap::getVoxelState_TSDF(const Eigen::Vector3d& point) {
   double distance = getVoxelDistance_TSDF(point);
   double weight = getVoxelWeight_TSDF(point);
-  double threshold = 0.3 ; 
+  double threshold = 0.0 ; 
   if (weight > threshold) {
     // This means the voxel is observed
     if (distance < c_voxel_size_) {
