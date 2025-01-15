@@ -268,7 +268,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
     }
 
     //if(is_surface){
-    //if(is_surface && close_unknown && close_empty){
+    if(is_surface && close_unknown && close_empty){
       return true;
     //}
     return false;
@@ -315,8 +315,8 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
     }
 
 
-    if(is_empty && close_unknown && close_occupied){
-    //if(is_empty){
+    //if(is_empty && close_unknown && close_occupied){
+    if(is_empty){
       return true;
     }
     return false;
@@ -350,7 +350,7 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        if ( isFrontierVoxel_TSDF_3(coord_3d)){
+        if ( isFrontierVoxel_TSDF_2(coord_3d)){
           frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;
