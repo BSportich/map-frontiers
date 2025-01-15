@@ -450,6 +450,8 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
 
 void NBV_Selector::publish_all_frontiers(){
   frontiers_pointcloud.header.frame_id = world_frame_;
+  values_for_eval_pointcloud.header.frame_id = world_frame;
+  values_for_eval_pointcloud2.header.frame_id = world_frame;
   pub_frontiers.publish(frontiers_pointcloud);
   pub_test_values.publish( values_for_eval_pointcloud);
   pub_test_values2.publish( values_for_eval_pointcloud2);
