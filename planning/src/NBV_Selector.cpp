@@ -326,7 +326,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
     }
 
 
-    for (int i = 6; i < 6; ++i) {
+    for (int i = 0; i < 6; ++i) {
 
 
       voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
