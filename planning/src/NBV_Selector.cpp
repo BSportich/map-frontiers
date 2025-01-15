@@ -350,6 +350,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
 
 void NBV_Selector::updateFrontiers(){
 
+    unsigned char current_state;
     ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
 
     voxblox::BlockIndexList blocks;
@@ -389,7 +390,7 @@ void NBV_Selector::updateFrontiers(){
         }
 
         //empty pointcloud
-        current_state = m_map.getVoxelState_TSDF(coord_3D);
+        current_state = m_map.getVoxelState_TSDF(coord_3d);
         if ( current_state == voxblox_map::VoxbloxMap::FREE ){
 
           pcl::PointXYZRGB point;
