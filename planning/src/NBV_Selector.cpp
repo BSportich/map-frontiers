@@ -39,6 +39,8 @@ private:
     std::vector<Frontier> frontiers;
     std::vector<Eigen::Vector3d> frontiers_set ; 
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
+    pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud ; 
+    pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud2 ; 
     bool m_frontier6;
     bool m_surface_frontiers;
     Frontier m_current_goal;
@@ -53,6 +55,16 @@ private:
     ros::Publisher pub_goal;
     ros::Publisher pub_pointcloud;
     ros::Publisher pub_frontiers;
+    ros::Publisher pub_test_values;
+    ros::Publisher pub_test_values2;
+
+    //map parameters
+    float z_max;
+    float z_min;
+    float y_max;
+    float y_min;
+    float x_max;
+    float x_min;
 
     //team analysis
     int m_team_size;
@@ -77,6 +89,8 @@ public:
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
     bool isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel);
     bool isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel);
+
+    bool isInBoundingBox(const Eigen::Vector3d& voxel);
 
     void publishAllUpdatedTsdfVoxels() ;
     void publish_all_frontiers();
@@ -127,6 +141,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
     frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
+    values_for_eval_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
+    values_for_eval_pointcloud2 = pcl::PointCloud<pcl::PointXYZRGB>(); 
 
 
 
@@ -140,6 +156,12 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
           "test_point_cloud", 1, true);
     pub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "frontiers_point_cloud", 1, true);
+
+    pub_test_values = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
+          "empty_point_cloud", 1, true);
+    
+    pub_test_values2 = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
+          "unknown_point_cloud", 1, true);
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -284,6 +306,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
   bool close_unknown = false;
   bool close_occupied = false; 
 
+  current_state = m_map.getVoxelState_TSDF(voxel);
     if( current_state == voxblox_map::VoxbloxMap::FREE){
       is_empty = true;
     } 
@@ -332,6 +355,8 @@ void NBV_Selector::updateFrontiers(){
     voxblox::BlockIndexList blocks;
     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
+    values_for_eval_pointcloud.clear();
+    values_for_eval_pointcloud2.clear();
     //frontiers_set.clear();
 
     // Cache layer settings.
@@ -361,6 +386,33 @@ void NBV_Selector::updateFrontiers(){
           point.g = 0;
           point.b = 0;
           frontiers_pointcloud.push_back(point);
+        }
+
+        //empty pointcloud
+        current_state = m_map.getVoxelState_TSDF(coord_3D);
+        if ( current_state == voxblox_map::VoxbloxMap::FREE ){
+
+          pcl::PointXYZRGB point;
+          point.x = coord.x();
+          point.y = coord.y();
+          point.z = coord.z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          values_for_eval_pointcloud.push_back(point);
+        }
+
+        //unknown pointcloud
+        if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
+
+          pcl::PointXYZRGB point;
+          point.x = coord.x();
+          point.y = coord.y();
+          point.z = coord.z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          values_for_eval_pointcloud2.push_back(point);
         }
 
       }
@@ -398,6 +450,8 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
 void NBV_Selector::publish_all_frontiers(){
   frontiers_pointcloud.header.frame_id = world_frame_;
   pub_frontiers.publish(frontiers_pointcloud);
+  pub_test_values.publish( values_for_eval_pointcloud);
+  pub_test_values2.publish( values_for_eval_pointcloud2);
 
 }
 
