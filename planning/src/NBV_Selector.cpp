@@ -11,22 +11,6 @@
 #include <voxblox_map/voxblox_map.h>
 #include <voxblox_msgs/Layer.h>
 
-struct Frontier
-{
-    //position
-    int x;
-    int y;
-    int z;
-
-    //orientation
-    int q_w ;
-    int q_x;
-    int q_y;
-    int q_z;
-
-};
-
-
 
 class NBV_Selector
 {
@@ -36,29 +20,39 @@ private:
     std::string world_frame_;
 
     ViewGenerator m_view_generator;
-    std::vector<Frontier> frontiers;
-    std::vector<Eigen::Vector3d> frontiers_set ; 
+    std::vector<ViewCandidate> views;
+    std::vector<Eigen::Vector3d> frontiers_set ;
+
+    //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud ; 
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud2 ; 
+
+    //view generated pointclouds
+    pcl::PointCloud<pcl::PointXYZRGB> all_views_pointcloud ;
+    pcl::PointCloud<pcl::PointXYZRGB> selected_views_pointcloud ;
+
+
     bool m_frontier6;
     bool m_surface_frontiers;
-    Frontier m_current_goal;
-    Frontier m_current_pos;
+    ViewCandidate m_current_goal;
+    ViewCandidate m_current_pos;
     bool m_availability;
 
-    //ros communication
+    //ROS COMMUNICATION
     ros::NodeHandle n;
     ros::Subscriber sub_map_tsdf;
     ros::Subscriber sub_map_esdf;
     ros::Subscriber sub_pos;
     ros::Publisher pub_goal;
+    //frontiers and tsdfs
     ros::Publisher pub_pointcloud;
     ros::Publisher pub_frontiers;
     ros::Publisher pub_test_values;
     ros::Publisher pub_test_values2;
 
-    //map parameters
+
+    //MAP PARAMETERS
     float z_max;
     float z_min;
     float y_max;
@@ -66,17 +60,17 @@ private:
     float x_max;
     float x_min;
 
-    //team analysis
+    //TEAM AND COORDINATIONS ANALYSIS
     int m_team_size;
     int m_team_id;
     std::vector<int> m_team;
-    std::unordered_map<int, Frontier> m_team_pos;
+    std::unordered_map<int, ViewCandidate> m_team_pos;
 
 
-    //neighbours
+    //NEIGHBOURS VOXELS
     Eigen::Vector3d c_neighbor_voxels_[26]; 
 
-    //states
+    //STATES
     const static unsigned char AVAILABLE = 0;  // NOLINT
     const static unsigned char BUSY = 1;      // NOLINT
 
@@ -144,6 +138,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     values_for_eval_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud2 = pcl::PointCloud<pcl::PointXYZRGB>(); 
 
+    //views
+    views = std::vector<ViewCandidate>();
+    all_views_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>();
+    selected_views_pointcloud  = pcl::PointCloud<pcl::PointXYZRGB>() ;
 
 
     //ros initialization
@@ -358,7 +356,7 @@ void NBV_Selector::updateFrontiers(){
     frontiers_pointcloud.clear();
     values_for_eval_pointcloud.clear();
     values_for_eval_pointcloud2.clear();
-    //frontiers_set.clear();
+    frontiers_set.clear();
 
     // Cache layer settings.
     size_t vps = m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();

@@ -6,10 +6,11 @@ ViewGenerator::ViewGenerator(float distance_min, float distance_max){
     ViewGenerator("sphere", distance_min, distance_max);
 }
 
-ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max){
+ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map){
     m_method_type = method_name;
     m_distance_max = distance_max;
     m_distance_min = m_distance_min;
+    m_map = map;
     if(distance_min > distance_max) {
 
         //throw exception
@@ -73,10 +74,11 @@ ViewGenerator::generateViews_sphere_sph_coord( std::vector<Eigen::Vector3d> fron
         for(int j=0; j< max_sampling; j++){
 
             float formula = -1 ;
+            bool isFree = false;
 
-            while(formula < m_distance_min || formula > m_distance_max){
+            while(isFree){
             
-                float r = ( std::rand(0, m_distance_max) - m_distance_max) ;
+                float r = ( std::rand(0, m_distance_max - m_distance_min ) + m_distance_min) ;
                 float theta = ( std::rand(0, 1) * 2 * M_PI) ;
                 float phi = ( std::rand(0, 1) * 2 * M_PI) ;
 
@@ -88,7 +90,11 @@ ViewGenerator::generateViews_sphere_sph_coord( std::vector<Eigen::Vector3d> fron
                 //cylindrical coordinates
                 // float o_x = r * cos( theta ) ;
                 // float o_y = r * sin( theta ) ;
-                // float o_z = temp_z ?  ;
+                // float o_z = temp_z ? ;
+
+
+                current_state = m_map.getVoxelState_TSDF(voxel);
+                isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
 
 
                 formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
@@ -107,3 +113,30 @@ ViewGenerator::generateViews_sphere_sph_coord( std::vector<Eigen::Vector3d> fron
 }
 
 
+void findOrientation(ViewCandidate& vc, const Eigen::Vector3d& voxel_frontier){
+
+
+       // Normalize the direction vector to get the forward vector
+    Eigen::Vector3d forward = direction.normalized();
+
+    // Compute the right vector as the cross product of up and forward
+
+    Eigen::Vector3d right = up.cross(forward).normalized();
+
+    // Recompute the orthogonal up vector
+    Eigen::Vector3d trueUp = forward.cross(right);
+
+    // Construct the rotation matrix
+    Eigen::Matrix3d rotationMatrix;
+    rotationMatrix.col(0) = right;    // X-axis
+    rotationMatrix.col(1) = trueUp;  // Y-axis
+    rotationMatrix.col(2) = forward; // Z-axis
+
+    // Convert the rotation matrix to a quaternion
+    Eigen::Quaterniond quaternion(rotationMatrix);
+
+
+
+
+
+}

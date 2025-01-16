@@ -1,5 +1,7 @@
 #pragma once
 #include <Eigen/Eigen>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -37,7 +39,7 @@ private:
     voxblox_map::VoxbloxMap m_map;
 
 public:
-    ViewGenerator(float distance_min, float distance_max, std::string method_type);
+    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map);
     ViewGenerator();
     ~ViewGenerator();
 
@@ -67,3 +69,5 @@ ViewGenerator::~ViewGenerator()
 {
 }
 
+
+void findOrientation(ViewCandidate& vc, const Eigen::Vector3d& voxel_frontier);
