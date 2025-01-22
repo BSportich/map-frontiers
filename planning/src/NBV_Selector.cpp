@@ -11,7 +11,7 @@
 #include <voxblox_map/voxblox_map.h>
 #include <voxblox_msgs/Layer.h>
 #include <visualization_msgs/Marker.h>
-
+#include <geometry_msgs/PoseArray.h>
 
 
 class NBV_Selector
