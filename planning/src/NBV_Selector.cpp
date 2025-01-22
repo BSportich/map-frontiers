@@ -526,7 +526,8 @@ void NBV_Selector::posCallback(const std_msgs::String::ConstPtr& msg){}
 
 void NBV_Selector::generate_views(){
 
-  views = m_view_generator.generateViews(frontiers_set);
+  m_view_generator.generateViews(frontiers_set);
+  views = m_view_generator.getViewCandidates();
 }
 
 void NBV_Selector::publish_views(){
