@@ -143,7 +143,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //modules
     //m_view_generator(vg);
-    m_view_generator = ViewGenerator("sphere", 1, 2, m_map)
+    m_view_generator = ViewGenerator("sphere", 1, 2, m_map);
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -526,7 +526,7 @@ void NBV_Selector::posCallback(const std_msgs::String::ConstPtr& msg){}
 
 void NBV_Selector::generate_views(){
 
-  views = m_view_generator.generate_views(frontiers_set);
+  views = m_view_generator.generateViews(frontiers_set);
 }
 
 void NBV_Selector::publish_views(){
