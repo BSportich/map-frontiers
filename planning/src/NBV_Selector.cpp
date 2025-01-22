@@ -10,6 +10,8 @@
 #include "voxblox_ros/ptcloud_vis.h"
 #include <voxblox_map/voxblox_map.h>
 #include <voxblox_msgs/Layer.h>
+#include <visualization_msgs/Marker.h>
+
 
 
 class NBV_Selector
@@ -29,8 +31,12 @@ private:
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud2 ; 
 
     //view generated pointclouds
-    pcl::PointCloud<pcl::PointXYZRGB> all_views_pointcloud ;
-    pcl::PointCloud<pcl::PointXYZRGB> selected_views_pointcloud ;
+    // pcl::PointCloud<pcl::PointXYZRGB> all_views_pointcloud ;
+    // pcl::PointCloud<pcl::PointXYZRGB> selected_views_pointcloud ;
+
+    //views generated poses
+    geometry_msgs::PoseArray views_set; 
+
 
 
     bool m_frontier6;
@@ -50,6 +56,9 @@ private:
     ros::Publisher pub_frontiers;
     ros::Publisher pub_test_values;
     ros::Publisher pub_test_values2;
+    //views and selected views
+    ros::Publisher pub_views ; 
+    ros::Publisher pub_nbv ; 
 
 
     //MAP PARAMETERS
@@ -140,8 +149,9 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //views
     views = std::vector<ViewCandidate>();
-    all_views_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>();
-    selected_views_pointcloud  = pcl::PointCloud<pcl::PointXYZRGB>() ;
+    // all_views_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>();
+    // selected_views_pointcloud  = pcl::PointCloud<pcl::PointXYZRGB>() ;
+    views_set = geometry_msgs::PoseArray();
 
 
     //ros initialization
@@ -160,6 +170,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     
     pub_test_values2 = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "unknown_point_cloud", 1, true);
+
+    pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
+    pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
+
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -506,7 +520,35 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
 void NBV_Selector::posCallback(const std_msgs::String::ConstPtr& msg){}
 
+void NBV_Selector::generate_views(){
 
+  views = m_view_generator.generate_views(frontiers_set);
+}
+
+void NBV_Selector::publish_views(){
+
+  for(int i=0; i< views.size();i++){
+
+    geometry_msgs::Pose temp_view ;
+    temp_view.position.x = views[i].x ; 
+    temp_view.position.y = views[i].y ;
+    temp_view.position.z = views[i].z ; 
+
+    temp_view.orientation.x = views[i].q_x ; 
+    temp_view.orientation.y = views[i].q_y ; 
+    temp_view.orientation.z = views[i].q_z ; 
+    temp_view.orientation.w = views[i].q_w ; 
+
+
+    
+    views_set.push_back(temp_view);
+  }
+
+  views_set.header.frame_id = world_frame_;
+  pub_views.publish(views_set);
+
+
+}
 
 
 int main(int argc, char** argv) {

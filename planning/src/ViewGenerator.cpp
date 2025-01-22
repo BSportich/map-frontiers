@@ -28,41 +28,41 @@ ViewGenerator::generateViews( std::vector<Eigen::Vector3d> frontiers_set ){
     }
 }
 
-ViewGenerator::generateViews_sphere_xyz( std::vector<Eigen::Vector3d> frontiers_set ){
-    for(int i=0; i< frontiers_set.size(); i++){
+// ViewGenerator::generateViews_sphere_xyz( std::vector<Eigen::Vector3d> frontiers_set ){
+//     for(int i=0; i< frontiers_set.size(); i++){
 
 
-        Eigen::Vector3d frontier = frontiers_set[i]
-        temp_x = frontier.x();
-        temp_y = frontier.y();
-        temp_z = frontier.z(); 
+//         Eigen::Vector3d frontier = frontiers_set[i]
+//         temp_x = frontier.x();
+//         temp_y = frontier.y();
+//         temp_z = frontier.z(); 
 
-        for(int j=0; j< max_sampling; j++){
+//         for(int j=0; j< max_sampling; j++){
 
-            float formula = -1 ;
+//             float formula = -1 ;
 
-            while(formula < m_distance_min || formula > m_distance_max){
+//             while(formula < m_distance_min || formula > m_distance_max){
             
-                float o_x = ( std::rand(0, m_distance_max) - m_distance_max) ;
-                float o_y = ( std::rand(0, m_distance_max) - m_distance_max) ;
-                float o_z = ( std::rand(0, m_distance_max) - m_distance_max) ;
+//                 float o_x = ( std::rand(0, m_distance_max) - m_distance_max) ;
+//                 float o_y = ( std::rand(0, m_distance_max) - m_distance_max) ;
+//                 float o_z = ( std::rand(0, m_distance_max) - m_distance_max) ;
 
-                formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
-            }
+//                 formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
+//             }
 
-            view_candidates.push_back( ViewCandidate(o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z) ) ;
+//             view_candidates.push_back( ViewCandidate(o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z) ) ;
 
-        }
-
-
+//         }
 
 
 
 
-    }
-}
 
-ViewGenerator::generateViews_sphere_sph_coord( std::vector<Eigen::Vector3d> frontiers_set ){
+
+//     }
+// }
+
+ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set ){
     for(int i=0; i< frontiers_set.size(); i++){
 
 
@@ -97,10 +97,14 @@ ViewGenerator::generateViews_sphere_sph_coord( std::vector<Eigen::Vector3d> fron
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
 
 
-                formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
+                //formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
             }
 
-            view_candidates.push_back( ViewCandidate(o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z) ) ;
+            ViewCandidate vc = ViewCandidate(o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z);
+            
+            findOrientation(vc);
+
+            view_candidates.push_back( vc ) ;
 
         }
 
@@ -113,30 +117,32 @@ ViewGenerator::generateViews_sphere_sph_coord( std::vector<Eigen::Vector3d> fron
 }
 
 
-void findOrientation(ViewCandidate& vc, const Eigen::Vector3d& voxel_frontier){
+void findOrientation(ViewCandidate& vc){
 
+    Eigen::Vector3d view_pos( vc.x, vc.y, vc.z ) ;
+    Eigen::Vector3d frontier_pos( vc.o_x, vc.o_y, vc.o_z ) ;
 
-       // Normalize the direction vector to get the forward vector
+    //Computes direction vector
+    Eigen::Vector3d direction = frontier_pos - view_pos ; 
+    
+    // Normalize the direction vector to get the forward vector
     Eigen::Vector3d forward = direction.normalized();
 
+    float heading_angle =  atan2( forward.y, forward.x ) ;
     // Compute the right vector as the cross product of up and forward
 
-    Eigen::Vector3d right = up.cross(forward).normalized();
+    float pitch = asin( forward.z ) ;
+    float roll = 0 ; 
 
-    // Recompute the orthogonal up vector
-    Eigen::Vector3d trueUp = forward.cross(right);
+    qx = sin(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) - cos(roll/2.0) * sin(pitch/2.0) * sin(yaw/2.0) ;
+    qy = cos(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) + sin(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) ;
+    qz = cos(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) - sin(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) ;
+    qw = cos(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) ;
 
-    // Construct the rotation matrix
-    Eigen::Matrix3d rotationMatrix;
-    rotationMatrix.col(0) = right;    // X-axis
-    rotationMatrix.col(1) = trueUp;  // Y-axis
-    rotationMatrix.col(2) = forward; // Z-axis
-
-    // Convert the rotation matrix to a quaternion
-    Eigen::Quaterniond quaternion(rotationMatrix);
-
-
-
+    vc.qx = qx;
+    vc.qy = qy;
+    vc.qz = qz;
+    vc.qw = qw;
 
 
 }

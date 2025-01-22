@@ -8,6 +8,7 @@
 #include <voxblox_map/voxblox_map.h>
 
 
+
 struct ViewCandidate
 {
     //position
@@ -16,10 +17,10 @@ struct ViewCandidate
     int z;
 
     //orientation
-    int q_w ;
-    int q_x;
+    int q_x ;
     int q_y;
     int q_z;
+    int q_w;
 
     //origin of the generation
     int o_x;
@@ -43,11 +44,11 @@ public:
     ViewGenerator();
     ~ViewGenerator();
 
-    void generateViews(std::vector<Eigen::Vector3d> frontiers_set);
-    void generateViews_sphere(std::vector<Eigen::Vector3d> frontiers_set);
-    void generateViews_echo(std::vector<Eigen::Vector3d> frontiers_set);
-    void generateViews_normals(std::vector<Eigen::Vector3d> frontiers_set);
-    void generateViews_gradients(std::vector<Eigen::Vector3d> frontiers_set);
+    void generateViews(const std::vector<Eigen::Vector3d>& frontiers_set);
+    void generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set);
+    // void generateViews_echo(std::vector<Eigen::Vector3d> frontiers_set);
+    // void generateViews_normals(std::vector<Eigen::Vector3d> frontiers_set);
+    // void generateViews_gradients(std::vector<Eigen::Vector3d> frontiers_set);
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
