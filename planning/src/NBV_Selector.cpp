@@ -98,6 +98,9 @@ public:
     void publishAllUpdatedTsdfVoxels() ;
     void publish_all_frontiers();
 
+    void generate_views();
+    void publish_views();
+
 
     //Tests functions
     //void test_publish();
@@ -139,7 +142,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
 
     //modules
-    // m_view_generator(vg);
+    //m_view_generator(vg);
+    m_view_generator = ViewGenerator("sphere", 1, 2, m_map)
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
