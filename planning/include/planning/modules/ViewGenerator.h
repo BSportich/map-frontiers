@@ -42,6 +42,7 @@ private:
 public:
     ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map);
     ViewGenerator(float distance_min, float distance_max);
+    ViewGenerator();
     ~ViewGenerator();
 
     void generateViews(const std::vector<Eigen::Vector3d>& frontiers_set);
@@ -62,9 +63,9 @@ public:
     
 };
 
-// ViewGenerator::ViewGenerator(/* args */)
-// {
-// }
+ViewGenerator::ViewGenerator(/* args */)
+{
+}
 
 ViewGenerator::~ViewGenerator()
 {
