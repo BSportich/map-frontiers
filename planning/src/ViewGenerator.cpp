@@ -17,7 +17,7 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
     }
 }
 
-ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_set ){
+void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_set ){
     if(m_method_type == "sphere"){
 
         ViewGenerator::generateViews_sphere( frontiers_set );
@@ -61,7 +61,7 @@ ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_set )
 //     }
 // }
 
-ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set ){
+void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set ){
     for(int i=0; i< frontiers_set.size(); i++){
 
 
