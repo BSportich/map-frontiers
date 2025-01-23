@@ -2,14 +2,13 @@
 #include <math.h>
 
 
-ViewGenerator::ViewGenerator(float distance_min, float distance_max){
-    ViewGenerator("sphere", distance_min, distance_max);
-}
+ViewGenerator::ViewGenerator(float distance_min, float distance_max)  
+   : ViewGenerator("sphere", distance_min, distance_max, voxblox_map::VoxbloxMap()) {}
 
 ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map){
     m_method_type = method_name;
     m_distance_max = distance_max;
-    m_distance_min = m_distance_min;
+    m_distance_min = distance_min;
     m_map = map;
     if(distance_min > distance_max) {
 
@@ -24,7 +23,7 @@ ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_set )
         ViewGenerator::generateViews_sphere( frontiers_set );
     }
     else{
-        throw string("Methods not defined ! ");
+        throw std::invalid_argument("Methods not defined ! ");
     }
 }
 
@@ -66,10 +65,10 @@ ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontier
     for(int i=0; i< frontiers_set.size(); i++){
 
 
-        Eigen::Vector3d frontier = frontiers_set[i]
-        temp_x = frontier.x();
-        temp_y = frontier.y();
-        temp_z = frontier.z(); 
+        Eigen::Vector3d frontier = frontiers_set[i];
+        float temp_x = frontier.x();
+        float temp_y = frontier.y();
+        float temp_z = frontier.z(); 
 
         for(int j=0; j< max_sampling; j++){
 
@@ -83,9 +82,9 @@ ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontier
                 float phi = ( std::rand(0, 1) * 2 * M_PI) ;
 
                 //spherical coordinates
-                float o_x = r * sin( theta ) * cos( phi ) ; 
-                float o_y = r * sin( theta ) * sin ( phi );
-                float o_z = r * cos( theta ) ;
+                float o_x = temp_x + r * sin( theta ) * cos( phi ) ; 
+                float o_y = temp_y + r * sin( theta ) * sin ( phi );
+                float o_z = temp_z + r * cos( theta ) ;
 
                 //cylindrical coordinates
                 // float o_x = r * cos( theta ) ;
@@ -129,6 +128,7 @@ void findOrientation(ViewCandidate& vc){
     Eigen::Vector3d forward = direction.normalized();
 
     float heading_angle =  atan2( forward.y, forward.x ) ;
+    float yaw = heading_angle ; 
     // Compute the right vector as the cross product of up and forward
 
     float pitch = asin( forward.z ) ;
