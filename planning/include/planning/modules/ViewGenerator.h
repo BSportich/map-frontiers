@@ -17,18 +17,18 @@ struct ViewCandidate
     int z;
 
     //orientation
-    int q_x ;
-    int q_y;
-    int q_z;
-    int q_w;
+    float q_x ;
+    float q_y;
+    float q_z;
+    float q_w;
 
     //origin of the generation
     int o_x;
     int o_y;
     int o_z;
 
-    ViewCandidate(int x, int y, int z, int qx, int qy, int qz, int qw, int ox, int oy, int oz)
-        : x(x), y(y), z(z), q_x(qx), q_y(qy), q_z(qz), q_w(qw), o_x(ox), o_y(oy), o_z(oz) {}
+    // ViewCandidate(int x, int y, int z, float qx, float qy, float qz, float qw, int ox, int oy, int oz)
+    //     : x(x), y(y), z(z), q_x(qx), q_y(qy), q_z(qz), q_w(qw), o_x(ox), o_y(oy), o_z(oz) {}
 
 };
 

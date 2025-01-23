@@ -99,7 +99,7 @@ ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontier
                 //formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
             }
 
-            ViewCandidate vc = ViewCandidate(o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z);
+            ViewCandidate vc = {o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z};
             
             findOrientation(vc);
 
