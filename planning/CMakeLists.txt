@@ -14,7 +14,6 @@ add_definitions(-std=c++14 -Wall -Wextra)
 
 cs_add_library(${PROJECT_NAME}
   src/ViewGenerator.cpp
-  include/planning/modules/ViewGenerator.h # Only include ViewGenerator here
 )
 
 ############
@@ -25,7 +24,6 @@ cs_add_library(${PROJECT_NAME}
 cs_add_executable(NBV_Selector
   src/NBV_Selector.cpp
 )
-
 # Link the NBV_Selector executable against the library.
 target_link_libraries(NBV_Selector ${PROJECT_NAME})
 
@@ -33,4 +31,4 @@ target_link_libraries(NBV_Selector ${PROJECT_NAME})
 # EXPORT #
 ##########
 cs_install()
-cs_export()
+cs_export(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include)
