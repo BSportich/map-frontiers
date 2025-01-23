@@ -42,6 +42,8 @@ private:
     float m_distance_min; // min sampling distance from the frontiers
     voxblox_map::VoxbloxMap m_map;
 
+    int max_sampling; 
+
 public:
     ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map);
     ViewGenerator(float distance_min, float distance_max);

@@ -10,6 +10,8 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
     m_distance_max = distance_max;
     m_distance_min = distance_min;
     m_map = map;
+
+    max_sampling = 3;
     if(distance_min > distance_max) {
 
         //throw exception
@@ -80,9 +82,9 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
             while(isFree){
             
-                float r = ( std::rand(0, m_distance_max - m_distance_min ) + m_distance_min) ;
-                float theta = ( std::rand(0, 1) * 2 * M_PI) ;
-                float phi = ( std::rand(0, 1) * 2 * M_PI) ;
+                float r = ( (static_cast<float>(rand()) / RAND_MAX) * ( m_distance_max - m_distance_min ) + m_distance_min) ;
+                float theta = ( (static_cast<float>(rand()) / RAND_MAX)  * 2 * M_PI) ;
+                float phi = ( (static_cast<float>(rand()) / RAND_MAX) * 2 * M_PI) ;
 
                 //spherical coordinates
                 float o_x = temp_x + r * sin( theta ) * cos( phi ) ; 
