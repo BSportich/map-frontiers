@@ -12,9 +12,9 @@
 struct ViewCandidate
 {
     //position
-    int x;
-    int y;
-    int z;
+    float x;
+    float y;
+    float z;
 
     //orientation
     float q_x ;
