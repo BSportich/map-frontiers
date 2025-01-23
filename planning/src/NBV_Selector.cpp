@@ -142,8 +142,9 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
 
     //modules
-    //m_view_generator(vg);
+    //m_view_generator.set_map(m_map);
     m_view_generator = ViewGenerator("sphere", 1, 2, m_map);
+
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -560,8 +561,11 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "nbv_selector_node");
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
-    ViewGenerator vg = ViewGenerator(1,2);
+    float distance_min = 1;
+    float distance_max = 2;
+    ViewGenerator vg(distance_min,distance_max);
     int team_id = 1;
+
     std::vector<int> robot_team ; 
     robot_team.push_back(team_id);
     NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, vg, team_id,  robot_team);
