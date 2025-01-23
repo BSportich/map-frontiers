@@ -74,6 +74,9 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
             float formula = -1 ;
             bool isFree = false;
+            float o_x = 0;
+            float o_y = 0 ;
+            float o_z = 0 ; 
 
             while(isFree){
             
@@ -127,11 +130,11 @@ void findOrientation(ViewCandidate& vc){
     // Normalize the direction vector to get the forward vector
     Eigen::Vector3d forward = direction.normalized();
 
-    float heading_angle =  atan2( forward.y, forward.x ) ;
+    float heading_angle =  atan2( forward.y(), forward.x() ) ;
     float yaw = heading_angle ; 
     // Compute the right vector as the cross product of up and forward
 
-    float pitch = asin( forward.z ) ;
+    float pitch = asin( forward.z() ) ;
     float roll = 0 ; 
 
     qx = sin(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) - cos(roll/2.0) * sin(pitch/2.0) * sin(yaw/2.0) ;

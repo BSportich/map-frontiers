@@ -75,4 +75,4 @@ ViewGenerator::~ViewGenerator()
 }
 
 
-void findOrientation(ViewCandidate& vc, const Eigen::Vector3d& voxel_frontier);
+void findOrientation(ViewCandidate& vc);
