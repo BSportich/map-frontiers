@@ -14,7 +14,7 @@ add_definitions(-std=c++14 -Wall -Wextra)
 
 cs_add_library(${PROJECT_NAME}
   src/ViewGenerator.cpp
-  src/ViewGenerator.h # Only include ViewGenerator here
+#  src/ViewGenerator.h # Only include ViewGenerator here
 )
 
 ############
