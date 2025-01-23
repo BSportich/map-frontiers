@@ -546,7 +546,7 @@ void NBV_Selector::publish_views(){
 
 
     
-    views_set.push_back(temp_view);
+    views_set.poses.push_back(temp_view);
   }
 
   views_set.header.frame_id = world_frame_;
