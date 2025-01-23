@@ -1,6 +1,6 @@
 #include <Eigen/Eigen>
 #include <iostream>
-#include "planning/modules/ViewGenerator.h"
+//#include "planning/modules/ViewGenerator.h"
 #include <string>
 
 #include "ros/ros.h"
