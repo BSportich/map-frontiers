@@ -13,7 +13,7 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
     if(distance_min > distance_max) {
 
         //throw exception
-        throw string(" Distances values are incorrect. Can not initialize ViewGenerator");
+        throw std::string(" Distances values are incorrect. Can not initialize ViewGenerator");
     }
 }
 
@@ -92,7 +92,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 // float o_z = temp_z ? ;
 
                 Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
-                current_state = m_map.getVoxelState_TSDF(voxel);
+                unsigned char current_state = m_map.getVoxelState_TSDF(voxel);
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
 
 
@@ -139,10 +139,10 @@ void findOrientation(ViewCandidate& vc){
     qz = cos(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) - sin(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) ;
     qw = cos(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) ;
 
-    vc.qx = qx;
-    vc.qy = qy;
-    vc.qz = qz;
-    vc.qw = qw;
+    vc.q_x = qx;
+    vc.q_y = qy;
+    vc.q_z = qz;
+    vc.q_w = qw;
 
 
 }
