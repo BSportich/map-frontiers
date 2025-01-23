@@ -29,39 +29,6 @@ void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_
     }
 }
 
-// ViewGenerator::generateViews_sphere_xyz( std::vector<Eigen::Vector3d> frontiers_set ){
-//     for(int i=0; i< frontiers_set.size(); i++){
-
-
-//         Eigen::Vector3d frontier = frontiers_set[i]
-//         temp_x = frontier.x();
-//         temp_y = frontier.y();
-//         temp_z = frontier.z(); 
-
-//         for(int j=0; j< max_sampling; j++){
-
-//             float formula = -1 ;
-
-//             while(formula < m_distance_min || formula > m_distance_max){
-            
-//                 float o_x = ( std::rand(0, m_distance_max) - m_distance_max) ;
-//                 float o_y = ( std::rand(0, m_distance_max) - m_distance_max) ;
-//                 float o_z = ( std::rand(0, m_distance_max) - m_distance_max) ;
-
-//                 formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
-//             }
-
-//             view_candidates.push_back( ViewCandidate(o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z) ) ;
-
-//         }
-
-
-
-
-
-
-//     }
-// }
 
 void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set ){
     for(int i=0; i< frontiers_set.size(); i++){

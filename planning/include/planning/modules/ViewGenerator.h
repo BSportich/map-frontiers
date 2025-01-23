@@ -68,13 +68,6 @@ public:
     
 };
 
-ViewGenerator::ViewGenerator(/* args */)
-{
-}
-
-ViewGenerator::~ViewGenerator()
-{
-}
 
 
 void findOrientation(ViewCandidate& vc);

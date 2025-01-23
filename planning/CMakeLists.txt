@@ -13,17 +13,19 @@ add_definitions(-std=c++14 -Wall -Wextra)
 #############
 
 cs_add_library(${PROJECT_NAME}
-  src/NBV_Selector.cpp
-  src/ViewGenerator.cpp 
+  src/ViewGenerator.cpp # Only include ViewGenerator here
 )
 
 ############
 # BINARIES #
 ############
 
+# Add the NBV_Selector executable, but do not compile it into the library.
 cs_add_executable(NBV_Selector
   src/NBV_Selector.cpp
 )
+
+# Link the NBV_Selector executable against the library.
 target_link_libraries(NBV_Selector ${PROJECT_NAME})
 
 ##########
