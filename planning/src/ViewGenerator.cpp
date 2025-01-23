@@ -152,10 +152,10 @@ void findOrientation(ViewCandidate& vc){
 
 }
 
-ViewGenerator::ViewGenerator(/* args */)
-{
-}
+// ViewGenerator::ViewGenerator(/* args */)
+// {
+// }
 
-ViewGenerator::~ViewGenerator()
-{
-}
+// ViewGenerator::~ViewGenerator()
+// {
+// }
