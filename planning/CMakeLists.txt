@@ -13,7 +13,8 @@ add_definitions(-std=c++14 -Wall -Wextra)
 #############
 
 cs_add_library(${PROJECT_NAME}
-  src/ViewGenerator.cpp # Only include ViewGenerator here
+  src/ViewGenerator.cpp
+  src/ViewGenerator.h # Only include ViewGenerator here
 )
 
 ############
@@ -32,4 +33,4 @@ target_link_libraries(NBV_Selector ${PROJECT_NAME})
 # EXPORT #
 ##########
 cs_install()
-#cs_export()
+cs_export()
