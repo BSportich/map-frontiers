@@ -560,7 +560,7 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "nbv_selector_node");
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
-    ViewGenerator vg = ViewGenerator();
+    ViewGenerator vg = ViewGenerator(1,2);
     int team_id = 1;
     std::vector<int> robot_team ; 
     robot_team.push_back(team_id);
