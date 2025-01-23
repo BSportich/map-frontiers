@@ -91,7 +91,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 // float o_y = r * sin( theta ) ;
                 // float o_z = temp_z ? ;
 
-
+                Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
                 current_state = m_map.getVoxelState_TSDF(voxel);
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
 
