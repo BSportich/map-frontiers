@@ -28,7 +28,7 @@ RUN catkin config  --extend /opt/ros/noetic \
 
 # # Hacky hack
 RUN mkdir -p /opt/catkin_ws/devel/.private/voxblox_map/include/ \
-    && mkdir -p /opt/catkin_ws/devel/.private/map_frontiers/include \
+    && mkdir -p /opt/catkin_ws/devel/.private/map_frontiers/include/ \
     && catkin build map_frontiers
 
 # # Source the setup.bash so that the package is available in the environment
