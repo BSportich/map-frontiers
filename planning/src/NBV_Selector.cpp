@@ -555,8 +555,7 @@ void NBV_Selector::publish_views(){
 
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
-  ROS_INFO_ONCE("Views published ! %lu ", views_set.size()) ;
-
+  //ROS_INFO("Views published ! %lu ", views_set.size()) ;
 
 }
 
