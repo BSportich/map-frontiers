@@ -47,7 +47,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
             float o_y = 0 ;
             float o_z = 0 ; 
 
-            while(!isFree){
+            while((isFree == false)){
             
                 float r = ( (static_cast<float>(rand()) / RAND_MAX) * ( m_distance_max - m_distance_min ) + m_distance_min) ;
                 float theta = ( (static_cast<float>(rand()) / RAND_MAX)  * 2 * M_PI) ;
