@@ -8,10 +8,6 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 add_definitions(-std=c++14 -Wall -Wextra)
 
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
 
 #############
 # LIBRARIES #
