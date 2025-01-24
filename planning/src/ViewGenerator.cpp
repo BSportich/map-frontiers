@@ -1,5 +1,6 @@
 #include "planning/modules/ViewGenerator.h"
 #include <math.h>
+#include "ros/ros.h"
 
 
 ViewGenerator::ViewGenerator(float distance_min, float distance_max)  
