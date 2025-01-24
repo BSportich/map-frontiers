@@ -10,6 +10,6 @@ invert_T_C_CH: true
 sensor_is_lidar: true
 width: 1024  # Px
 height: 64 # Px
-fov_up: 3.0  # deg
-fov_down: -25.0  # deg
+fov_up: 52.0  # deg
+fov_down: -7.0  # deg
 smooth_thre_ratio: 0.05
