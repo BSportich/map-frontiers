@@ -66,6 +66,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
                 unsigned char current_state = m_map.getVoxelState_TSDF(voxel);
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
+                ROS_INFO_ONCE("Generating views");
 
 
                 //formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;

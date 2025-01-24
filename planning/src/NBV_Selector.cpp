@@ -144,7 +144,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //modules
     //m_view_generator.set_map(m_map);
     std::string method = "sphere";
-    m_view_generator = ViewGenerator(method, 1, 100, m_map);
+    m_view_generator = ViewGenerator(method, 5, 10, m_map);
 
 
     //frontiers
