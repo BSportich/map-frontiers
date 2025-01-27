@@ -32,6 +32,8 @@ void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_
 
 
 void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set ){
+    view_candidates.clear();
+
     for(int i=0; i< frontiers_set.size(); i++){
 
 
