@@ -14,10 +14,17 @@ RUN apt-get update && apt-get install -y \
     libtool \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone the ROS package from GitHub
-RUN git clone --single-branch --branch test/avenue https://github.com/BSportich/map-frontiers.git \
-    && wstool init . /opt/catkin_ws/src/map-frontiers/voxfield_https.rosinstall \
-    && wstool update
+# Clone the repository and get the commit to be checkout at from the docker-compose.yaml file
+ARG BRANCH='test/avenue'
+ARG BRANCH_COMMIT=$BRANCH # Checkout the last commit per default
+RUN git clone --single-branch --branch $BRANCH https://github.com/BSportich/map-frontiers.git \ 
+    && cd /opt/catkin_ws/src/map-frontiers/ \
+    && echo "The commit to be check out is: $BRANCH_COMMIT" \
+    && git checkout $BRANCH_COMMIT
+
+# Install the package's dependencies
+RUN wstool init . /opt/catkin_ws/src/map-frontiers/voxfield_https.rosinstall \
+&& wstool update
 
 # Go back to the workspace root
 WORKDIR /opt/catkin_ws/
