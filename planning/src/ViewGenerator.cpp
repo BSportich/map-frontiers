@@ -55,9 +55,9 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 float phi = ( (static_cast<float>(rand()) / RAND_MAX) * 2 * M_PI) ;
 
                 //spherical coordinates
-                float o_x = temp_x + r * sin( theta ) * cos( phi ) ; 
-                float o_y = temp_y + r * sin( theta ) * sin ( phi );
-                float o_z = temp_z + r * cos( theta ) ;
+                o_x = temp_x + r * sin( theta ) * cos( phi ) ; 
+                o_y = temp_y + r * sin( theta ) * sin ( phi );
+                o_z = temp_z + r * cos( theta ) ;
 
                 //cylindrical coordinates
                 // float o_x = r * cos( theta ) ;
@@ -67,7 +67,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
                 unsigned char current_state = m_map.getVoxelState_TSDF(voxel);
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
-                ROS_INFO("Generating views");
+                ROS_INFO("Generating views %f %f %f ", o_x, o_y, o_z );
 
 
                 //formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
