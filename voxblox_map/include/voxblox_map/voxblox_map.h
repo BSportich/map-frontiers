@@ -74,6 +74,10 @@ class VoxbloxMap {
   double get_confidence_threshold();
   double get_distance_threshold();
 
+  //evaluation of the total map
+  double evaluation_TSDF(float truncationdist);
+  double evaluation_ESDF();
+
   
 private:
   // esdf server that contains the map, subscribe to external ESDF/TSDF updates

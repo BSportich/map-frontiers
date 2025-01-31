@@ -1,6 +1,7 @@
 #include <Eigen/Eigen>
 #include <iostream>
 #include "planning/modules/ViewGenerator.h"
+#include "planning/modules/ViewEvaluator.h"
 #include <string>
 
 #include "ros/ros.h"
@@ -24,20 +25,18 @@ private:
     ViewGenerator m_view_generator;
     std::vector<ViewCandidate> views;
     std::vector<Eigen::Vector3d> frontiers_set ;
+    std::vector<Eigen::Vector3d> frontiers_subset ;
+
+    ViewEvaluator m_view_evaluator;
+    SensorModel m_sensor_model;
 
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud ; 
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud2 ; 
 
-    //view generated pointclouds
-    // pcl::PointCloud<pcl::PointXYZRGB> all_views_pointcloud ;
-    // pcl::PointCloud<pcl::PointXYZRGB> selected_views_pointcloud ;
-
     //views generated poses
     geometry_msgs::PoseArray views_set; 
-
-
 
     bool m_frontier6;
     bool m_surface_frontiers;
@@ -89,6 +88,9 @@ public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
+    void sample_subset_frontiers();
+
+
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
     bool isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel);
     bool isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel);
@@ -101,6 +103,7 @@ public:
     void generate_views();
     void publish_views();
 
+    void select_next_best_view(); 
 
     //Tests functions
     //void test_publish();
@@ -108,7 +111,7 @@ public:
     //callbacks
     void tSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void eSDFCallback(const voxblox_msgs::Layer& layer_msg);
-    void posCallback(const std_msgs::String::ConstPtr& msg);
+    void posCallback(const nav_msgs::Odometry& msg_odom);
   
 
     ~NBV_Selector();
@@ -149,14 +152,13 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
+    frontiers_subset = std::vector<Eigen::Vector3d>();
     frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud2 = pcl::PointCloud<pcl::PointXYZRGB>(); 
 
     //views
     views = std::vector<ViewCandidate>();
-    // all_views_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>();
-    // selected_views_pointcloud  = pcl::PointCloud<pcl::PointXYZRGB>() ;
     views_set = geometry_msgs::PoseArray();
 
 
@@ -445,6 +447,57 @@ void NBV_Selector::updateFrontiers(){
 
  }
 
+
+void NBV_Selector::sample_subset_frontiers(){
+  int sub_sample_size = 100 ; 
+  std::arrays<float, frontiers_set.size() > distances_table ; 
+  if( frontiers_set.size() > sub_sample_size ){
+
+    double min_value_distance = std::numeric_limits<double>::max() ; 
+    double max_value_distance = std::numeric_limits<double>::min() ; 
+    double total_distance = 0 ;
+
+    for(int i=0; i< frontiers_set.size(); i++){
+      
+      Eigen::Vector3d current_pos = Eigen::Vector3d( m_current_pos.x, m_current_pos.y, m_current_pos.z )
+      double distance_frontier = (frontiers_set[i] - current_pos).norm();
+      distances_table[i] = distance_frontier ; 
+
+      if(distance_frontier > max_value_distance){
+        max_value_distance = distance_frontier;
+      }
+      if(distance_frontier < min_value_distance){
+        min_value_distance = distance_frontier;
+      }
+
+    }
+
+    float threshold_tirage = sample_subset_frontiers / frontiers_set.size() ;
+    int i = 0 ; 
+    while((frontiers_subset.size() < sub_sample_size) && (i < frontiers_set.size() )){
+
+        float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
+        threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
+        
+
+        if(value_tirage > threshold_tirage){
+
+          frontiers_subset.push_back(frontiers_set[i]);
+
+        }
+        i=i+1;
+    }
+    
+
+
+  }
+  else {
+
+    frontiers_subset = frontiers_set ; 
+  }
+
+}
+
 NBV_Selector::~NBV_Selector()
 {
 }
@@ -528,11 +581,36 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
 }
 
-void NBV_Selector::posCallback(const std_msgs::String::ConstPtr& msg){}
+void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){
+
+  m_current_pos.o_x = m_current_pos.x ; 
+  m_current_pos.o_y = m_current_pos.y;
+  m_current_pos.o_z = m_current_pos.z;
+
+  m_current_pos.x = msg_odom.pose.pose.position.x ;
+  m_current_pos.y = msg_odom.pose.pose.position.y ;
+  m_current_pos.z = msg_odom.pose.pose.position.z ;
+  m_current_pos.q_x = msg_odom.pose.pose.orientation.x ;
+  m_current_pos.q_y = msg_odom.pose.pose.orientation.y ;
+  m_current_pos.q_z = msg_odom.pose.pose.orientation.z ;
+  m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
+
+  if( m_availability == AVAILABLE) {
+
+    select_next_best_view();
+
+    publish_goal();
+
+    
+  }
+
+
+}
 
 void NBV_Selector::generate_views(){
 
-  m_view_generator.generateViews(frontiers_set);
+  //m_view_generator.generateViews(frontiers_set);
+  m_view_generator.generateViews(frontiers_subset);
   views = m_view_generator.getViewCandidates();
 }
 
@@ -558,6 +636,54 @@ void NBV_Selector::publish_views(){
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
   //ROS_INFO("Views published ! %lu ", views_set.size()) ;
+
+}
+
+
+void NBV_Selector::select_next_best_view(){
+
+  //sample frontiers
+  sample_subset_frontiers();
+
+  //generate views
+  generate_views()
+
+  //evaluate views
+  std::vector<float> values_views();
+  int index_of_nbv = -1 ;
+  float max_value_nbv = -1 ; 
+  float temp_value = -1 ; 
+  for(int i=0;i< views.size();i++){
+
+    ViewCandidate view = views[i] ; 
+    std::vector<Eigen::Vector3d> visible_voxels(); 
+    Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
+    Eigen::Quaternion orient = Eigen::Quaternion( view.q_x, view.q_y, view.q_z, view.q_w);
+
+    m_view_evaluator.getVisibleVoxels(
+    &visible_voxels, pos, orient) ;
+
+    temp_value = m_view_evaluator.count_frontiers_view();
+    values_views.push_back(temp_value);
+    if( temp_value > max_value_nbv){
+      index_of_nbv = i;
+      max_value_nbv = temp_value;
+
+    }
+
+  m_current_goal = views[index_of_nbv];
+
+
+  }
+
+
+  //select views
+
+
+
+
+
+
 
 }
 

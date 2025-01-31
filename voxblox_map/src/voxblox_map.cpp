@@ -176,4 +176,48 @@ double VoxbloxMap::getVoxelWeight_TSDF(const Eigen::Vector3d& point) {
 // get the maximum allowed weight (return 0 if using uncapped weights)
 double VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }
 
+//evaluate the whole produced map 
+double evaluation_TSDF(float truncationdist){
+  double result = 0.0;
+  int voxel_count = 0 ;
+
+  voxblox::BlockIndexList blocks;
+  tsdf_map_pointer->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
+
+  // Cache layer settings.
+  size_t vps = tsdf_map_pointer->getTsdfLayerPtr()->voxels_per_side();
+  size_t num_voxels_per_block = vps * vps * vps;
+
+  for (const voxblox::BlockIndex& index : blocks) {
+    // Iterate over all voxels in said blocks.
+    const voxblox::Block<voxblox::TsdfVoxel>& block = tsdf_map_pointer->getTsdfLayerPtr()->getBlockByIndex(index);
+
+    voxblox::Point origin = block.origin();
+
+    for (size_t linear_index = 0; linear_index < num_voxels_per_block;
+          ++linear_index) {
+      voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+      const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+      Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
+
+      //Test if voxel is observed
+      float voxeldistance = getVoxelDistance_TSDF(coord_3d);
+      if(voxeldistance > 0 ){
+        
+        if( voxeldistance < truncationdist){
+          //if closes to the surface sums its weights
+          result = result + getVoxelWeight_TSDF(coord_3d);
+          voxel_count = voxel_count + 1;
+        }
+      } 
+
+    }
+
+  }
+
+  return result/voxel_count;
+
+}
+
+
 }
