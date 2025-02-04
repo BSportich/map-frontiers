@@ -103,6 +103,7 @@ public:
 
     void generate_views();
     void publish_views();
+    void publish_goal();
 
     void select_next_best_view(); 
 
@@ -610,6 +611,10 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){
 
 }
 
+void NBV_Selector::publish_goal(){ 
+
+}
+
 void NBV_Selector::generate_views(){
 
   //m_view_generator.generateViews(frontiers_set);
@@ -666,7 +671,7 @@ void NBV_Selector::select_next_best_view(){
     m_view_evaluator.getVisibleVoxels_LIDAR(
     &visible_voxels, pos, orient) ;
 
-    temp_value = m_view_evaluator.count_frontiers_view();
+    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
     values_views.push_back(temp_value);
     if( temp_value > max_value_nbv){
       index_of_nbv = i;
