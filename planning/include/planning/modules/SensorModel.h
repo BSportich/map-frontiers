@@ -17,7 +17,7 @@ public:
 
     // mounting transform from body (pose) to sensor , in body frame
     Eigen::Vector3d mounting_translation_;  // x,y,z [m]
-    Eigen::Quaternionf mounting_rotation_;  // x,y,z,w quaternion
+    Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
 
     //sensor parameters
     double p_ray_length_;  // params for camera model

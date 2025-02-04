@@ -17,10 +17,10 @@ struct ViewCandidate
     float z;
 
     //orientation
-    float q_x ;
-    float q_y;
-    float q_z;
-    float q_w;
+    double q_x ;
+    double q_y;
+    double q_z;
+    double q_w;
 
     //origin of the generation
     int o_x;
