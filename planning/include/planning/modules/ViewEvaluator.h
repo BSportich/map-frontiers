@@ -13,6 +13,7 @@ private:
     /* data */
     std::string m_method_type;
     voxblox_map::VoxbloxMap m_map;
+    SensorModel sensor_model ; 
 
     // params
     double p_ray_step_;
@@ -57,6 +58,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   m_method_type = method_name ;
   p_ray_step_ = m_map.getVoxelSize() ;
   p_downsampling_factor_ = 1.0 ;
+  sensor_model = sensor_lidar ; 
 
   // Downsample to voxel size resolution at max range
   c_res_x_ = std::min(static_cast<int>(std::ceil(
@@ -138,7 +140,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
       if (current_segment < 0) {
         continue;  // already occluded ray
       }
-      LidarModel::getDirectionVector(
+      sensor_model.getDirectionVector(
           &camera_direction,
           static_cast<double>(i) / (static_cast<double>(c_res_x_) - 1.0),
           static_cast<double>(j) / (static_cast<double>(c_res_y_) - 1.0));
@@ -158,7 +160,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
 
           // Check voxel occupied 
           if (m_map.getVoxelState_TSDF(current_position) ==
-              VoxbloxMap::OCCUPIED) {
+              voxblox_map::OCCUPIED) {
             // Occlusion, mark neighboring rays as occluded
             markNeighboringRays(i, j, current_segment, -1);
             cast_ray = false;
@@ -177,7 +179,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
       }
     }
   }
-  return true;
+  //return true;
 }
 
 
