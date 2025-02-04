@@ -196,7 +196,7 @@ void ViewEvaluator::markNeighboringRays(int x, int y, int segment,
 }
 
 //potential inefficiency : testing frontiers with dedicated method might be more efficient
-float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set){
+float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set, const std::vector<Eigen::Vector3d>& frontiers_set){
   float evaluation = 0 ;
   for(int i=0; i< voxels_set.size(); i++) {
 

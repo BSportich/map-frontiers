@@ -657,7 +657,7 @@ void NBV_Selector::select_next_best_view(){
   generate_views();
 
   //evaluate views
-  std::vector<float> values_views();
+  std::vector<float> values_views;
   int index_of_nbv = -1 ;
   float max_value_nbv = -1 ; 
   float temp_value = -1 ; 
