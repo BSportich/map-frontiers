@@ -452,7 +452,7 @@ void NBV_Selector::updateFrontiers(){
 
 void NBV_Selector::sample_subset_frontiers(){
   int sub_sample_size = 100 ; 
-  std::arrays<float, frontiers_set.size() > distances_table ; 
+  std::array<float, frontiers_set.size() > distances_table ; 
   if( frontiers_set.size() > sub_sample_size ){
 
     double min_value_distance = std::numeric_limits<double>::max() ; 
@@ -474,7 +474,7 @@ void NBV_Selector::sample_subset_frontiers(){
 
     }
 
-    float threshold_tirage = sample_subset_frontiers / frontiers_set.size() ;
+    float threshold_tirage = sub_sample_size / frontiers_set.size() ;
     int i = 0 ; 
     while((frontiers_subset.size() < sub_sample_size) && (i < frontiers_set.size() )){
 
