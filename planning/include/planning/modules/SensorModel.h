@@ -29,6 +29,7 @@ public:
     double p_sampling_time_;  // sample camera poses from segment, use 0 for last
                                 // only
     SensorModel(double ray_length, double fov_x, double fov_y, double resolution_x, double resolution_y, double sampling_time);
+    SensorModel();
     ~SensorModel();
     void getDirectionVector_LIDAR(Eigen::Vector3d* result, double relative_x,
                                     double relative_y);

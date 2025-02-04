@@ -13,6 +13,7 @@
 #include <voxblox_msgs/Layer.h>
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/PoseArray.h>
+#include <nav_msgs/Odometry.h>
 
 
 class NBV_Selector
@@ -148,6 +149,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //m_view_generator.set_map(m_map);
     std::string method = "sphere";
     m_view_generator = ViewGenerator(method, 5, 10, m_map);
+    //m_view_evaluator = ViewEvaluator(m_map, "", );
 
 
     //frontiers
@@ -646,7 +648,7 @@ void NBV_Selector::select_next_best_view(){
   sample_subset_frontiers();
 
   //generate views
-  generate_views()
+  generate_views();
 
   //evaluate views
   std::vector<float> values_views();
@@ -660,7 +662,7 @@ void NBV_Selector::select_next_best_view(){
     Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
     Eigen::Quaternion orient = Eigen::Quaternion( view.q_x, view.q_y, view.q_z, view.q_w);
 
-    m_view_evaluator.getVisibleVoxels(
+    m_view_evaluator.getVisibleVoxels_LIDAR(
     &visible_voxels, pos, orient) ;
 
     temp_value = m_view_evaluator.count_frontiers_view();

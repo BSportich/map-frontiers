@@ -37,6 +37,7 @@ private:
 
 public:
     ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar) ;
+    ViewEvaluator(){};
     ~ViewEvaluator();
 
     // float evaluate_view_image(const ViewCandidate& vc); 
@@ -140,7 +141,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
       if (current_segment < 0) {
         continue;  // already occluded ray
       }
-      sensor_model.getDirectionVector(
+      sensor_model.getDirectionVector_LIDAR(
           &camera_direction,
           static_cast<double>(i) / (static_cast<double>(c_res_x_) - 1.0),
           static_cast<double>(j) / (static_cast<double>(c_res_y_) - 1.0));
