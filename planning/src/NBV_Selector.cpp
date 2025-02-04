@@ -452,7 +452,8 @@ void NBV_Selector::updateFrontiers(){
 
 void NBV_Selector::sample_subset_frontiers(){
   int sub_sample_size = 100 ; 
-  std::array<float, frontiers_set.size() > distances_table ; 
+  std::vector<float> distances_table(frontiers_set.size());
+
   if( frontiers_set.size() > sub_sample_size ){
 
     double min_value_distance = std::numeric_limits<double>::max() ; 
@@ -461,7 +462,7 @@ void NBV_Selector::sample_subset_frontiers(){
 
     for(int i=0; i< frontiers_set.size(); i++){
       
-      Eigen::Vector3d current_pos = Eigen::Vector3d( m_current_pos.x, m_current_pos.y, m_current_pos.z )
+      Eigen::Vector3d current_pos = Eigen::Vector3d( m_current_pos.x, m_current_pos.y, m_current_pos.z );
       double distance_frontier = (frontiers_set[i] - current_pos).norm();
       distances_table[i] = distance_frontier ; 
 
