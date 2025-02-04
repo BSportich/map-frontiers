@@ -35,7 +35,7 @@ private:
     float value_frontier_ ; 
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name) : m_map {map}, m_method_type{method_name} ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name) ;
     ~ViewEvaluator();
 
     // float evaluate_view_image(const ViewCandidate& vc); 
@@ -48,6 +48,8 @@ public:
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(const ViewCandidate& vc);
+    void markNeighboringRays(int x, int y, int segment, int value);
+    float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set)
 
 };
 
@@ -117,7 +119,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
 
 // }
 
-void ViewEvaluator::getVisibleVoxels(
+void ViewEvaluator::getVisibleVoxels_LIDAR(
     std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position,
     const Eigen::Quaterniond& orientation) {
   // Setup ray table (contains at which segment to start, -1 if occluded
