@@ -35,7 +35,7 @@ private:
     float value_frontier_ ; 
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, , const SensorModel::SensorModel& sensor_lidar) ;
     ~ViewEvaluator();
 
     // float evaluate_view_image(const ViewCandidate& vc); 
@@ -53,7 +53,7 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel::SensorModel& sensor_lidar) : m_map {map}, m_method_type{method_name}
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel::SensorModel& sensor_lidar) 
 {
   m_map = map ;
   m_method_type = method_name ;
