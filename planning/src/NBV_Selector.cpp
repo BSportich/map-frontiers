@@ -669,7 +669,7 @@ void NBV_Selector::select_next_best_view(){
     Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
 
     m_view_evaluator.getVisibleVoxels_LIDAR(
-    &visible_voxels, pos, orient) ;
+    visible_voxels, pos, orient) ;
 
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
     values_views.push_back(temp_value);
