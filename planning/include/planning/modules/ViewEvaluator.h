@@ -49,13 +49,14 @@ public:
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(const ViewCandidate& vc);
     void markNeighboringRays(int x, int y, int segment, int value);
-    float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set)
+    float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set);
 
 };
 
 ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel::SensorModel& sensor_lidar) : m_map {map}, m_method_type{method_name}
 {
-
+  m_map = map ;
+  m_method_type = method_name ;
   p_ray_step_ = m_map->getVoxelSize() ;
   p_downsampling_factor_ = 1.0 ;
 
