@@ -35,7 +35,7 @@ private:
     float value_frontier_ ; 
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel::SensorModel& sensor_lidar) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar) ;
     ~ViewEvaluator();
 
     // float evaluate_view_image(const ViewCandidate& vc); 
@@ -44,8 +44,6 @@ public:
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
-    float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set);
-
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
     void markNeighboringRays(int x, int y, int segment, int value);
@@ -53,21 +51,21 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel::SensorModel& sensor_lidar) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar) 
 {
   m_map = map ;
   m_method_type = method_name ;
-  p_ray_step_ = m_map->getVoxelSize() ;
+  p_ray_step_ = m_map.getVoxelSize() ;
   p_downsampling_factor_ = 1.0 ;
 
   // Downsample to voxel size resolution at max range
   c_res_x_ = std::min(static_cast<int>(std::ceil(
                           sensor_lidar.p_ray_length_ * sensor_lidar.p_fov_x_ /
-                          (m_map->getVoxelSize() * p_downsampling_factor_))),
+                          (m_map.getVoxelSize() * p_downsampling_factor_))),
                       sensor_lidar.p_resolution_x_);
   c_res_y_ = std::min(static_cast<int>(std::ceil(
                           sensor_lidar.p_ray_length_ * sensor_lidar.p_fov_y_ /
-                          (m_map->getVoxelSize() * p_downsampling_factor_))),
+                          (m_map.getVoxelSize() * p_downsampling_factor_))),
                       sensor_lidar.p_resolution_y_);
 
   // Determine number of splits + split distances
@@ -104,15 +102,15 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
 //         distance += p_ray_step_;
 
 //         // Check voxel occupied
-//         if (map_->getVoxelState(current_position) ==
+//         if (map_.getVoxelState(current_position) ==
 //             map::OccupancyMap::OCCUPIED) {
 //           break;
 //         }
 
 //         // Add point (duplicates are handled in
 //         // CameraModel::getVisibleVoxelsFromTrajectory)
-//         m_map->getVoxelCenter_TSDF(&voxel_center, current_position);
-//         result->push_back(voxel_center);
+//         m_map.getVoxelCenter_TSDF(&voxel_center, current_position);
+//         result.push_back(voxel_center);
 //       }
 //     }
 //   }
@@ -155,11 +153,11 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
 
           // Add point (duplicates are handled in
           // CameraModel::getVisibleVoxelsFromTrajectory)
-          m_map->getVoxelCenter_TSDF(&voxel_center, current_position);
+          m_map.getVoxelCenter_TSDF(&voxel_center, current_position);
           result->push_back(voxel_center);
 
           // Check voxel occupied 
-          if (m_map->getVoxelState_TSDF(current_position) ==
+          if (m_map.getVoxelState_TSDF(current_position) ==
               VoxbloxMap::OCCUPIED) {
             // Occlusion, mark neighboring rays as occluded
             markNeighboringRays(i, j, current_segment, -1);
@@ -205,7 +203,7 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
         
         Eigen::Vector3d frontier = frontiers_set[j];
 
-        if( voxel_test == frontier ){ // .isApprox() ?
+        if( voxel_test.isApprox(frontier, 1e-6) ){ // .isApprox() ?
 
           evaluation = evaluation + value_frontier_ ; 
         }

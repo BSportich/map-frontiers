@@ -4,6 +4,7 @@
 #include <Eigen/Geometry>
 #include <voxblox_map/voxblox_map.h>
 #include <string>
+#include <cmath>
 
 class SensorModel
 {
