@@ -4,7 +4,7 @@
 #include <Eigen/Geometry>
 #include <voxblox_map/voxblox_map.h>
 #include <string>
-#include <SensorModel.h>
+#include <planning/modules/SensorModel.h>
 
 
 class ViewEvaluator

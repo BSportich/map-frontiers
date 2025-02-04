@@ -92,20 +92,20 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 }
 
 void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set ){
-    view_candidates.clear();
+    // view_candidates.clear();
 
-    for(int i=0; i< frontiers_set.size(); i++){
+    // for(int i=0; i< frontiers_set.size(); i++){
 
 
-        Eigen::Vector3d frontier = frontiers_set[i];
-        float temp_x = frontier.x();
-        float temp_y = frontier.y();
-        float temp_z = frontier.z(); 
+    //     Eigen::Vector3d frontier = frontiers_set[i];
+    //     float temp_x = frontier.x();
+    //     float temp_y = frontier.y();
+    //     float temp_z = frontier.z(); 
 
 
         
 
-    }
+    // }
 
 
 
