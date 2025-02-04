@@ -33,7 +33,7 @@ public:
                                     double relative_y);
 };
 
-SensorModel::SensorModel(double ray_length, double fov_x, double fov_y, double resolution_x, double resolution_y, double sampling_time) : p_ray_length_{ray_length}, p_fov_x{fov_x}, p_fov_y{fov_y}, p_resolution_x{resolution_x}, p_resolution_y{resolution_y}, p_sampling_time{sampling_time}
+SensorModel::SensorModel(double ray_length, double fov_x, double fov_y, double resolution_x, double resolution_y, double sampling_time) : p_ray_length_{ray_length}, p_fov_x_{fov_x}, p_fov_y_{fov_y}, p_resolution_x_{resolution_x}, p_resolution_y_{resolution_y}, p_sampling_time_{sampling_time}
 {
 }
 
