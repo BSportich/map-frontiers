@@ -664,12 +664,12 @@ void NBV_Selector::select_next_best_view(){
   for(int i=0;i< views.size();i++){
 
     ViewCandidate view = views[i] ; 
-    std::vector<Eigen::Vector3d> visible_voxels(); 
+    std::vector<Eigen::Vector3d> visible_voxels; 
     Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
     Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
 
     m_view_evaluator.getVisibleVoxels_LIDAR(
-    visible_voxels, pos, orient) ;
+    &visible_voxels, pos, orient) ;
 
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
     values_views.push_back(temp_value);
