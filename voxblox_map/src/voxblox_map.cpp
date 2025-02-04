@@ -177,7 +177,7 @@ double VoxbloxMap::getVoxelWeight_TSDF(const Eigen::Vector3d& point) {
 double VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }
 
 //evaluate the whole produced map 
-double evaluation_TSDF(float truncationdist){
+double VoxbloxMap::evaluation_TSDF(float truncationdist){
   double result = 0.0;
   int voxel_count = 0 ;
 
