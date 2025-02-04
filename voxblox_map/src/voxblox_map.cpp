@@ -198,15 +198,14 @@ double VoxbloxMap::evaluation_TSDF(float truncationdist){
           ++linear_index) {
       voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
       const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
-      Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
       //Test if voxel is observed
-      float voxeldistance = getVoxelDistance_TSDF(coord_3d);
+      float voxeldistance = voxel.distance;
       if(voxeldistance > 0 ){
         
         if( voxeldistance < truncationdist){
           //if closes to the surface sums its weights
-          result = result + getVoxelWeight_TSDF(coord_3d);
+          result = result + voxel.weight ;
           voxel_count = voxel_count + 1;
         }
       } 
