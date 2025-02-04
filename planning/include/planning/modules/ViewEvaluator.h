@@ -47,7 +47,7 @@ public:
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
-    void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
+    void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaternionf& orientation);
     void markNeighboringRays(int x, int y, int segment, int value);
     float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set);
 
@@ -123,7 +123,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
 
 void ViewEvaluator::getVisibleVoxels_LIDAR(
     std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position,
-    const Eigen::Quaterniond& orientation) {
+    const Eigen::Quaternionf& orientation) {
   // Setup ray table (contains at which segment to start, -1 if occluded
   ray_table_ = Eigen::ArrayXXi::Zero(c_res_x_, c_res_y_);
 
@@ -161,7 +161,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
 
           // Check voxel occupied 
           if (m_map.getVoxelState_TSDF(current_position) ==
-              voxblox_map::OCCUPIED) {
+              voxblox_map::VoxbloxMap::OCCUPIED) {
             // Occlusion, mark neighboring rays as occluded
             markNeighboringRays(i, j, current_segment, -1);
             cast_ray = false;

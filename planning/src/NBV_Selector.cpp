@@ -666,7 +666,7 @@ void NBV_Selector::select_next_best_view(){
     ViewCandidate view = views[i] ; 
     std::vector<Eigen::Vector3d> visible_voxels(); 
     Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
-    Eigen::Quaternion orient = Eigen::Quaternion( view.q_x, view.q_y, view.q_z, view.q_w);
+    Eigen::Quaternionf orient = Eigen::Quaternionf( view.q_x, view.q_y, view.q_z, view.q_w);
 
     m_view_evaluator.getVisibleVoxels_LIDAR(
     &visible_voxels, pos, orient) ;
