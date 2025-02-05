@@ -39,6 +39,8 @@ SensorModel::SensorModel(double ray_length, double fov_x, double fov_y, int reso
 {
 }
 
+SensorModel::SensorModel(){}
+
 SensorModel::~SensorModel()
 {
 }
