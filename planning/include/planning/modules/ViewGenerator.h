@@ -23,9 +23,9 @@ struct ViewCandidate
     double q_w;
 
     //origin of the generation
-    int o_x;
-    int o_y;
-    int o_z;
+    float o_x;
+    float o_y;
+    float o_z;
 
     // ViewCandidate(int x, int y, int z, float qx, float qy, float qz, float qw, int ox, int oy, int oz)
     //     : x(x), y(y), z(z), q_x(qx), q_y(qy), q_z(qz), q_w(qw), o_x(ox), o_y(oy), o_z(oz) {}

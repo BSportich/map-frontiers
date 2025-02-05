@@ -87,7 +87,7 @@ private:
 
 public:
     NBV_Selector();
-    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team);
+    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
     void sample_subset_frontiers();
 
@@ -119,7 +119,7 @@ public:
     ~NBV_Selector();
 };
 
-NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, const ViewGenerator& vg, int team_id, std::vector<int> robot_team)
+NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team)
 {
     n = nh;
     //initialization
@@ -150,7 +150,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //m_view_generator.set_map(m_map);
     std::string method = "sphere";
     m_view_generator = ViewGenerator(method, 5, 10, m_map);
-    //m_view_evaluator = ViewEvaluator(m_map, "", );
+    m_sensor_model = SensorModel()
+    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
 
 
     //frontiers
@@ -700,14 +701,37 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "nbv_selector_node");
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
+
+    //////////////View Generation parameters
     float distance_min = 1;
     float distance_max = 2;
-    ViewGenerator vg(distance_min,distance_max);
-    int team_id = 1;
+    ///////////////
 
+    //////////////View Evaluator parameters
+    float value_frontier = 1 ;
+    ///////////////
+
+    //////////////LIDAR Parameters
+    Eigen::Vector3d mounting_translation_;  // x,y,z [m]
+    Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
+    //sensor parameters
+    double p_ray_length = 10;  // params for camera model
+    double p_fov_x;  // Total fields of view [deg], expected symmetric w.r.t.
+    // sensor facing direction
+    double p_fov_y;
+    int p_resolution_x;
+    int p_resolution_y;
+    double p_sampling_time; 
+    ///////////////
+
+
+    ///////////////Robot team initialization
+    int team_id = 1;
     std::vector<int> robot_team ; 
     robot_team.push_back(team_id);
-    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, vg, team_id,  robot_team);
+    ///////////////
+
+    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, team_id,  robot_team);
     ros::spin();
     return 0;
 }
