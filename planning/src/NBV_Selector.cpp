@@ -150,7 +150,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //m_view_generator.set_map(m_map);
     std::string method = "sphere";
     m_view_generator = ViewGenerator(method, 5, 10, m_map);
-    m_sensor_model = SensorModel()
+    m_sensor_model = SensorModel() ;
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
 
 
@@ -171,7 +171,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     sub_map_tsdf = n.subscribe("tsdf_map_out", 10, &NBV_Selector::tSDFCallback, this);
     sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
     sub_pos = n.subscribe("pos", 20, &NBV_Selector::posCallback, this);
-    pub_goal = n.advertise<std_msgs::String>("pos_goal", 20); //to redefine msg type
+    pub_goal = n.advertise<nav_msgs::Odometry>("pos_goal", 20); //to redefine msg type
     pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
     pub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
@@ -614,6 +614,20 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){
 
 void NBV_Selector::publish_goal(){ 
 
+  geometry_msgs::Pose next_goal ;
+  next_goal.position.x = m_current_goal.x ; 
+  next_goal.position.y = m_current_goal.y ;
+  next_goal.position.z = m_current_goal.z ; 
+
+  next_goal.orientation.x = m_current_goal.q_x ; 
+  next_goal.orientation.y = m_current_goal.q_y ; 
+  next_goal.orientation.z = m_current_goal.q_z ; 
+  next_goal.orientation.w = m_current_goal.q_w ; 
+
+  next_goal.header.frame_id = world_frame_;
+
+  pub_goal.publish(next_goal);
+
 }
 
 void NBV_Selector::generate_views(){
@@ -716,11 +730,11 @@ int main(int argc, char** argv) {
     Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
     //sensor parameters
     double p_ray_length = 10;  // params for camera model
-    double p_fov_x;  // Total fields of view [deg], expected symmetric w.r.t.
+    double p_fov_x = ;  // Total fields of view [deg], expected symmetric w.r.t.
     // sensor facing direction
-    double p_fov_y;
-    int p_resolution_x;
-    int p_resolution_y;
+    double p_fov_y = ;
+    int p_resolution_x ;
+    int p_resolution_y ; // high number attendu
     double p_sampling_time; 
     ///////////////
 
