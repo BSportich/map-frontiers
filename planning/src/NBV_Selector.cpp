@@ -645,14 +645,14 @@ void NBV_Selector::publish_goal(){
   next_goal.header.stamp = ros::Time::now();  // Set timestamp
   next_goal.header.frame_id = world_frame_; 
 
-  next_goal.position.x = m_current_goal.x ; 
-  next_goal.position.y = m_current_goal.y ;
-  next_goal.position.z = m_current_goal.z ; 
+  next_goal.pose.position.x = m_current_goal.x ; 
+  next_goal.pose.position.y = m_current_goal.y ;
+  next_goal.pose.position.z = m_current_goal.z ; 
 
-  next_goal.orientation.x = m_current_goal.q_x ; 
-  next_goal.orientation.y = m_current_goal.q_y ; 
-  next_goal.orientation.z = m_current_goal.q_z ; 
-  next_goal.orientation.w = m_current_goal.q_w ; 
+  next_goal.pose.orientation.x = m_current_goal.q_x ; 
+  next_goal.pose.orientation.y = m_current_goal.q_y ; 
+  next_goal.pose.orientation.z = m_current_goal.q_z ; 
+  next_goal.pose.orientation.w = m_current_goal.q_w ; 
 
   pub_goal.publish(next_goal);
 
