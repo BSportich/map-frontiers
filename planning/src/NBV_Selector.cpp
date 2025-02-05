@@ -196,7 +196,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     // ros::init(argc, argv, "NBV_selector_node robot ");
     sub_map_tsdf = n.subscribe("tsdf_map_out", 10, &NBV_Selector::tSDFCallback, this);
     sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
-    sub_pos = n.subscribe("pos", 20, &NBV_Selector::posCallback, this);
+    sub_pos = n.subscribe("/intelaero_bugwright_0/groundtruth/odom", 20, &NBV_Selector::posCallback, this);
     pub_goal = n.advertise<geometry_msgs::PoseStamped>("pos_goal", 20); //to redefine msg type
     pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
@@ -249,6 +249,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
         c_neighbor_voxels_[24] = Eigen::Vector3d(-vs, vs, -vs);
         c_neighbor_voxels_[25] = Eigen::Vector3d(-vs, -vs, -vs);
     }
+
+
 
     //ros::spin()
 }
@@ -613,7 +615,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : Use tf/odometry in the multi robot case
-
+  ROS_INFO("POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
   m_current_pos.o_z = m_current_pos.z;
@@ -692,12 +694,17 @@ void NBV_Selector::publish_views(){
 
 
 void NBV_Selector::select_next_best_view(){
-
+  
+  ROS_INFO("SELECTING VIEWS NOW");
   //sample frontiers
   sample_subset_frontiers();
+  ROS_INFO("SAMPLING");
 
   //generate views
   generate_views();
+
+  ROS_INFO("GENERATING VIEWS");
+
 
   //evaluate views
   std::vector<float> values_views;
@@ -706,6 +713,9 @@ void NBV_Selector::select_next_best_view(){
   float temp_value = -1 ; 
   for(int i=0;i< views.size();i++){
 
+    ROS_INFO("GET VOXELS VIEW %d", i);
+
+
     ViewCandidate view = views[i] ; 
     std::vector<Eigen::Vector3d> visible_voxels; 
     Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
@@ -713,6 +723,8 @@ void NBV_Selector::select_next_best_view(){
 
     m_view_evaluator.getVisibleVoxels_LIDAR(
     &visible_voxels, pos, orient) ;
+
+    ROS_INFO("COUNTING FRONTIERS VIEW %d", i);
 
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
     values_views.push_back(temp_value);
