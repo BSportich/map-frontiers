@@ -14,6 +14,7 @@
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/PoseArray.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PoseStamped.h>
 
 
 struct system_parameters
@@ -196,7 +197,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     sub_map_tsdf = n.subscribe("tsdf_map_out", 10, &NBV_Selector::tSDFCallback, this);
     sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
     sub_pos = n.subscribe("pos", 20, &NBV_Selector::posCallback, this);
-    pub_goal = n.advertise<nav_msgs::Odometry>("pos_goal", 20); //to redefine msg type
+    pub_goal = n.advertise<geometry_msgs::PoseStamped>("pos_goal", 20); //to redefine msg type
     pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
     pub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
@@ -639,7 +640,11 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
 void NBV_Selector::publish_goal(){ 
 
-  geometry_msgs::Pose next_goal ;
+  geometry_msgs::PoseStamped next_goal ;
+
+  next_goal.header.stamp = ros::Time::now();  // Set timestamp
+  next_goal.header.frame_id = world_frame_; 
+
   next_goal.position.x = m_current_goal.x ; 
   next_goal.position.y = m_current_goal.y ;
   next_goal.position.z = m_current_goal.z ; 
@@ -648,8 +653,6 @@ void NBV_Selector::publish_goal(){
   next_goal.orientation.y = m_current_goal.q_y ; 
   next_goal.orientation.z = m_current_goal.q_z ; 
   next_goal.orientation.w = m_current_goal.q_w ; 
-
-  next_goal.header.frame_id = world_frame_;
 
   pub_goal.publish(next_goal);
 
@@ -761,7 +764,7 @@ int main(int argc, char** argv) {
     sys_params.p_fov_x = 63.05;
     sys_params.p_resolution_x = 40 ;
     sys_params.p_resolution_y = 40; // high number attendu
-    sys_params.p_sampling_time; 
+    sys_params.p_sampling_time =1; 
     ///////////////
 
 
