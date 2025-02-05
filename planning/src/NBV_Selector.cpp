@@ -112,7 +112,7 @@ private:
 
 public:
     NBV_Selector();
-    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team);
+    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param);
     void updateFrontiers();
     void sample_subset_frontiers();
 
@@ -144,7 +144,7 @@ public:
     ~NBV_Selector();
 };
 
-NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team)
+NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param)
 {
     n = nh;
     //initialization
@@ -175,7 +175,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //m_view_generator.set_map(m_map);
     std::string method = "sphere";
     m_view_generator = ViewGenerator(method, 5, 10, m_map);
-    m_sensor_model = SensorModel() ;
+    m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
 
 
@@ -741,7 +741,7 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
 
-    system_parameters sys_param ; 
+    system_parameters sys_params ; 
     //////////////View Generation parameters
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
@@ -771,7 +771,7 @@ int main(int argc, char** argv) {
     robot_team.push_back(team_id);
     ///////////////
 
-    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, team_id,  robot_team);
+    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, team_id,  robot_team, sys_params);
     ros::spin();
     return 0;
 }
