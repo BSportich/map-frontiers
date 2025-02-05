@@ -16,6 +16,31 @@
 #include <nav_msgs/Odometry.h>
 
 
+struct system_parameters
+{
+      //////////////View Generation parameters
+    float distance_min ;
+    float distance_max ;
+    ///////////////
+
+    //////////////View Evaluator parameters
+    float value_frontier ;
+    ///////////////
+
+    //////////////LIDAR Parameters
+    Eigen::Vector3d mounting_translation_;  // x,y,z [m]
+    Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
+    //sensor parameters
+    double p_ray_length ;  // params for camera model
+    double p_fov_x ;  // Total fields of view [deg], expected symmetric w.r.t.
+    // sensor facing direction
+    double p_fov_y ;
+    int p_resolution_x ;
+    int p_resolution_y ; // high number attendu
+    double p_sampling_time;
+};
+
+
 class NBV_Selector
 {
 private:
@@ -586,7 +611,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
 }
 
-void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){
+void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : Use tf/odometry in the multi robot case
 
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
@@ -716,26 +741,27 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
 
+    system_parameters sys_param ; 
     //////////////View Generation parameters
-    float distance_min = 1;
-    float distance_max = 2;
+    sys_params.distance_min = 1;
+    sys_params.distance_max = 2;
     ///////////////
 
     //////////////View Evaluator parameters
-    float value_frontier = 1 ;
+    sys_params.value_frontier = 1 ;
     ///////////////
 
     //////////////LIDAR Parameters
     Eigen::Vector3d mounting_translation_;  // x,y,z [m]
     Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
     //sensor parameters
-    double p_ray_length = 10;  // params for camera model
-    double p_fov_x = ;  // Total fields of view [deg], expected symmetric w.r.t.
+    sys_params.p_ray_length = 10;  // params for camera model
+    sys_params.p_fov_y = 360;  // Total fields of view [deg], expected symmetric w.r.t.
     // sensor facing direction
-    double p_fov_y = ;
-    int p_resolution_x ;
-    int p_resolution_y ; // high number attendu
-    double p_sampling_time; 
+    sys_params.p_fov_x = 63.05;
+    sys_params.p_resolution_x = 40 ;
+    sys_params.p_resolution_y = 40; // high number attendu
+    sys_params.p_sampling_time; 
     ///////////////
 
 
