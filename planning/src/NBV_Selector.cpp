@@ -3,6 +3,7 @@
 #include "planning/modules/ViewGenerator.h"
 #include "planning/modules/ViewEvaluator.h"
 #include <string>
+#include <math.h> 
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -663,7 +664,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
 
   if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
-    float pos_test = (m_current_pos.x - m_current_goal.x ) ** 2 + (m_current_pos.y - m_current_goal.y ) ** 2 + (m_current_pos.z - m_current_goal.z ) ** 2 
+    float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
     if(pos_test < m_tolerance_distance_ ){
       m_availability = AVAILABLE ; 
     }
