@@ -704,9 +704,11 @@ void NBV_Selector::select_next_best_view(){
   ROS_INFO("SAMPLING");
 
   //generate views
-  generate_views();
-
   ROS_INFO("GENERATING VIEWS");
+  generate_views();
+  ROS_INFO("PUBLISHING VIEWS");
+  publish_views()
+
 
 
   //evaluate views
