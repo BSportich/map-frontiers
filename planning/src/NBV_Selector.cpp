@@ -22,6 +22,7 @@ struct system_parameters
       //////////////View Generation parameters
     float distance_min ;
     float distance_max ;
+    int subsampling_views ;
     ///////////////
 
     //////////////View Evaluator parameters
@@ -64,6 +65,7 @@ private:
 
     //views generated poses
     geometry_msgs::PoseArray views_set; 
+    int m_sub_sample_size_ ;
 
     bool m_frontier6;
     bool m_surface_frontiers;
@@ -178,7 +180,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_view_generator = ViewGenerator(method, 5, 10, m_map);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
-
+    m_sub_sample_size_ = sys_param.subsampling_views ; 
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -481,7 +483,7 @@ void NBV_Selector::updateFrontiers(){
 
 
 void NBV_Selector::sample_subset_frontiers(){
-  int sub_sample_size = 100 ; 
+  int sub_sample_size = m_sub_sample_size_ ; 
   std::vector<float> distances_table(frontiers_set.size());
 
   if( frontiers_set.size() > sub_sample_size ){
@@ -762,6 +764,7 @@ int main(int argc, char** argv) {
     //////////////View Generation parameters
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
+    sys_params.subsampling_views = 10 ;
     ///////////////
 
     //////////////View Evaluator parameters
