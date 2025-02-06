@@ -118,7 +118,7 @@ void findOrientation(ViewCandidate& vc){
     Eigen::Vector3d frontier_pos( vc.o_x, vc.o_y, vc.o_z ) ;
 
     //Computes direction vector
-    Eigen::Vector3d direction = view_pos - frontier_pos ; 
+    Eigen::Vector3d direction =  frontier_pos - view_pos ; 
     
     // Normalize the direction vector to get the forward vector
     Eigen::Vector3d forward = direction.normalized();
