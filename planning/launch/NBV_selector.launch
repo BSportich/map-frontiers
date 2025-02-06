@@ -3,6 +3,7 @@
   <arg name="voxels_per_side" default="16" />
   <arg name="sub_sample_size" default="10" />
   <arg name="namespace" default="" />
+  <arg name="timer" default="true" />
 
     <node name="drone_NBV_selector" pkg="map_frontiers" type="NBV_Selector" output="screen">
         <remap from="esdf_map_out" to="/voxblox_node/esdf_map_out" />

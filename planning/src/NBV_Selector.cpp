@@ -119,7 +119,7 @@ private:
     const static unsigned char AVAILABLE = 0;  // NOLINT
     const static unsigned char BUSY = 1;      // NOLINT
 
-
+    bool timer_=false;
 
 public:
     NBV_Selector();
@@ -181,6 +181,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     nh_private.param("sub_sample_size", sys_param.subsampling_views, sys_param.subsampling_views);
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
+
+    nh_private.param("timer", timer_, timer_);
 
     world_frame_ = "world";
     //map
@@ -419,6 +421,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
 
 
 void NBV_Selector::updateFrontiers(){
+    ros::Time start_update_frontiers = ros::Time::now();
 
     unsigned char current_state;
     ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
@@ -488,17 +491,19 @@ void NBV_Selector::updateFrontiers(){
 
       }
 
-      ROS_INFO_ONCE("Frontiers updated!");
-
     //block.voxel_size()
     }
-
+    ROS_INFO_ONCE("Frontiers updated!");
+    ros::Time end_update_frontiers = ros::Time::now();
+    ros::Duration duration = end_update_frontiers - start_update_frontiers;
+    ROS_INFO_COND(timer_, "[NBV_Selector][updateFrontiers] %.4f s", duration.toSec());
     
 
  }
 
 
 void NBV_Selector::sample_subset_frontiers(){
+  ros::Time start_sample_subset_frontiers = ros::Time::now();
   frontiers_sub_pointcloud.clear();
   frontiers_subset.clear();
 
@@ -559,6 +564,9 @@ void NBV_Selector::sample_subset_frontiers(){
     frontiers_subset = frontiers_set ; 
   }
 
+  ros::Time end_sample_subset_frontiers = ros::Time::now();
+  ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
+  ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers] %.4f s", duration.toSec());
 }
 
 NBV_Selector::~NBV_Selector()
@@ -709,10 +717,13 @@ void NBV_Selector::publish_goal(){
 }
 
 void NBV_Selector::generate_views(){
-
+  ros::Time start_generate_views = ros::Time::now();
   //m_view_generator.generateViews(frontiers_set);
   m_view_generator.generateViews(frontiers_subset);
   views = m_view_generator.getViewCandidates();
+  ros::Time end_generate_views = ros::Time::now();
+  ros::Duration duration = end_generate_views - start_generate_views;
+  ROS_INFO_COND(timer_, "[NBV_Selector][generate_views] %.4f s", duration.toSec());
 }
 
 void NBV_Selector::publish_views(){
@@ -777,8 +788,12 @@ void NBV_Selector::select_next_best_view(){
     Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
     Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
 
+    ros::Time start_get_visible_voxels_lidar = ros::Time::now();
     m_view_evaluator.getVisibleVoxels_LIDAR(
     &visible_voxels, pos, orient) ;
+    ros::Time end_get_visible_voxels_lidar = ros::Time::now();
+    ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
+    ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
 
     ROS_INFO("COUNTING FRONTIERS VIEW %d", i);
 
