@@ -65,6 +65,7 @@ bool VoxbloxMap::isObserved_ESDF(const Eigen::Vector3d& point) {
 
 
 // get occupancy - use ESDF
+//inappropriate !!! 
 unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
   double distance = 0.0;
   if (esdf_map_pointer->getDistanceAtPosition(point, &distance)) {
@@ -80,6 +81,23 @@ unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
 }
 // get occupancy - use TSDF
 //getDistanceAtPosition unavailable in TSDF_map.h
+
+//THIS FUNCTION SHOULD BE USED FOR FRONTIERS DETECTION !! 
+unsigned char VoxbloxMap::getVoxelState_TSDF(const Eigen::Vector3d& point) {
+  double distance = getVoxelDistance_TSDF(point);
+  double weight = getVoxelWeight_TSDF(point);
+  double threshold = 0.3 ; 
+  if (weight > threshold) {
+    // This means the voxel is observed
+    if (distance < c_voxel_size_) {
+      return VoxbloxMap::OCCUPIED;
+    } else {
+      return VoxbloxMap::FREE;
+    }
+  } else {
+    return VoxbloxMap::UNKNOWN;
+  }
+}
 
 
 // get voxel size 
@@ -157,5 +175,48 @@ double VoxbloxMap::getVoxelWeight_TSDF(const Eigen::Vector3d& point) {
 
 // get the maximum allowed weight (return 0 if using uncapped weights)
 double VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }
+
+//evaluate the whole produced map 
+double VoxbloxMap::evaluation_TSDF(float truncationdist){
+  double result = 0.0;
+  int voxel_count = 0 ;
+
+  voxblox::BlockIndexList blocks;
+  tsdf_map_pointer->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
+
+  // Cache layer settings.
+  size_t vps = tsdf_map_pointer->getTsdfLayerPtr()->voxels_per_side();
+  size_t num_voxels_per_block = vps * vps * vps;
+
+  for (const voxblox::BlockIndex& index : blocks) {
+    // Iterate over all voxels in said blocks.
+    const voxblox::Block<voxblox::TsdfVoxel>& block = tsdf_map_pointer->getTsdfLayerPtr()->getBlockByIndex(index);
+
+    voxblox::Point origin = block.origin();
+
+    for (size_t linear_index = 0; linear_index < num_voxels_per_block;
+          ++linear_index) {
+      voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+      const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+
+      //Test if voxel is observed
+      float voxeldistance = voxel.distance;
+      if(voxeldistance > 0 ){
+        
+        if( voxeldistance < truncationdist){
+          //if closes to the surface sums its weights
+          result = result + voxel.weight ;
+          voxel_count = voxel_count + 1;
+        }
+      } 
+
+    }
+
+  }
+
+  return result/voxel_count;
+
+}
+
 
 }

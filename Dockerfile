@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone the repository and get the commit to be checkout at from the docker-compose.yaml file
-ARG BRANCH='test/avenue'
+ARG BRANCH='merge/px4_nbv_selector'
 ARG BRANCH_COMMIT=$BRANCH # Checkout the last commit per default
 RUN git clone --single-branch --branch $BRANCH https://github.com/BSportich/map-frontiers.git \ 
     && cd /opt/catkin_ws/src/map-frontiers/ \
@@ -35,6 +35,7 @@ RUN catkin config  --extend /opt/ros/noetic \
 
 # # Hacky hack
 RUN mkdir -p /opt/catkin_ws/devel/.private/voxblox_map/include/ \
+    && mkdir -p /opt/catkin_ws/devel/.private/map_frontiers/include/ \
     && catkin build map_frontiers
 
 # # Source the setup.bash so that the package is available in the environment

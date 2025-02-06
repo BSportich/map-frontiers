@@ -36,6 +36,7 @@ class VoxbloxMap {
 
   // get occupancy
   unsigned char getVoxelState_ESDF(const Eigen::Vector3d& point) ;
+  unsigned char getVoxelState_TSDF(const Eigen::Vector3d& point);
 
   // get voxel size
   double getVoxelSize() ;
@@ -72,6 +73,10 @@ class VoxbloxMap {
   double get_collision_radius();
   double get_confidence_threshold();
   double get_distance_threshold();
+
+  //evaluation of the total map
+  double evaluation_TSDF(float truncationdist);
+  double evaluation_ESDF();
 
   
 private:

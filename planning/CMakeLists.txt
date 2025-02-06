@@ -8,25 +8,28 @@ catkin_simple(ALL_DEPS_REQUIRED)
 
 add_definitions(-std=c++14 -Wall -Wextra)
 
+
 #############
 # LIBRARIES #
 #############
 
 cs_add_library(${PROJECT_NAME}
-  src/NBV_Selector.cpp
+  src/ViewGenerator.cpp
 )
 
 ############
 # BINARIES #
 ############
 
+# Add the NBV_Selector executable, but do not compile it into the library.
 cs_add_executable(NBV_Selector
   src/NBV_Selector.cpp
 )
+# Link the NBV_Selector executable against the library.
 target_link_libraries(NBV_Selector ${PROJECT_NAME})
 
 ##########
 # EXPORT #
 ##########
 cs_install()
-#cs_export()
+cs_export(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include)
