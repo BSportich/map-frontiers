@@ -1,10 +1,14 @@
 <launch>
   <arg name="voxel_size" default="0.2" />
   <arg name="voxels_per_side" default="16" />
+  <arg name="namespace" default="" />
 
     <node name="drone_NBV_selector" pkg="map_frontiers" type="NBV_Selector" output="screen">
         <remap from="esdf_map_out" to="/voxblox_node/esdf_map_out" />
         <remap from="tsdf_map_out" to="/voxblox_node/tsdf_map_out" />
+
+        <remap from="pos_goal" to="/$(arg namespace)/next_best_viewpoint" />
+        <!-- TODO: same with odometry -->
 
         <param name="voxel_size" value="$(arg voxel_size)" />
         <param name="voxels_per_side" value="$(arg voxels_per_side)" />
