@@ -49,6 +49,7 @@ private:
     voxblox_map::VoxbloxMap m_map;
     std::string world_frame_;
 
+    int sub_sample_size;
     ViewGenerator m_view_generator;
     std::vector<ViewCandidate> views;
     std::vector<Eigen::Vector3d> frontiers_set ;
@@ -167,6 +168,9 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
     ROS_INFO("Received voxels_per_side: %i found", voxels_per_side);
+
+    nh_private.param("sub_sample_size", sub_sample_size, sub_sample_size);
+    ROS_INFO("Received sub_sample_size: %i", sub_sample_size);
 
     world_frame_ = "world";
     //map
@@ -481,7 +485,6 @@ void NBV_Selector::updateFrontiers(){
 
 
 void NBV_Selector::sample_subset_frontiers(){
-  int sub_sample_size = 100 ; 
   std::vector<float> distances_table(frontiers_set.size());
 
   if( frontiers_set.size() > sub_sample_size ){

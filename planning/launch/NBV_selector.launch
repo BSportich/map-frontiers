@@ -1,6 +1,7 @@
 <launch>
   <arg name="voxel_size" default="0.2" />
   <arg name="voxels_per_side" default="16" />
+  <arg name="sub_sample_size" default="10" />
   <arg name="namespace" default="" />
 
     <node name="drone_NBV_selector" pkg="map_frontiers" type="NBV_Selector" output="screen">
@@ -12,6 +13,8 @@
 
         <param name="voxel_size" value="$(arg voxel_size)" />
         <param name="voxels_per_side" value="$(arg voxels_per_side)" />
+        
+        <param name="sub_sample_size" value="$(arg sub_sample_size)" />
     </node>
 
 </launch>
