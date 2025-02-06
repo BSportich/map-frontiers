@@ -659,6 +659,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
     select_next_best_view();
 
     publish_goal();
+    m_availability = BUSY ; 
 
     
   }
