@@ -22,6 +22,7 @@ struct system_parameters
       //////////////View Generation parameters
     float distance_min ;
     float distance_max ;
+    int subsampling_views ;
     ///////////////
 
     //////////////View Evaluator parameters
@@ -49,7 +50,6 @@ private:
     voxblox_map::VoxbloxMap m_map;
     std::string world_frame_;
 
-    int sub_sample_size;
     ViewGenerator m_view_generator;
     std::vector<ViewCandidate> views;
     std::vector<Eigen::Vector3d> frontiers_set ;
@@ -65,6 +65,7 @@ private:
 
     //views generated poses
     geometry_msgs::PoseArray views_set; 
+    int m_sub_sample_size_ ;
 
     bool m_frontier6;
     bool m_surface_frontiers;
@@ -169,8 +170,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
     ROS_INFO("Received voxels_per_side: %i found", voxels_per_side);
 
-    nh_private.param("sub_sample_size", sub_sample_size, sub_sample_size);
-    ROS_INFO("Received sub_sample_size: %i", sub_sample_size);
+    nh_private.param("sub_sample_size", sys_param.subsampling_views, sys_param.subsampling_views);
+    ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
 
     world_frame_ = "world";
     //map
@@ -182,7 +183,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_view_generator = ViewGenerator(method, 5, 10, m_map);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
-
+    m_sub_sample_size_ = sys_param.subsampling_views ; 
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -487,7 +488,7 @@ void NBV_Selector::updateFrontiers(){
 void NBV_Selector::sample_subset_frontiers(){
   std::vector<float> distances_table(frontiers_set.size());
 
-  if( frontiers_set.size() > sub_sample_size ){
+  if( frontiers_set.size() > m_sub_sample_size_ ){
 
     double min_value_distance = std::numeric_limits<double>::max() ; 
     double max_value_distance = std::numeric_limits<double>::min() ; 
@@ -508,9 +509,9 @@ void NBV_Selector::sample_subset_frontiers(){
 
     }
 
-    float threshold_tirage = sub_sample_size / frontiers_set.size() ;
+    float threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
     int i = 0 ; 
-    while((frontiers_subset.size() < sub_sample_size) && (i < frontiers_set.size() )){
+    while((frontiers_subset.size() < m_sub_sample_size_) && (i < frontiers_set.size() )){
 
         float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
@@ -705,9 +706,11 @@ void NBV_Selector::select_next_best_view(){
   ROS_INFO("SAMPLING");
 
   //generate views
-  generate_views();
-
   ROS_INFO("GENERATING VIEWS");
+  generate_views();
+  ROS_INFO("PUBLISHING VIEWS");
+  publish_views();
+
 
 
   //evaluate views
@@ -765,6 +768,7 @@ int main(int argc, char** argv) {
     //////////////View Generation parameters
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
+    sys_params.subsampling_views = 10 ;
     ///////////////
 
     //////////////View Evaluator parameters
