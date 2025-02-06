@@ -19,7 +19,11 @@
 
 struct system_parameters
 {
-      //////////////View Generation parameters
+
+    ///////////////NAVIGATION
+    float tolerance_distance ; 
+
+    //////////////View Generation parameters
     float distance_min ;
     float distance_max ;
     int subsampling_views ;
@@ -67,6 +71,7 @@ private:
     //views generated poses
     geometry_msgs::PoseArray views_set; 
     int m_sub_sample_size_ ;
+    float m_tolerance_distance_ ; 
 
     bool m_frontier6;
     bool m_surface_frontiers;
@@ -184,6 +189,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
     m_sub_sample_size_ = sys_param.subsampling_views ; 
+    m_tolerance_distance_ = sys_param.tolerance_distance ; 
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -654,6 +660,14 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.q_z = msg_odom.pose.pose.orientation.z ;
   m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
 
+  if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
+    float pos_test = (m_current_pos.x - m_current_goal.x ) ** 2 + (m_current_pos.y - m_current_goal.y ) ** 2 + (m_current_pos.z - m_current_goal.z ) ** 2 
+    if(pos_test < m_tolerance_distance_ ){
+      m_availability = AVAILABLE ; 
+    }
+
+  }
+
   if( m_availability == AVAILABLE) {
 
     select_next_best_view();
@@ -791,6 +805,10 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh_private("~");  
 
     system_parameters sys_params ; 
+    /////////////// NAVIGATION
+    sys_params.tolerance_distance = 0.2 ;
+
+
     //////////////View Generation parameters
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
