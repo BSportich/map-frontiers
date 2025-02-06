@@ -11,8 +11,8 @@
     <arg name="voxel_size" value="$(arg voxel_size)"/>
     <arg name="voxels_per_side" value="$(arg voxels_per_side)"/>
     <!-- TODO: Should launch this node as many time as $(arg number_of_drones)-->
-    <arg name="id"      value= "0" />
-    <param name="namespace"           value="/$(arg drone)_$(arg id)"/>
+    <!-- <arg name="id"      value= "0" /> -->
+    <arg name="namespace"           value="/$(arg drone)_0"/>
   </include>
 
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
@@ -40,5 +40,5 @@
 
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/mai_25cm.rviz" />
   <!-- To avoid being spammed with rviz warnings -->
-  <node pkg="rosservice" type="rosservice" name="rvizvisualisation" args="call --wait /rvizvisualisation/set_logger_level 'ros' 'error'" />
+  <node pkg="rosservice" type="rosservice" name="rvizvisualisationlogservicecall" args="call --wait /rvizvisualisation/set_logger_level 'ros' 'error'" />
 </launch>
