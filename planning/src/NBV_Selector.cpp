@@ -693,6 +693,7 @@ void NBV_Selector::publish_views(){
 }
 
 
+//Called in poscallback after pose updated
 void NBV_Selector::select_next_best_view(){
   
   ROS_INFO("SELECTING VIEWS NOW");
@@ -711,6 +712,7 @@ void NBV_Selector::select_next_best_view(){
   int index_of_nbv = -1 ;
   float max_value_nbv = -1 ; 
   float temp_value = -1 ; 
+  m_current_goal = m_current_pos;
   ROS_INFO("EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
@@ -735,16 +737,15 @@ void NBV_Selector::select_next_best_view(){
 
     }
 
-  m_current_goal = views[index_of_nbv];
-
 
   }
 
 
   //select views
 
-
-
+  if (views.size() > 0){
+    m_current_goal = views[index_of_nbv];
+  }
 
 
 
