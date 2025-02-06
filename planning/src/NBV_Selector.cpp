@@ -667,6 +667,8 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
     float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
     if(pos_test < m_tolerance_distance_ ){
       m_availability = AVAILABLE ; 
+      ROS_INFO("ROBOT IS NOW AVAILABLE");
+
     }
 
   }
@@ -677,6 +679,8 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
     publish_goal();
     m_availability = BUSY ; 
+    ROS_INFO("ROBOT IS NOW BUSY");
+
 
     
   }
@@ -793,6 +797,7 @@ void NBV_Selector::select_next_best_view(){
   //select views
 
   if (views.size() > 0){
+    ROS_INFO("UPDATING CURRENT GOAL ");
     m_current_goal = views[index_of_nbv];
   }
 
