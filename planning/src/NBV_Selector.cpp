@@ -601,12 +601,12 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_ONCE("Frontiers updating ...");
     updateFrontiers();
     ROS_INFO_ONCE("Frontiers publishing ...");
-    publish_all_frontiers();
-    ROS_INFO_ONCE("Frontiers published !");
-    generate_views() ; 
-    ROS_INFO_ONCE("Views generated !");
-    publish_views();
-    ROS_INFO_ONCE("Views published !");
+    //publish_all_frontiers();
+    // ROS_INFO_ONCE("Frontiers published !");
+    // generate_views() ; 
+    // ROS_INFO_ONCE("Views generated !");
+    // publish_views();
+    // ROS_INFO_ONCE("Views published !");
 
     }
   
@@ -711,6 +711,7 @@ void NBV_Selector::select_next_best_view(){
   int index_of_nbv = -1 ;
   float max_value_nbv = -1 ; 
   float temp_value = -1 ; 
+  ROS_INFO("EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
     ROS_INFO("GET VOXELS VIEW %d", i);
