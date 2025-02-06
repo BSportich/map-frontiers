@@ -60,6 +60,7 @@ private:
 
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
+    pcl::PointCloud<pcl::PointXYZRGB> frontiers_sub_pointcloud ;
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud ; 
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud2 ; 
 
@@ -82,6 +83,7 @@ private:
     //frontiers and tsdfs
     ros::Publisher pub_pointcloud;
     ros::Publisher pub_frontiers;
+    ros::Publisher pub_sub_frontiers;
     ros::Publisher pub_test_values;
     ros::Publisher pub_test_values2;
     //views and selected views
@@ -128,6 +130,7 @@ public:
 
     void publishAllUpdatedTsdfVoxels() ;
     void publish_all_frontiers();
+    void publish_sub_frontiers();
 
     void generate_views();
     void publish_views();
@@ -186,6 +189,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     frontiers_set = std::vector<Eigen::Vector3d>();
     frontiers_subset = std::vector<Eigen::Vector3d>();
     frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
+    frontiers_sub_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud2 = pcl::PointCloud<pcl::PointXYZRGB>(); 
 
@@ -204,6 +208,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
           "test_point_cloud", 1, true);
     pub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "frontiers_point_cloud", 1, true);
+    pub_sub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
+          "subfrontiers_point_cloud", 1, true);
 
     pub_test_values = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "empty_point_cloud", 1, true);
@@ -484,6 +490,9 @@ void NBV_Selector::updateFrontiers(){
 
 void NBV_Selector::sample_subset_frontiers(){
   int sub_sample_size = m_sub_sample_size_ ; 
+  frontiers_sub_pointcloud.clear();
+  frontiers_subset.clear();
+
   std::vector<float> distances_table(frontiers_set.size());
 
   if( frontiers_set.size() > sub_sample_size ){
@@ -518,6 +527,16 @@ void NBV_Selector::sample_subset_frontiers(){
         if(value_tirage > threshold_tirage){
 
           frontiers_subset.push_back(frontiers_set[i]);
+
+          pcl::PointXYZRGB point;
+          point.x = frontiers_set[i].x();
+          point.y = frontiers_set[i].y();
+          point.z = frontiers_set[i].z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          frontiers_sub_pointcloud.push_back(point);
+          
 
         }
         i=i+1;
@@ -562,6 +581,11 @@ void NBV_Selector::publish_all_frontiers(){
   pub_test_values.publish( values_for_eval_pointcloud);
   pub_test_values2.publish( values_for_eval_pointcloud2);
 
+}
+
+void NBV_Selector::publish_sub_frontiers(){
+  frontiers_sub_pointcloud.header.frame_id = world_frame_;
+  pub_sub_frontiers.publish(frontiers_sub_pointcloud);
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
@@ -702,6 +726,9 @@ void NBV_Selector::select_next_best_view(){
   //sample frontiers
   sample_subset_frontiers();
   ROS_INFO("SAMPLING");
+  publish_sub_frontiers();
+  ROS_INFO("PUBLISHING SUB FRONTIERS");
+
 
   //generate views
   ROS_INFO("GENERATING VIEWS");
