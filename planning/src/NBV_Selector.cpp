@@ -778,6 +778,9 @@ int main(int argc, char** argv) {
     sys_params.p_resolution_x = 40 ;
     sys_params.p_resolution_y = 40; // high number attendu
     sys_params.p_sampling_time =1; 
+
+    sys_params.p_fov_x_ *= M_PI / 180.0;
+    sys_params.p_fov_y_ *= M_PI / 180.0;
     ///////////////
 
 
