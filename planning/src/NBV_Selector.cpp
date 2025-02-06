@@ -119,7 +119,8 @@ private:
     const static unsigned char AVAILABLE = 0;  // NOLINT
     const static unsigned char BUSY = 1;      // NOLINT
 
-    bool timer_=false;
+    bool timer_ = false;
+    bool verbose_ = false;
 
 public:
     NBV_Selector();
@@ -183,6 +184,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
 
     nh_private.param("timer", timer_, timer_);
+    nh_private.param("verbose", verbose_, verbose_);
 
     world_frame_ = "world";
     //map
@@ -424,7 +426,7 @@ void NBV_Selector::updateFrontiers(){
     ros::Time start_update_frontiers = ros::Time::now();
 
     unsigned char current_state;
-    ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
+    ROS_INFO_COND(verbose_, "Updated frontiers: %lu found", frontiers_set.size());
 
     voxblox::BlockIndexList blocks;
     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
@@ -658,7 +660,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : Use tf/odometry in the multi robot case
-  ROS_INFO("POS CALLBACK");
+  ROS_INFO_COND(verbose_, "POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
   m_current_pos.o_z = m_current_pos.z;
@@ -675,7 +677,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
     float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
     if(pos_test < m_tolerance_distance_ ){
       m_availability = AVAILABLE ; 
-      ROS_INFO("ROBOT IS NOW AVAILABLE");
+      ROS_INFO_COND(verbose_, "ROBOT IS NOW AVAILABLE");
 
     }
 
@@ -687,7 +689,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
     publish_goal();
     m_availability = BUSY ; 
-    ROS_INFO("ROBOT IS NOW BUSY");
+    ROS_INFO_COND(verbose_, "ROBOT IS NOW BUSY");
 
 
     
@@ -747,7 +749,7 @@ void NBV_Selector::publish_views(){
 
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
-  //ROS_INFO("Views published ! %lu ", views_set.size()) ;
+  //ROS_INFO_COND(verbose_, "Views published ! %lu ", views_set.size()) ;
 
 }
 
@@ -755,18 +757,18 @@ void NBV_Selector::publish_views(){
 //Called in poscallback after pose updated
 void NBV_Selector::select_next_best_view(){
   
-  ROS_INFO("SELECTING VIEWS NOW");
+  ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
   //sample frontiers
   sample_subset_frontiers();
-  ROS_INFO("SAMPLING");
+  ROS_INFO_COND(verbose_, "SAMPLING");
   publish_sub_frontiers();
-  ROS_INFO("PUBLISHING SUB FRONTIERS");
+  ROS_INFO_COND(verbose_, "PUBLISHING SUB FRONTIERS");
 
 
   //generate views
-  ROS_INFO("GENERATING VIEWS");
+  ROS_INFO_COND(verbose_, "GENERATING VIEWS");
   generate_views();
-  ROS_INFO("PUBLISHING VIEWS");
+  ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
   publish_views();
 
 
@@ -777,10 +779,10 @@ void NBV_Selector::select_next_best_view(){
   float max_value_nbv = -1 ; 
   float temp_value = -1 ; 
   m_current_goal = m_current_pos;
-  ROS_INFO("EXAMINING %d", views.size());
+  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
-    ROS_INFO("GET VOXELS VIEW %d", i);
+    ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
 
 
     ViewCandidate view = views[i] ; 
@@ -795,7 +797,7 @@ void NBV_Selector::select_next_best_view(){
     ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
     ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
 
-    ROS_INFO("COUNTING FRONTIERS VIEW %d", i);
+    ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
 
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
     values_views.push_back(temp_value);
@@ -812,7 +814,7 @@ void NBV_Selector::select_next_best_view(){
   //select views
 
   if (views.size() > 0){
-    ROS_INFO("UPDATING CURRENT GOAL ");
+    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
     m_current_goal = views[index_of_nbv];
   }
 

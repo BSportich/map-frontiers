@@ -1,4 +1,7 @@
 <launch>
+  <arg name="timer" default="false" />
+  <arg name="verbose" default="false" />
+
   <param name="use_sim_time" value="true" />
   <arg name="process_every_nth_frame" default="1" />
 
@@ -16,6 +19,9 @@
     <!-- TODO: Should launch this node as many time as $(arg number_of_drones)-->
     <!-- <arg name="id"      value= "0" /> -->
     <arg name="namespace"           value="/$(arg drone)_0"/>
+
+    <arg name="timer" value="$(arg timer)" />
+    <arg name="verbose" value="$(arg verbose)" />
   </include>
 
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
