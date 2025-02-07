@@ -7,6 +7,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <std_srvs/Empty.h>
 #include "voxblox/utils/timing.h"
 #include "voxblox_ros/conversions.h"
 #include "voxblox_ros/ptcloud_vis.h"
@@ -86,6 +87,8 @@ private:
     ros::Subscriber sub_map_esdf;
     ros::Subscriber sub_pos;
     ros::Publisher pub_goal;
+    ros::ServiceServer start_server;
+    ros::ServiceServer stop_server;
     //frontiers and tsdfs
     ros::Publisher pub_pointcloud;
     ros::Publisher pub_frontiers;
@@ -119,8 +122,10 @@ private:
     const static unsigned char AVAILABLE = 0;  // NOLINT
     const static unsigned char BUSY = 1;      // NOLINT
 
+    // GENERAL BEHAVIOUR
     bool timer_ = false;
     bool verbose_ = false;
+    bool is_started_ = false;
 
 public:
     NBV_Selector();
@@ -152,6 +157,12 @@ public:
     void tSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void eSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void posCallback(const nav_msgs::Odometry& msg_odom);
+    bool startCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
+    bool stopCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
   
 
     ~NBV_Selector();
@@ -238,6 +249,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
 
+    start_server = n.advertiseService("start_NBV_selector", &NBV_Selector::startCallback, this);
+    stop_server = n.advertiseService("stop_NBV_selector", &NBV_Selector::stopCallback, this);
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -612,6 +625,9 @@ void NBV_Selector::publish_sub_frontiers(){
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
+  if (!is_started_)
+    return;
+
   voxblox::timing::Timer receive_map_timer("map/receive_tsdf");
 
   bool success =
@@ -638,6 +654,9 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
+  if (!is_started_)
+    return;
+
   voxblox::timing::Timer receive_map_timer("map/receive_esdf");
 
   bool success =
@@ -664,6 +683,9 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : Use tf/odometry in the multi robot case
+  if (!is_started_)
+      return;
+
   ROS_INFO_COND(verbose_, "POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
@@ -700,6 +722,22 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   }
 
 
+}
+
+bool NBV_Selector::startCallback(
+    std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
+    /*response*/) {  // NOLINT
+  ROS_INFO("Received a start service call.");
+  is_started_ = true;
+  return true;  // Return true to indicate the callback handled the response
+}
+
+bool NBV_Selector::stopCallback(
+    std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
+    /*response*/) {  // NOLINT
+  ROS_INFO("Received a stop service call.");
+  is_started_ = false;
+  return true;  // Return true to indicate the callback handled the response
 }
 
 void NBV_Selector::publish_goal(){ 
