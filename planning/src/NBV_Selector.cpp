@@ -184,7 +184,11 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
 
     nh_private.param("timer", timer_, timer_);
+    ROS_INFO("Enabling timer: %s", timer_ ? "true" : "false");
+
     nh_private.param("verbose", verbose_, verbose_);
+    ROS_INFO("Enabling verbose: %s", verbose_ ? "true" : "false");
+
 
     world_frame_ = "world";
     //map

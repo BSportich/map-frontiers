@@ -18,8 +18,8 @@
         
         <param name="sub_sample_size" value="$(arg sub_sample_size)" />
 
-        <arg name="timer" value="$(arg timer)" />
-        <arg name="verbose" value="$(arg verbose)" />
+        <param name="timer" value="$(arg timer)" />
+        <param name="verbose" value="$(arg verbose)" />
     </node>
 
 </launch>
