@@ -5,6 +5,8 @@
 #include <string>
 #include <math.h> 
 #include <chrono>
+#include <random>
+#include <numeric>
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -632,7 +634,7 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
     std::mt19937 gen(rd());
     std::discrete_distribution<> dist(weight_table.begin(), weight_table.end());
 
-    for(int i =0; i < m_sub_sample_size_){
+    for(int i =0; i < m_sub_sample_size_ ; i++){
 
           int idx = dist(gen);
 
