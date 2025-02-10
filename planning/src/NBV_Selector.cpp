@@ -878,6 +878,7 @@ void NBV_Selector::publish_views(){
 void NBV_Selector::select_next_best_view(){
   
   ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
+  ROS_INFO_COND(verbose_, "THERE ARE %d FRONTIERS", frontiers_set.size() );
   //sample frontiers
   sample_subset_frontiers_discrete();
   ROS_INFO_COND(verbose_, "SAMPLING");
