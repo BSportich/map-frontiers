@@ -3,9 +3,6 @@
 #include "ros/ros.h"
 
 
-ViewGenerator::ViewGenerator(float distance_min, float distance_max)  
-   : ViewGenerator("sphere", distance_min, distance_max, voxblox_map::VoxbloxMap()) {}
-
 ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius){
     m_method_type = method_name;
     m_distance_max = distance_max;
@@ -155,7 +152,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
         for(int j= -(robot_radius_/2) ; i < (robot_radius_/2) ; i++){
             for(int k= -(robot_radius_/2) ; i < (robot_radius_/2) ; k++){
 
-                shift = Eigen::Vector3d(i,j,k);
+                Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
                 dist = m_map.getVoxelDistance_ESDF(voxel + shift) ;
                 if( dist < robot_radius_ ){
                     return false;
