@@ -133,6 +133,7 @@ public:
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param);
     void updateFrontiers();
     void sample_subset_frontiers();
+    void sample_subset_frontiers_discrete();
     void sample_subset_frontiers_shells();
 
 

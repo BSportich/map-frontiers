@@ -47,7 +47,6 @@ private:
 
 public:
     ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius);
-    ViewGenerator(float distance_min, float distance_max);
     ViewGenerator(){};
     ~ViewGenerator(){};
 
