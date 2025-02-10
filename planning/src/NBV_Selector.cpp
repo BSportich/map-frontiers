@@ -8,6 +8,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <std_srvs/Empty.h>
 #include "voxblox/utils/timing.h"
 #include "voxblox_ros/conversions.h"
 #include "voxblox_ros/ptcloud_vis.h"
@@ -87,6 +88,8 @@ private:
     ros::Subscriber sub_map_esdf;
     ros::Subscriber sub_pos;
     ros::Publisher pub_goal;
+    ros::ServiceServer start_server;
+    ros::ServiceServer stop_server;
     //frontiers and tsdfs
     ros::Publisher pub_pointcloud;
     ros::Publisher pub_frontiers;
@@ -120,7 +123,10 @@ private:
     const static unsigned char AVAILABLE = 0;  // NOLINT
     const static unsigned char BUSY = 1;      // NOLINT
 
-
+    // GENERAL BEHAVIOUR
+    bool timer_ = false;
+    bool verbose_ = false;
+    bool is_started_ = false;
 
 public:
     NBV_Selector();
@@ -153,6 +159,12 @@ public:
     void tSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void eSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void posCallback(const nav_msgs::Odometry& msg_odom);
+    bool startCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
+    bool stopCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
   
 
     ~NBV_Selector();
@@ -183,6 +195,13 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     nh_private.param("sub_sample_size", sys_param.subsampling_views, sys_param.subsampling_views);
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
+
+    nh_private.param("timer", timer_, timer_);
+    ROS_INFO("Enabling timer: %s", timer_ ? "true" : "false");
+
+    nh_private.param("verbose", verbose_, verbose_);
+    ROS_INFO("Enabling verbose: %s", verbose_ ? "true" : "false");
+
 
     world_frame_ = "world";
     //map
@@ -232,6 +251,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
 
+    start_server = n.advertiseService("start_NBV_selector", &NBV_Selector::startCallback, this);
+    stop_server = n.advertiseService("stop_NBV_selector", &NBV_Selector::stopCallback, this);
 
     if(m_frontier6 == true){
         c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
@@ -421,9 +442,10 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
 
 
 void NBV_Selector::updateFrontiers(){
+    ros::Time start_update_frontiers = ros::Time::now();
 
     unsigned char current_state;
-    ROS_INFO("Updated frontiers: %lu found", frontiers_set.size());
+    ROS_INFO_COND(verbose_, "Updated frontiers: %lu found", frontiers_set.size());
 
     voxblox::BlockIndexList blocks;
     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
@@ -490,17 +512,19 @@ void NBV_Selector::updateFrontiers(){
 
       }
 
-      ROS_INFO_ONCE("Frontiers updated!");
-
     //block.voxel_size()
     }
-
+    ROS_INFO_ONCE("Frontiers updated!");
+    ros::Time end_update_frontiers = ros::Time::now();
+    ros::Duration duration = end_update_frontiers - start_update_frontiers;
+    ROS_INFO_COND(timer_, "[NBV_Selector][updateFrontiers] %.4f s", duration.toSec());
     
 
  }
 
 
 void NBV_Selector::sample_subset_frontiers(){
+  ros::Time start_sample_subset_frontiers = ros::Time::now();
   frontiers_sub_pointcloud.clear();
   frontiers_subset.clear();
 
@@ -561,6 +585,9 @@ void NBV_Selector::sample_subset_frontiers(){
     frontiers_subset = frontiers_set ; 
   }
 
+  ros::Time end_sample_subset_frontiers = ros::Time::now();
+  ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
+  ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers] %.4f s", duration.toSec());
 }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
@@ -672,6 +699,9 @@ void NBV_Selector::publish_sub_frontiers(){
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
+  if (!is_started_)
+    return;
+
   voxblox::timing::Timer receive_map_timer("map/receive_tsdf");
 
   bool success =
@@ -698,6 +728,9 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
+  if (!is_started_)
+    return;
+
   voxblox::timing::Timer receive_map_timer("map/receive_esdf");
 
   bool success =
@@ -724,7 +757,10 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : Use tf/odometry in the multi robot case
-  ROS_INFO("POS CALLBACK");
+  if (!is_started_)
+      return;
+
+  ROS_INFO_COND(verbose_, "POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
   m_current_pos.o_z = m_current_pos.z;
@@ -741,7 +777,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
     float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
     if(pos_test < m_tolerance_distance_ ){
       m_availability = AVAILABLE ; 
-      ROS_INFO("ROBOT IS NOW AVAILABLE");
+      ROS_INFO_COND(verbose_, "ROBOT IS NOW AVAILABLE");
 
     }
 
@@ -753,13 +789,29 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
     publish_goal();
     m_availability = BUSY ; 
-    ROS_INFO("ROBOT IS NOW BUSY");
+    ROS_INFO_COND(verbose_, "ROBOT IS NOW BUSY");
 
 
     
   }
 
 
+}
+
+bool NBV_Selector::startCallback(
+    std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
+    /*response*/) {  // NOLINT
+  ROS_INFO("Received a start service call.");
+  is_started_ = true;
+  return true;  // Return true to indicate the callback handled the response
+}
+
+bool NBV_Selector::stopCallback(
+    std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
+    /*response*/) {  // NOLINT
+  ROS_INFO("Received a stop service call.");
+  is_started_ = false;
+  return true;  // Return true to indicate the callback handled the response
 }
 
 void NBV_Selector::publish_goal(){ 
@@ -783,10 +835,13 @@ void NBV_Selector::publish_goal(){
 }
 
 void NBV_Selector::generate_views(){
-
+  ros::Time start_generate_views = ros::Time::now();
   //m_view_generator.generateViews(frontiers_set);
   m_view_generator.generateViews(frontiers_subset);
   views = m_view_generator.getViewCandidates();
+  ros::Time end_generate_views = ros::Time::now();
+  ros::Duration duration = end_generate_views - start_generate_views;
+  ROS_INFO_COND(timer_, "[NBV_Selector][generate_views] %.4f s", duration.toSec());
 }
 
 void NBV_Selector::publish_views(){
@@ -810,7 +865,7 @@ void NBV_Selector::publish_views(){
 
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
-  //ROS_INFO("Views published ! %lu ", views_set.size()) ;
+  //ROS_INFO_COND(verbose_, "Views published ! %lu ", views_set.size()) ;
 
 }
 
@@ -818,18 +873,18 @@ void NBV_Selector::publish_views(){
 //Called in poscallback after pose updated
 void NBV_Selector::select_next_best_view(){
   
-  ROS_INFO("SELECTING VIEWS NOW");
+  ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
   //sample frontiers
   sample_subset_frontiers();
-  ROS_INFO("SAMPLING");
+  ROS_INFO_COND(verbose_, "SAMPLING");
   publish_sub_frontiers();
-  ROS_INFO("PUBLISHING SUB FRONTIERS");
+  ROS_INFO_COND(verbose_, "PUBLISHING SUB FRONTIERS");
 
 
   //generate views
-  ROS_INFO("GENERATING VIEWS");
+  ROS_INFO_COND(verbose_, "GENERATING VIEWS");
   generate_views();
-  ROS_INFO("PUBLISHING VIEWS");
+  ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
   publish_views();
 
 
@@ -840,10 +895,10 @@ void NBV_Selector::select_next_best_view(){
   float max_value_nbv = -1 ; 
   float temp_value = -1 ; 
   m_current_goal = m_current_pos;
-  ROS_INFO("EXAMINING %d", views.size());
+  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
-    ROS_INFO("GET VOXELS VIEW %d", i);
+    ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
 
 
     ViewCandidate view = views[i] ; 
@@ -851,10 +906,14 @@ void NBV_Selector::select_next_best_view(){
     Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
     Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
 
+    ros::Time start_get_visible_voxels_lidar = ros::Time::now();
     m_view_evaluator.getVisibleVoxels_LIDAR(
     &visible_voxels, pos, orient) ;
+    ros::Time end_get_visible_voxels_lidar = ros::Time::now();
+    ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
+    ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
 
-    ROS_INFO("COUNTING FRONTIERS VIEW %d", i);
+    ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
 
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
     values_views.push_back(temp_value);
@@ -871,7 +930,7 @@ void NBV_Selector::select_next_best_view(){
   //select views
 
   if (views.size() > 0){
-    ROS_INFO("UPDATING CURRENT GOAL ");
+    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
     m_current_goal = views[index_of_nbv];
   }
 
