@@ -32,6 +32,7 @@ struct system_parameters
     float distance_min ;
     float distance_max ;
     int subsampling_views ;
+    float robot_radius ; 
     ///////////////
 
     //////////////View Evaluator parameters
@@ -213,7 +214,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //modules
     //m_view_generator.set_map(m_map);
     std::string method = "sphere";
-    m_view_generator = ViewGenerator(method, 5, 10, m_map);
+    m_view_generator = ViewGenerator(method, 5, 10, m_map, sys_param.robot_radius);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
     m_sub_sample_size_ = sys_param.subsampling_views ; 
@@ -950,13 +951,15 @@ int main(int argc, char** argv) {
 
     system_parameters sys_params ; 
     /////////////// NAVIGATION
-    sys_params.tolerance_distance = 0.2 ;
+    sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
+    
 
 
     //////////////View Generation parameters
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
     sys_params.subsampling_views = 10 ;
+    sys_params.robot_radius = 5; 
     ///////////////
 
     //////////////View Evaluator parameters
