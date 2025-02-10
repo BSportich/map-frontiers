@@ -720,6 +720,13 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     publishAllUpdatedTsdfVoxels();
     ROS_INFO_ONCE("Published pointclouds");
 
+    ROS_INFO_COND(verbose_, "THERE ARE %d FRONTIERS", frontiers_set.size() );
+    //sample frontiers
+    sample_subset_frontiers_discrete();
+    ROS_INFO_COND(verbose_, "SAMPLING");
+    publish_sub_frontiers();
+    ROS_INFO_COND(verbose_, "PUBLISHING SUB FRONTIERS");
+
     //SEND PROCEDURE
     voxblox_msgs::Layer layer_msg;
 
@@ -878,12 +885,7 @@ void NBV_Selector::publish_views(){
 void NBV_Selector::select_next_best_view(){
   
   ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
-  ROS_INFO_COND(verbose_, "THERE ARE %d FRONTIERS", frontiers_set.size() );
-  //sample frontiers
-  sample_subset_frontiers_discrete();
-  ROS_INFO_COND(verbose_, "SAMPLING");
-  publish_sub_frontiers();
-  ROS_INFO_COND(verbose_, "PUBLISHING SUB FRONTIERS");
+
 
 
   //generate views
