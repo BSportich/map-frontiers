@@ -190,22 +190,7 @@ double VoxbloxMap::getVoxelWeight_TSDF(const Eigen::Vector3d& point) {
   return 0.0;
 }
 
-// get the stored weight - use ESDF
-double VoxbloxMap::getVoxelWeight_ESDF(const Eigen::Vector3d& point) {
-  voxblox::Point voxblox_point(point.x(), point.y(), point.z());
-  voxblox::Block<voxblox::EsdfVoxel>::Ptr block =
-      esdf_map_pointer
-          ->getTsdfLayerPtr()
-          ->getBlockPtrByCoordinates(voxblox_point);
-  if (block) {
-    voxblox::EsdfVoxel* esdf_voxel =
-        block->getVoxelPtrByCoordinates(voxblox_point);
-    if (esdf_voxel) {
-      return esdf_voxel->weight;
-    }
-  }
-  return 0.0;
-}
+//ESDF Voxel has no weight
 
 // get the maximum allowed weight (return 0 if using uncapped weights)
 double VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }
