@@ -4,6 +4,7 @@
 #include "planning/modules/ViewEvaluator.h"
 #include <string>
 #include <math.h> 
+#include <chrono>
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -126,6 +127,7 @@ public:
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param);
     void updateFrontiers();
     void sample_subset_frontiers();
+    void sample_subset_frontiers_shells();
 
 
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
@@ -558,6 +560,78 @@ void NBV_Selector::sample_subset_frontiers(){
 
     frontiers_subset = frontiers_set ; 
   }
+
+}
+
+void NBV_Selector::sample_subset_frontiers_shells(){
+
+
+}
+
+void NBV_Selector::sample_subset_frontiers_discrete(){
+  frontiers_sub_pointcloud.clear();
+  frontiers_subset.clear();
+
+  std::vector<float> distances_table(frontiers_set.size());
+  std::vector<float> weight_table(frontiers_set.size());
+
+  if( frontiers_set.size() > m_sub_sample_size_ ){
+
+    double min_value_distance = std::numeric_limits<double>::max() ; 
+    double max_value_distance = std::numeric_limits<double>::min() ; 
+    double total_distance = 0 ;
+
+    for(int i=0; i< frontiers_set.size(); i++){
+      
+      Eigen::Vector3d current_pos = Eigen::Vector3d( m_current_pos.x, m_current_pos.y, m_current_pos.z );
+      double distance_frontier = (frontiers_set[i] - current_pos).norm();
+      distances_table[i] = distance_frontier ; 
+      weight_table[i] = 1/( distance_frontier + 1e-6);
+
+      if(distance_frontier > max_value_distance){
+        max_value_distance = distance_frontier;
+      }
+      if(distance_frontier < min_value_distance){
+        min_value_distance = distance_frontier;
+      }
+
+    }
+
+    float sum_weight = std::accumulate( weight_table.begin(), weight_table.end(), 0); // sum of weights
+    for(auto& w : weight_table){ w = w / sum_weight; } //normalize weights
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::discrete_distribution<> dist(weight_table.begin(), weight_table.end());
+
+    for(int i =0; i < m_sub_sample_size_){
+
+          int idx = dist(gen);
+
+          frontiers_subset.push_back(frontiers_set[idx]);
+
+          pcl::PointXYZRGB point;
+          point.x = frontiers_set[idx].x();
+          point.y = frontiers_set[idx].y();
+          point.z = frontiers_set[idx].z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          frontiers_sub_pointcloud.push_back(point);
+          
+
+    }
+        
+    
+    
+
+
+  }
+  else {
+
+    frontiers_subset = frontiers_set ; 
+  }
+
 
 }
 

@@ -46,6 +46,8 @@ public:
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
+    float evaluate_view_angular(const ViewCandidate& vc);
+
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
     void markNeighboringRays(int x, int y, int segment, int value);
@@ -120,6 +122,15 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
 //   return true
 
 // }
+
+float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos){
+  Eigen::Vector3d view_pos = Eigen::Vector3d(vc.x, vc.y, vc.z) ;
+  Eigen::Vector3d comp = (view_pos - robot_pos) / (view_pos - robot_pos).norm() ;
+  Eigen::Vector3d vel(1,1,1);
+  vel = vel / vel.norm() ; 
+  return vel.transpose() * comp ; 
+}
+
 
 void ViewEvaluator::getVisibleVoxels_LIDAR(
     std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position,

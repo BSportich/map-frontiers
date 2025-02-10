@@ -6,11 +6,12 @@
 ViewGenerator::ViewGenerator(float distance_min, float distance_max)  
    : ViewGenerator("sphere", distance_min, distance_max, voxblox_map::VoxbloxMap()) {}
 
-ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map){
+ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius){
     m_method_type = method_name;
     m_distance_max = distance_max;
     m_distance_min = distance_min;
     m_map = map;
+    robot_radius_ = robot_radius ; 
 
     max_sampling = 1;
     if(distance_min > distance_max) {
@@ -140,6 +141,30 @@ void findOrientation(ViewCandidate& vc){
     vc.q_z = qz;
     vc.q_w = qw;
 
+
+}
+
+bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
+    //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
+    //const voxblox::EsdfVoxel& voxel = 
+    float dist = m_map.getVoxelDistance_ESDF(voxel) ;
+    if( dist < robot_radius_ ){
+        return false;
+    }
+    for(int i= -(robot_radius_/2) ; i < (robot_radius_/2) ; i++){
+        for(int j= -(robot_radius_/2) ; i < (robot_radius_/2) ; i++){
+            for(int k= -(robot_radius_/2) ; i < (robot_radius_/2) ; k++){
+
+                shift = Eigen::Vector3d(i,j,k);
+                dist = m_map.getVoxelDistance_ESDF(voxel + shift) ;
+                if( dist < robot_radius_ ){
+                    return false;
+                }
+
+            }
+        }
+    }
+    return true;
 
 }
 

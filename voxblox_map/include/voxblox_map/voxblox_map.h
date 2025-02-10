@@ -50,9 +50,11 @@ class VoxbloxMap {
 
   // get the stored distance
   double getVoxelDistance_TSDF(const Eigen::Vector3d& point) ;
+  double getVoxelDistance_ESDF(const Eigen::Vector3d& point) ;
 
   // get the stored weight
   double getVoxelWeight_TSDF(const Eigen::Vector3d& point) ;
+  double getVoxelWeight_ESDF(const Eigen::Vector3d& point) ;
 
   // get the maximum allowed weight (return 0 if using uncapped weights)
   double getMaximumWeight() ;

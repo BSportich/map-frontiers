@@ -42,10 +42,11 @@ private:
     float m_distance_min; // min sampling distance from the frontiers
     voxblox_map::VoxbloxMap m_map;
 
-    int max_sampling; 
+    int max_sampling;
+    float robot_radius_ ; 
 
 public:
-    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map);
+    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius);
     ViewGenerator(float distance_min, float distance_max);
     ViewGenerator(){};
     ~ViewGenerator(){};
@@ -59,6 +60,7 @@ public:
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
     std::string getMethod_type(){ return m_method_type; } ;
+    bool isSafeView(const Eigen::Vector3d& voxel);
 
 
 
