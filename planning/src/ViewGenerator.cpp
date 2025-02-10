@@ -65,8 +65,9 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 // float o_z = temp_z ? ;
 
                 Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
-                unsigned char current_state = m_map.getVoxelState_TSDF(voxel);
-                isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
+                //unsigned char current_state = m_map.getVoxelState_TSDF(voxel);
+                //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
+                isFree = isSafeView(voxel);
                 //ROS_INFO("Generating views %f %f %f ", o_x, o_y, o_z );
 
 
@@ -148,13 +149,13 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     if( dist < robot_radius_ ){
         return false;
     }
-    for(int i= -(robot_radius_/2) ; i < (robot_radius_/2) ; i++){
-        for(int j= -(robot_radius_/2) ; i < (robot_radius_/2) ; i++){
-            for(int k= -(robot_radius_/2) ; i < (robot_radius_/2) ; k++){
+    for(int i= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
+        for(int j= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
+            for(int k= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; k++){
 
                 Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
                 dist = m_map.getVoxelDistance_ESDF(voxel + shift) ;
-                if( dist < robot_radius_ ){
+                if( dist < m_map.getVoxelSize() ){
                     return false;
                 }
 

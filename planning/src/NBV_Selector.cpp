@@ -879,7 +879,7 @@ void NBV_Selector::select_next_best_view(){
   
   ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
   //sample frontiers
-  sample_subset_frontiers();
+  sample_subset_frontiers_discrete();
   ROS_INFO_COND(verbose_, "SAMPLING");
   publish_sub_frontiers();
   ROS_INFO_COND(verbose_, "PUBLISHING SUB FRONTIERS");
@@ -959,7 +959,7 @@ int main(int argc, char** argv) {
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
     sys_params.subsampling_views = 10 ;
-    sys_params.robot_radius = 5; 
+    sys_params.robot_radius = 5; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
     ///////////////
 
     //////////////View Evaluator parameters
