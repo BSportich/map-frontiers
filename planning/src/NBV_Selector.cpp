@@ -720,12 +720,12 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     publishAllUpdatedTsdfVoxels();
     ROS_INFO_ONCE("Published pointclouds");
 
-    ROS_INFO_COND(verbose_, "THERE ARE %d FRONTIERS", frontiers_set.size() );
+    ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
     sample_subset_frontiers_discrete();
-    ROS_INFO_COND(verbose_, "SAMPLING");
+    ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
     publish_sub_frontiers();
-    ROS_INFO_COND(verbose_, "PUBLISHING SUB FRONTIERS");
+    ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
 
     //SEND PROCEDURE
     voxblox_msgs::Layer layer_msg;
