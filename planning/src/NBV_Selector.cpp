@@ -600,6 +600,8 @@ void NBV_Selector::sample_subset_frontiers_shells(){
 }
 
 void NBV_Selector::sample_subset_frontiers_discrete(){
+  ros::Time start_sample_subset_frontiers = ros::Time::now();
+
   frontiers_sub_pointcloud.clear();
   frontiers_subset.clear();
 
@@ -662,6 +664,11 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
 
     frontiers_subset = frontiers_set ; 
   }
+
+
+  ros::Time end_sample_subset_frontiers = ros::Time::now();
+  ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
+  ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers_discrete] %.4f s", duration.toSec());
 
 
 }
