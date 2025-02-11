@@ -30,7 +30,6 @@ void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_
 
 
 void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set ){
-    ROS_INFO_COND(verbose_, "[ViewGenerator] Entering");
 
     view_candidates.clear();
 
@@ -90,7 +89,6 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
 
     }
-    ROS_INFO_COND(verbose_, "[ViewGenerator] Ending");
 }
 
 void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set ){
