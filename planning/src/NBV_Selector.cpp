@@ -907,50 +907,50 @@ void NBV_Selector::select_next_best_view(){
 
 
 
-  // //evaluate views
-  // std::vector<float> values_views;
-  // int index_of_nbv = -1 ;
-  // float max_value_nbv = -1 ; 
-  // float temp_value = -1 ; 
-  // m_current_goal = m_current_pos;
-  // ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
-  // for(int i=0;i< views.size();i++){
+  //evaluate views
+  std::vector<float> values_views;
+  int index_of_nbv = -1 ;
+  float max_value_nbv = -1 ; 
+  float temp_value = -1 ; 
+  m_current_goal = m_current_pos;
+  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  for(int i=0;i< views.size();i++){
 
-  //   ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
-
-
-  //   ViewCandidate view = views[i] ; 
-  //   std::vector<Eigen::Vector3d> visible_voxels; 
-  //   Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
-  //   Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
-
-  //   ros::Time start_get_visible_voxels_lidar = ros::Time::now();
-  //   m_view_evaluator.getVisibleVoxels_LIDAR(
-  //   &visible_voxels, pos, orient) ;
-  //   ros::Time end_get_visible_voxels_lidar = ros::Time::now();
-  //   ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
-  //   ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
-
-  //   ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
-
-  //   temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
-  //   values_views.push_back(temp_value);
-  //   if( temp_value > max_value_nbv){
-  //     index_of_nbv = i;
-  //     max_value_nbv = temp_value;
-
-  //   }
+    ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
 
 
-  // }
+    ViewCandidate view = views[i] ; 
+    std::vector<Eigen::Vector3d> visible_voxels; 
+    Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
+    Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
+
+    ros::Time start_get_visible_voxels_lidar = ros::Time::now();
+    m_view_evaluator.getVisibleVoxels_LIDAR(
+    &visible_voxels, pos, orient) ;
+    ros::Time end_get_visible_voxels_lidar = ros::Time::now();
+    ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
+    ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
+
+    ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
+
+    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
+    values_views.push_back(temp_value);
+    if( temp_value > max_value_nbv){
+      index_of_nbv = i;
+      max_value_nbv = temp_value;
+
+    }
 
 
-  // //select views
+  }
 
-  // if (views.size() > 0){
-  //   ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
-  //   m_current_goal = views[index_of_nbv];
-  // }
+
+  //select views
+
+  if (views.size() > 0){
+    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
+    m_current_goal = views[index_of_nbv];
+  }
 
 
 
