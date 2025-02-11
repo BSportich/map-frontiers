@@ -703,8 +703,10 @@ void NBV_Selector::publish_sub_frontiers(){
 }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
+  ROS_INFO_COND(verbose_, "[TSDF callback] Entering TSDF callback");
   if (!is_started_)
     return;
+  ROS_INFO_COND(verbose_, "[TSDF callback] Activated "); 
 
   voxblox::timing::Timer receive_map_timer("map/receive_tsdf");
 
@@ -716,9 +718,9 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     LOG(ERROR) << "layer_msg voxel size = " << layer_msg.voxel_size << " map layer voxel size = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxel_size();
     LOG(ERROR) << "layer_msg voxel per side = " << layer_msg.voxels_per_side << " map layer voxel per side = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
   } else {
-    ROS_INFO_ONCE("Got an TSDF map from ROS topic!");
+    ROS_INFO_COND(verbose_, "[TSDF callback] Got an TSDF map from ROS topic!");
     publishAllUpdatedTsdfVoxels();
-    ROS_INFO_ONCE("Published pointclouds");
+    ROS_INFO_COND(verbose_, "[TSDF callback] Published pointclouds");
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
@@ -739,21 +741,23 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
+  ROS_INFO_COND(verbose_, "[ESDF callback] Entering ESDF callback");
   if (!is_started_)
     return;
-
+  ROS_INFO_COND(verbose_, "[ESDF callback] Activated");
   voxblox::timing::Timer receive_map_timer("map/receive_esdf");
 
   bool success =
       voxblox::deserializeMsgToLayer<voxblox::EsdfVoxel>(layer_msg, m_map.get_esdf_map_pointer()->getEsdfLayerPtr());
+  ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized done ! ");
 
   if (!success) {
     ROS_ERROR_THROTTLE(10, "MAP FRONTIERS : Got an invalid ESDF map message!");
+    ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized failed ! ");
   } else {
-    ROS_INFO_ONCE("Got an ESDF map from ROS topic!");
-    ROS_INFO_ONCE("Frontiers updating ...");
+    ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
     updateFrontiers();
-    ROS_INFO_ONCE("Frontiers publishing ...");
+    ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
     //publish_all_frontiers();
     // ROS_INFO_ONCE("Frontiers published !");
     // generate_views() ; 
@@ -888,58 +892,58 @@ void NBV_Selector::select_next_best_view(){
   
   ROS_INFO_COND(verbose_, "EMPTY SPACE");
 
-  //generate views
-  ROS_INFO_COND(verbose_, "GENERATING VIEWS");
-  generate_views();
-  ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
-  publish_views();
+  // //generate views
+  // ROS_INFO_COND(verbose_, "GENERATING VIEWS");
+  // generate_views();
+  // ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
+  // publish_views();
 
 
 
-  //evaluate views
-  std::vector<float> values_views;
-  int index_of_nbv = -1 ;
-  float max_value_nbv = -1 ; 
-  float temp_value = -1 ; 
-  m_current_goal = m_current_pos;
-  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
-  for(int i=0;i< views.size();i++){
+  // //evaluate views
+  // std::vector<float> values_views;
+  // int index_of_nbv = -1 ;
+  // float max_value_nbv = -1 ; 
+  // float temp_value = -1 ; 
+  // m_current_goal = m_current_pos;
+  // ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  // for(int i=0;i< views.size();i++){
 
-    ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
-
-
-    ViewCandidate view = views[i] ; 
-    std::vector<Eigen::Vector3d> visible_voxels; 
-    Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
-    Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
-
-    ros::Time start_get_visible_voxels_lidar = ros::Time::now();
-    m_view_evaluator.getVisibleVoxels_LIDAR(
-    &visible_voxels, pos, orient) ;
-    ros::Time end_get_visible_voxels_lidar = ros::Time::now();
-    ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
-    ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
-
-    ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
-
-    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
-    values_views.push_back(temp_value);
-    if( temp_value > max_value_nbv){
-      index_of_nbv = i;
-      max_value_nbv = temp_value;
-
-    }
+  //   ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
 
 
-  }
+  //   ViewCandidate view = views[i] ; 
+  //   std::vector<Eigen::Vector3d> visible_voxels; 
+  //   Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
+  //   Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
+
+  //   ros::Time start_get_visible_voxels_lidar = ros::Time::now();
+  //   m_view_evaluator.getVisibleVoxels_LIDAR(
+  //   &visible_voxels, pos, orient) ;
+  //   ros::Time end_get_visible_voxels_lidar = ros::Time::now();
+  //   ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
+  //   ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
+
+  //   ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
+
+  //   temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
+  //   values_views.push_back(temp_value);
+  //   if( temp_value > max_value_nbv){
+  //     index_of_nbv = i;
+  //     max_value_nbv = temp_value;
+
+  //   }
 
 
-  //select views
+  // }
 
-  if (views.size() > 0){
-    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
-    m_current_goal = views[index_of_nbv];
-  }
+
+  // //select views
+
+  // if (views.size() > 0){
+  //   ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
+  //   m_current_goal = views[index_of_nbv];
+  // }
 
 
 
