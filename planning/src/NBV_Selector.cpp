@@ -556,10 +556,11 @@ void NBV_Selector::sample_subset_frontiers(){
     }
 
     float threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
+    float value_tirage = -1 ; 
     int i = 0 ; 
     while((frontiers_subset.size() < m_sub_sample_size_) && (i < frontiers_set.size() )){
 
-        float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
+        value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
         threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
         
