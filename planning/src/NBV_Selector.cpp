@@ -605,7 +605,7 @@ void NBV_Selector::sample_subset_frontiers_shells(){
   for(int i =0 ; i < m_sub_sample_size_; i++ ){
 
     value_tirage = (static_cast<float>(rand()) / RAND_MAX) * m_sub_sample_size_ ; 
-    index_id = static_cast<int> value_tirage ;
+    index_id = static_cast<int>(value_tirage) ;
     frontiers_subset.push_back( frontiers_set[index_id] ) ; 
 
 
