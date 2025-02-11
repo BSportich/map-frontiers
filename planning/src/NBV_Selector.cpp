@@ -787,10 +787,10 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
     //publish_all_frontiers();
     // ROS_INFO_ONCE("Frontiers published !");
-    // generate_views() ; 
-    // ROS_INFO_ONCE("Views generated !");
-    // publish_views();
-    // ROS_INFO_ONCE("Views published !");
+    generate_views() ; 
+    ROS_INFO_ONCE("Views generated !");
+    publish_views();
+    ROS_INFO_ONCE("Views published !");
 
     }
   
@@ -917,13 +917,13 @@ void NBV_Selector::select_next_best_view(){
   
   ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
   
-  ROS_INFO_COND(verbose_, "EMPTY SPACE");
+  // ROS_INFO_COND(verbose_, "EMPTY SPACE");
 
-  //generate views
-  ROS_INFO_COND(verbose_, "GENERATING VIEWS");
-  generate_views();
-  ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
-  publish_views();
+  // //generate views
+  // ROS_INFO_COND(verbose_, "GENERATING VIEWS");
+  // generate_views();
+  // ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
+  // publish_views();
 
 
 
