@@ -564,8 +564,8 @@ void NBV_Selector::sample_subset_frontiers(){
         threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
         
-        // ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
-        // ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
+        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
+        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
         if(value_tirage > threshold_tirage){
 
           frontiers_subset.push_back(frontiers_set[i]);
@@ -582,7 +582,7 @@ void NBV_Selector::sample_subset_frontiers(){
 
         }
         i=i+1;
-        // ROS_INFO_COND(verbose_, "[Sampling] End while loop");
+        ROS_INFO_COND(verbose_, "[Sampling] End while loop");
     }
     
 
@@ -590,7 +590,7 @@ void NBV_Selector::sample_subset_frontiers(){
   }
   else {
 
-    frontiers_subset = frontiers_set ; 
+    frontiers_subset = frontiers_set ; //careful ! Seems like a deep copy but not sure
   }
 
   ros::Time end_sample_subset_frontiers = ros::Time::now();
@@ -599,7 +599,16 @@ void NBV_Selector::sample_subset_frontiers(){
 }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
+  float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
+  int index_id = -1 ; 
+  for(int i =0 ; i < m_sub_sample_size_; i++ ){
 
+    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * m_sub_sample_size_ ; 
+    index_id = static_cast<int> value_tirage ;
+    frontiers_subset.push_back( frontiers_set[index_id] ) ; 
+
+
+  }
 
 }
 
@@ -738,7 +747,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
-    sample_subset_frontiers();
+    sample_subset_frontiers_shells();
     ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
     publish_sub_frontiers();
     ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
