@@ -562,7 +562,8 @@ void NBV_Selector::sample_subset_frontiers(){
         float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
         
-
+        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
+        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
         if(value_tirage > threshold_tirage){
 
           frontiers_subset.push_back(frontiers_set[i]);
@@ -629,6 +630,7 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
       }
 
     }
+    ROS_INFO_COND(verbose_, "[Sampling][Before generating distribution] ");
 
     float sum_weight = std::accumulate( weight_table.begin(), weight_table.end(), 0); // sum of weights
     for(auto& w : weight_table){ w = w / sum_weight; } //normalize weights
@@ -636,6 +638,8 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
     std::random_device rd;
     std::mt19937 gen(rd());
     std::discrete_distribution<> dist(weight_table.begin(), weight_table.end());
+
+    ROS_INFO_COND(verbose_, "[Sampling][After generating distribution] ");
 
     for(int i =0; i < m_sub_sample_size_ ; i++){
 
