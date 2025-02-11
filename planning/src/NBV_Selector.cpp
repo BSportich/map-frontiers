@@ -599,6 +599,7 @@ void NBV_Selector::sample_subset_frontiers(){
 }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
+  ROS_INFO_COND(verbose_, "[Sampling] shells start");
   float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
   int index_id = -1 ; 
   for(int i =0 ; i < m_sub_sample_size_; i++ ){
@@ -609,6 +610,8 @@ void NBV_Selector::sample_subset_frontiers_shells(){
 
 
   }
+
+  ROS_INFO_COND(verbose_, "[Sampling] shells end");
 
 }
 
