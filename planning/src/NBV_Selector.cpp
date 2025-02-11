@@ -564,8 +564,8 @@ void NBV_Selector::sample_subset_frontiers(){
         threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
         
-        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
-        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
+        // ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
+        // ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
         if(value_tirage > threshold_tirage){
 
           frontiers_subset.push_back(frontiers_set[i]);
@@ -582,7 +582,7 @@ void NBV_Selector::sample_subset_frontiers(){
 
         }
         i=i+1;
-        ROS_INFO_COND(verbose_, "[Sampling] End while loop");
+        // ROS_INFO_COND(verbose_, "[Sampling] End while loop");
     }
     
 
