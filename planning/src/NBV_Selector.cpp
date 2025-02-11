@@ -67,6 +67,7 @@ private:
 
     ViewEvaluator m_view_evaluator;
     SensorModel m_sensor_model;
+    ros::Time last_nbv_ ;
 
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
@@ -185,6 +186,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     // m_team_pos();
     m_availability = AVAILABLE;
     m_frontier6 = false;
+    last_nbv_ = ros::Time::now();
 
     // Get ros params
     //taken for default value in the code of tsdf_map.h and esdf_map.h
@@ -827,11 +829,11 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
   }
 
-  ros::Duration duration = ros::Time::now() - last_nbv ; 
+  ros::Duration duration = ros::Time::now() - last_nbv_ ; 
   if( (m_availability == AVAILABLE) && ( duration.toSec() > 1.0 ) ) {
 
     select_next_best_view();
-    ros::Time last_nbv = ros::Time::now();
+    last_nbv_ = ros::Time::now();
 
     publish_goal();
     m_availability = BUSY ; 
@@ -994,7 +996,7 @@ int main(int argc, char** argv) {
 
 
     //////////////View Generation parameters
-    sys_params.distance_min = 1;
+    sys_params.distance_min = 0;
     sys_params.distance_max = 2;
     sys_params.subsampling_views = 10 ;
     sys_params.robot_radius = 5; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
