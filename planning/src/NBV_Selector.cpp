@@ -722,7 +722,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
-    sample_subset_frontiers_discrete();
+    sample_subset_frontiers();
     ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
     publish_sub_frontiers();
     ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
