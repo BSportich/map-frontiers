@@ -148,7 +148,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
     //const voxblox::EsdfVoxel& voxel = 
     float dist = m_map.getVoxelDistance_ESDF(voxel) ;
-    if( dist < robot_radius_ ){
+    if( dist < (robot_radius_ * m_map.getVoxelSize() * 0.5 ) ){
         return false;
     }
     for(int i= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
