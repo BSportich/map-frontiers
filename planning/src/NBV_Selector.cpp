@@ -892,11 +892,11 @@ void NBV_Selector::select_next_best_view(){
   
   ROS_INFO_COND(verbose_, "EMPTY SPACE");
 
-  // //generate views
-  // ROS_INFO_COND(verbose_, "GENERATING VIEWS");
-  // generate_views();
-  // ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
-  // publish_views();
+  //generate views
+  ROS_INFO_COND(verbose_, "GENERATING VIEWS");
+  generate_views();
+  ROS_INFO_COND(verbose_, "PUBLISHING VIEWS");
+  publish_views();
 
 
 
