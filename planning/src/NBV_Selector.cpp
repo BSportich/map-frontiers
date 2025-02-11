@@ -802,6 +802,8 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   if (!is_started_)
       return;
 
+  
+
   ROS_INFO_COND(verbose_, "POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
@@ -825,9 +827,11 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
   }
 
-  if( m_availability == AVAILABLE) {
+  ros::Duration duration = ros::Time::now() - last_nbv ; 
+  if( (m_availability == AVAILABLE) && ( duration.toSec() > 1.0 ) ) {
 
     select_next_best_view();
+    ros::Time last_nbv = ros::Time::now();
 
     publish_goal();
     m_availability = BUSY ; 
@@ -967,10 +971,10 @@ void NBV_Selector::select_next_best_view(){
 
   //select views
 
-  if (views.size() > 0){
-    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
-    m_current_goal = views[index_of_nbv];
-  }
+  // if (views.size() > 0){
+  //   ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
+  //   m_current_goal = views[index_of_nbv];
+  // }
 
 
 
