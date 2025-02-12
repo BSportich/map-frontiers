@@ -34,9 +34,10 @@ private:
 
     //parameters for the view evaluation
     float value_frontier_ ; 
+    double m_threshold_known ;
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold) ;
     ViewEvaluator(){};
     ~ViewEvaluator();
 
@@ -55,13 +56,14 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold) 
 {
   m_map = map ;
   m_method_type = method_name ;
   p_ray_step_ = m_map.getVoxelSize() ;
   p_downsampling_factor_ = 1.0 ;
   sensor_model = sensor_lidar ; 
+  m_threshold_known = threshold ; 
 
   // Downsample to voxel size resolution at max range
   c_res_x_ = std::min(static_cast<int>(std::ceil(
@@ -171,7 +173,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
           result->push_back(voxel_center);
 
           // Check voxel occupied 
-          if (m_map.getVoxelState_TSDF(current_position) ==
+          if (m_map.getVoxelState_TSDF(current_position , m_threshold_known) ==
               voxblox_map::VoxbloxMap::OCCUPIED) {
             // Occlusion, mark neighboring rays as occluded
             markNeighboringRays(i, j, current_segment, -1);

@@ -66,7 +66,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 // float o_z = temp_z ? ;
 
                 Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
-                unsigned char current_state = m_map.getVoxelState_TSDF(voxel);
+                unsigned char current_state = m_map.getVoxelState_ESDF(voxel);
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
                 //isFree = isSafeView(voxel);
                 ROS_INFO(" Is safe ?%s ", isFree ? "true " : "false");
