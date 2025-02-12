@@ -789,10 +789,10 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
     publish_all_frontiers();
     ROS_INFO_ONCE("Frontiers published !");
-    // generate_views() ; 
-    // ROS_INFO_ONCE("Views generated !");
-    // publish_views();
-    // ROS_INFO_ONCE("Views published !");
+    generate_views() ; 
+    ROS_INFO_ONCE("Views generated !");
+    publish_views();
+    ROS_INFO_ONCE("Views published !");
 
     }
   
