@@ -752,11 +752,11 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
-    //sample_subset_frontiers_shells();
-    // frontiers_subset.assign(frontiers_set.begin(), frontiers_set.begin() + m_sub_sample_size_ );
-    // ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
-    // publish_sub_frontiers();
-    // ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
+    sample_subset_frontiers_shells();
+     //frontiers_subset.assign(frontiers_set.begin(), frontiers_set.begin() + m_sub_sample_size_ );
+    /ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
+    publish_sub_frontiers();
+    ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
 
     //SEND PROCEDURE
     voxblox_msgs::Layer layer_msg;
@@ -788,11 +788,11 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     updateFrontiers();
     ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
     publish_all_frontiers();
-    ROS_INFO_ONCE("Frontiers published !");
+    ROS_INFO_COND(verbose_, "Frontiers published !");
     generate_views() ; 
-    ROS_INFO_ONCE("Views generated !");
+    ROS_INFO_COND(verbose_, "Views generated !" );
     publish_views();
-    ROS_INFO_ONCE("Views published !");
+    ROS_INFO_COND(verbose_,"Views published !");
 
     }
   
