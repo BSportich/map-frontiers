@@ -83,10 +83,10 @@ unsigned char VoxbloxMap::getVoxelState_ESDF(const Eigen::Vector3d& point) {
 //getDistanceAtPosition unavailable in TSDF_map.h
 
 //THIS FUNCTION SHOULD BE USED FOR FRONTIERS DETECTION !! 
-unsigned char VoxbloxMap::getVoxelState_TSDF(const Eigen::Vector3d& point) {
+unsigned char VoxbloxMap::getVoxelState_TSDF(const Eigen::Vector3d& point, double t_threshold) {
   double distance = getVoxelDistance_TSDF(point);
   double weight = getVoxelWeight_TSDF(point);
-  double threshold = 0.3 ; 
+  double threshold = t_threshold ; 
   if (weight > threshold) {
     // This means the voxel is observed
     if (distance < c_voxel_size_) {

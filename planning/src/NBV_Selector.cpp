@@ -27,6 +27,7 @@ struct system_parameters
 
     ///////////////NAVIGATION
     float tolerance_distance ; 
+    double threshold_known ;
 
     //////////////View Generation parameters
     float distance_min ;
@@ -79,6 +80,7 @@ private:
     geometry_msgs::PoseArray views_set; 
     int m_sub_sample_size_ ;
     float m_tolerance_distance_ ; 
+    double m_threshold_known ; 
 
     bool m_frontier6;
     bool m_surface_frontiers;
@@ -221,6 +223,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model);
     m_sub_sample_size_ = sys_param.subsampling_views ; 
     m_tolerance_distance_ = sys_param.tolerance_distance ; 
+    m_threshold_known = sys_param.threshold_known ; 
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -341,7 +344,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
   bool close_empty = false; 
   if ( m_frontier6 ) {
 
-    current_state = m_map.getVoxelState_TSDF(voxel);
+    current_state = m_map.getVoxelState_TSDF(voxel, m_threshold_known);
     if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
       is_surface = true;
     } 
@@ -350,7 +353,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
     }
     for (int i = 0; i < 6; ++i) {
 
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         close_unknown = true;
       }
@@ -367,7 +370,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
     return false;
   } else {
 
-    current_state = m_map.getVoxelState_TSDF(voxel);
+    current_state = m_map.getVoxelState_TSDF(voxel, m_threshold_known);
     if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
       is_surface = true;
     } 
@@ -378,7 +381,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
     for (int i = 0; i < 26; ++i) {
 
 
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         close_unknown = true;
       }
@@ -405,7 +408,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
   bool close_unknown = false;
   bool close_occupied = false; 
 
-  current_state = m_map.getVoxelState_TSDF(voxel);
+  current_state = m_map.getVoxelState_TSDF(voxel, m_threshold_known);
     if( current_state == voxblox_map::VoxbloxMap::FREE){
       is_empty = true;
     } 
@@ -416,7 +419,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
 
     for (int i = 0; i < 6; ++i) {
 
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
         close_unknown = true;
       }
@@ -428,7 +431,7 @@ bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
     for (int i = 0; i < 6; ++i) {
 
 
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i]);
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
       if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
         close_occupied = true;
 
@@ -490,7 +493,7 @@ void NBV_Selector::updateFrontiers(){
         }
 
         //empty pointcloud
-        current_state = m_map.getVoxelState_TSDF(coord_3d);
+        current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
         if ( current_state == voxblox_map::VoxbloxMap::FREE ){
 
           pcl::PointXYZRGB point;
@@ -752,8 +755,11 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
-    sample_subset_frontiers_shells();
-     //frontiers_subset.assign(frontiers_set.begin(), frontiers_set.begin() + m_sub_sample_size_ );
+    //sample_subset_frontiers_shells();
+    if(frontiers_set.size() > m_sub_sample_size_){
+      frontiers_subset.assign(frontiers_set.begin(), frontiers_set.begin() + m_sub_sample_size_ );
+    }
+    
     ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
     publish_sub_frontiers();
     ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
@@ -787,7 +793,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
     updateFrontiers();
     ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
-    publish_all_frontiers();
+    //publish_all_frontiers();
     ROS_INFO_COND(verbose_, "Frontiers published !");
     generate_views() ; 
     ROS_INFO_COND(verbose_, "Views generated !" );
@@ -995,6 +1001,8 @@ int main(int argc, char** argv) {
     system_parameters sys_params ; 
     /////////////// NAVIGATION
     sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
+
+    sys_params.threshold_known = 0.3 ; //from Hardouin
     
 
 
