@@ -79,6 +79,29 @@ visualization_msgs::Marker CreateVerticalFOVMarker(const geometry_msgs::Pose& vi
     return fovMarker;
 }
 
+visualization_msgs::Marker CreateViewToFrontiersLine(const geometry_msgs::Pose& view, const geometry_msgs::Point& frontier, int markerId) {
+    // Define the Marker message
+    visualization_msgs::Marker fovMarker;
+    fovMarker.header.frame_id = "world";  // Reference frame
+    fovMarker.header.stamp = ros::Time::now();
+    fovMarker.ns = "view_to_frontiers";
+    fovMarker.id = markerId;
+    fovMarker.type = visualization_msgs::Marker::LINE_STRIP;  // Use LINE_STRIP to draw lines
+    fovMarker.action = visualization_msgs::Marker::ADD;
+
+    // Set the color and scale of the triangle
+    fovMarker.color.r = 1.0;
+    fovMarker.color.g = 0.0;
+    fovMarker.color.b = 0.0;
+    fovMarker.color.a = 0.5;  // Semi-transparent red
+
+    fovMarker.scale.x = 0.01;  // Thickness of the lines
+
+    fovMarker.points.push_back(view.position);
+    fovMarker.points.push_back(frontier);
+    return fovMarker;
+}
+
 } //namespace visualization
 
 } //namespace map_frontiers
