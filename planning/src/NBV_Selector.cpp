@@ -174,7 +174,6 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 {
     n = nh;
     //initialization
-    int vs = 1;  // voxel temp variable
     m_team_id = team_id ;
     m_team_size = robot_team.size() ;
     m_team = robot_team;
