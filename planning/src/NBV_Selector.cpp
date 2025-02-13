@@ -758,7 +758,16 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     //sample_subset_frontiers_shells();
     if(frontiers_set.size() > m_sub_sample_size_){
        frontiers_subset.assign(frontiers_set.begin(), frontiers_set.begin() + m_sub_sample_size_ );
-       frontiers_sub_pointcloud.assign(frontiers_pointcloud.begin(), frontiers_pointcloud.begin() + m_sub_sample_size_)
+
+       // Ensure we don't exceed the original point cloud size
+      int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
+      // Clear the destination point cloud
+      frontiers_sub_pointcloud.clear();
+      // Copy the first 'sample_size' points
+      for (int i = 0; i < sample_size; i++) {
+          frontiers_sub_pointcloud.push_back(frontiers_pointcloud.points[i]);
+      }
+
        ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
      }
     
