@@ -47,7 +47,7 @@ public:
     // float evaluate_view_image(const ViewCandidate& vc); 
     // float evaluate_view_pos(const ViewCandidate& vc, const ViewCandidate& current_pos);
 
-    bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known);
+    bool isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known);
 
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
