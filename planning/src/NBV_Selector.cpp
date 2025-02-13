@@ -144,8 +144,6 @@ public:
 
 
     bool isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel);
-    bool isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel);
-    bool isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel);
 
     bool isInBoundingBox(const Eigen::Vector3d& voxel);
 
@@ -336,119 +334,6 @@ bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
 
 }
 
-bool NBV_Selector::isFrontierVoxel_TSDF_2(const Eigen::Vector3d& voxel){
-  unsigned char voxel_state;
-  unsigned char current_state;
-  bool is_surface = false;
-  bool close_unknown = false;
-  bool close_empty = false; 
-  if ( m_frontier6 ) {
-
-    current_state = m_map.getVoxelState_TSDF(voxel, m_threshold_known);
-    if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
-      is_surface = true;
-    } 
-    else{
-      return false;
-    }
-    for (int i = 0; i < 6; ++i) {
-
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
-      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-        close_unknown = true;
-      }
-      else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
-        close_empty = true;
-      } 
-
-
-    }
-
-    if(is_surface && close_unknown && close_empty){
-      return true;
-    }
-    return false;
-  } else {
-
-    current_state = m_map.getVoxelState_TSDF(voxel, m_threshold_known);
-    if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
-      is_surface = true;
-    } 
-    else{
-      return false;
-    }
-
-    for (int i = 0; i < 26; ++i) {
-
-
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
-      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-        close_unknown = true;
-      }
-      else if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
-        close_empty = true;
-      } 
-
-    }
-
-    //if(is_surface){
-    if(is_surface && close_unknown && close_empty){
-      return true;
-    }
-    return false;
-  }
-
-}
-
-
-bool NBV_Selector::isFrontierVoxel_TSDF_3(const Eigen::Vector3d& voxel){
-  unsigned char voxel_state;
-  unsigned char current_state;
-  bool is_empty = false;
-  bool close_unknown = false;
-  bool close_occupied = false; 
-
-  current_state = m_map.getVoxelState_TSDF(voxel, m_threshold_known);
-    if( current_state == voxblox_map::VoxbloxMap::FREE){
-      is_empty = true;
-    } 
-    else{
-      return false;
-    }
-
-
-    for (int i = 0; i < 6; ++i) {
-
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
-      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-        close_unknown = true;
-      }
-
-
-    }
-
-
-    for (int i = 0; i < 6; ++i) {
-
-
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], m_threshold_known);
-      if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
-        close_occupied = true;
-
-      } 
-
-    }
-
-
-    if(is_empty && close_unknown && close_occupied){
-    //if(is_empty){
-      return true;
-    }
-    return false;
-  }
-
-
-
 
 void NBV_Selector::updateFrontiers(){
     ros::Time start_update_frontiers = ros::Time::now();
@@ -479,7 +364,7 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        if ( isFrontierVoxel_TSDF_3(coord_3d)){
+        if ( m_view_evaluator.isFrontierVoxel_TSDF(coord_3d, m_threshold_known)){
           frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;

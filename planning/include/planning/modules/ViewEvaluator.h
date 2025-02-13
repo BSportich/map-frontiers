@@ -44,6 +44,8 @@ public:
     // float evaluate_view_image(const ViewCandidate& vc); 
     // float evaluate_view_pos(const ViewCandidate& vc, const ViewCandidate& current_pos);
 
+    bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known);
+
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
@@ -215,11 +217,7 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
 
     Eigen::Vector3d voxel_test = voxels_set[i];
 
-    for(int j=0; j< frontiers_set.size(); j++){
-        
-        Eigen::Vector3d frontier = frontiers_set[j];
-
-        if( voxel_test.isApprox(frontier, 1e-6) ){ // .isApprox() ?
+    if( isFrontierVoxel_TSDF(voxel_test, m_threshold_known) ){
 
           evaluation = evaluation + value_frontier_ ; 
         }
@@ -227,12 +225,57 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
 
     }
 
-  }
 
   return evaluation; 
 
 
 }
+
+bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known){
+  unsigned char voxel_state;
+  unsigned char current_state;
+  bool is_empty = false;
+  bool close_unknown = false;
+  bool close_occupied = false; 
+
+  current_state = m_map.getVoxelState_TSDF(voxel, threshold_known);
+    if( current_state == voxblox_map::VoxbloxMap::FREE){
+      is_empty = true;
+    } 
+    else{
+      return false;
+    }
+
+
+    for (int i = 0; i < 6; ++i) {
+
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], threshold_known);
+      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+        close_unknown = true;
+      }
+
+
+    }
+
+
+    for (int i = 0; i < 6; ++i) {
+
+
+      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], threshold_known);
+      if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
+        close_occupied = true;
+
+      } 
+
+    }
+
+
+    if(is_empty && close_unknown && close_occupied){
+    //if(is_empty){
+      return true;
+    }
+    return false;
+  }
 
 
 
