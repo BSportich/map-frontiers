@@ -2,6 +2,8 @@
 #include <iostream>
 #include "planning/modules/ViewGenerator.h"
 #include "planning/modules/ViewEvaluator.h"
+#include "planning/data/type_conversions.h"
+#include "planning/data/visualization_marker.h"
 #include <string>
 #include <math.h> 
 #include <chrono>
@@ -103,6 +105,7 @@ private:
     ros::Publisher pub_test_values2;
     //views and selected views
     ros::Publisher pub_views ; 
+    ros::Publisher pub_views_marker ; 
     ros::Publisher pub_nbv ; 
 
 
@@ -127,6 +130,7 @@ private:
     // GENERAL BEHAVIOUR
     bool timer_ = false;
     bool verbose_ = false;
+    bool extra_viz_ = false;
     bool is_started_ = false;
 
 public:
@@ -201,6 +205,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     nh_private.param("verbose", verbose_, verbose_);
     ROS_INFO("Enabling verbose: %s", verbose_ ? "true" : "false");
 
+    nh_private.param("extra_viz", extra_viz_, extra_viz_);
+    ROS_INFO("Enabling extra_viz: %s", extra_viz_ ? "true" : "false");
 
     world_frame_ = "world";
     //map
@@ -249,6 +255,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
           "unknown_point_cloud", 1, true);
 
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
+    pub_views_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
 
     start_server = n.advertiseService("start_NBV_selector", &NBV_Selector::startCallback, this);
@@ -727,17 +734,8 @@ void NBV_Selector::publish_goal(){
   geometry_msgs::PoseStamped next_goal ;
 
   next_goal.header.stamp = ros::Time::now();  // Set timestamp
-  next_goal.header.frame_id = world_frame_; 
-
-  next_goal.pose.position.x = m_current_goal.x ; 
-  next_goal.pose.position.y = m_current_goal.y ;
-  next_goal.pose.position.z = m_current_goal.z ; 
-
-  next_goal.pose.orientation.x = m_current_goal.q_x ; 
-  next_goal.pose.orientation.y = m_current_goal.q_y ; 
-  next_goal.pose.orientation.z = m_current_goal.q_z ; 
-  next_goal.pose.orientation.w = m_current_goal.q_w ; 
-
+  next_goal.header.frame_id = world_frame_;
+  map_frontiers::conversions::ViewCandidateToGeometryPose(m_current_goal, next_goal.pose);
   pub_goal.publish(next_goal);
 
 }
@@ -753,28 +751,24 @@ void NBV_Selector::generate_views(){
 }
 
 void NBV_Selector::publish_views(){
+  if (!extra_viz_)
+    return;
+  visualization_msgs::MarkerArray marker_array;
+  float range_for_viz = 0.3;
 
-  for(int i=0; i< views.size();i++){
-
-    geometry_msgs::Pose temp_view ;
-    temp_view.position.x = views[i].x ; 
-    temp_view.position.y = views[i].y ;
-    temp_view.position.z = views[i].z ; 
-
-    temp_view.orientation.x = views[i].q_x ; 
-    temp_view.orientation.y = views[i].q_y ; 
-    temp_view.orientation.z = views[i].q_z ; 
-    temp_view.orientation.w = views[i].q_w ; 
-
-
-    
+  views_set.poses.clear();
+  for(int i = 0; i < views.size(); i++){
+    geometry_msgs::Pose temp_view;
+    map_frontiers::conversions::ViewCandidateToGeometryPose(views[i], temp_view);
     views_set.poses.push_back(temp_view);
-  }
 
+    // Create markers to represent the fov the view would have
+    marker_array.markers.push_back(map_frontiers::visualization::CreateHorizontalFOVMarker(temp_view, i, range_for_viz));
+    marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
+  }
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
-  //ROS_INFO_COND(verbose_, "Views published ! %lu ", views_set.size()) ;
-
+  pub_views_marker.publish(marker_array);
 }
 
 

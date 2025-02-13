@@ -5,6 +5,7 @@
   <arg name="namespace" default="" />
   <arg name="timer" default="false" />
   <arg name="verbose" default="false" />
+  <arg name="extra_viz" default="false" />
 
     <node name="drone_NBV_selector" pkg="map_frontiers" type="NBV_Selector" output="screen">
         <remap from="esdf_map_out" to="/voxblox_node/esdf_map_out" />
@@ -20,6 +21,7 @@
 
         <param name="timer" value="$(arg timer)" />
         <param name="verbose" value="$(arg verbose)" />
+        <param name="extra_viz" value="$(arg extra_viz)" />
     </node>
 
 </launch>
