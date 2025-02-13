@@ -82,7 +82,6 @@ private:
     float m_tolerance_distance_ ; 
     double m_threshold_known ; 
 
-    bool m_frontier6;
     bool m_surface_frontiers;
     ViewCandidate m_current_goal;
     ViewCandidate m_current_pos;
@@ -120,10 +119,6 @@ private:
     int m_team_id;
     std::vector<int> m_team;
     std::unordered_map<int, ViewCandidate> m_team_pos;
-
-
-    //NEIGHBOURS VOXELS
-    Eigen::Vector3d c_neighbor_voxels_[26]; 
 
     //STATES
     const static unsigned char AVAILABLE = 0;  // NOLINT
@@ -185,7 +180,6 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_team = robot_team;
     // m_team_pos();
     m_availability = AVAILABLE;
-    m_frontier6 = false;
     last_nbv_ = ros::Time::now();
 
     // Get ros params
@@ -261,78 +255,40 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     start_server = n.advertiseService("start_NBV_selector", &NBV_Selector::startCallback, this);
     stop_server = n.advertiseService("stop_NBV_selector", &NBV_Selector::stopCallback, this);
 
-    if(m_frontier6 == true){
-        c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
-        c_neighbor_voxels_[1] = Eigen::Vector3d(-vs, 0, 0);
-        c_neighbor_voxels_[2] = Eigen::Vector3d(0, vs, 0);
-        c_neighbor_voxels_[3] = Eigen::Vector3d(0, -vs, 0);
-        c_neighbor_voxels_[4] = Eigen::Vector3d(0, 0, vs);
-        c_neighbor_voxels_[5] = Eigen::Vector3d(0, 0, -vs);
-    }
-    else{
-        c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
-        c_neighbor_voxels_[1] = Eigen::Vector3d(vs, vs, 0);
-        c_neighbor_voxels_[2] = Eigen::Vector3d(vs, -vs, 0);
-        c_neighbor_voxels_[3] = Eigen::Vector3d(vs, 0, vs);
-        c_neighbor_voxels_[4] = Eigen::Vector3d(vs, vs, vs);
-        c_neighbor_voxels_[5] = Eigen::Vector3d(vs, -vs, vs);
-        c_neighbor_voxels_[6] = Eigen::Vector3d(vs, 0, -vs);
-        c_neighbor_voxels_[7] = Eigen::Vector3d(vs, vs, -vs);
-        c_neighbor_voxels_[8] = Eigen::Vector3d(vs, -vs, -vs);
-        c_neighbor_voxels_[9] = Eigen::Vector3d(0, vs, 0);
-        c_neighbor_voxels_[10] = Eigen::Vector3d(0, -vs, 0);
-        c_neighbor_voxels_[11] = Eigen::Vector3d(0, 0, vs);
-        c_neighbor_voxels_[12] = Eigen::Vector3d(0, vs, vs);
-        c_neighbor_voxels_[13] = Eigen::Vector3d(0, -vs, vs);
-        c_neighbor_voxels_[14] = Eigen::Vector3d(0, 0, -vs);
-        c_neighbor_voxels_[15] = Eigen::Vector3d(0, vs, -vs);
-        c_neighbor_voxels_[16] = Eigen::Vector3d(0, -vs, -vs);
-        c_neighbor_voxels_[17] = Eigen::Vector3d(-vs, 0, 0);
-        c_neighbor_voxels_[18] = Eigen::Vector3d(-vs, vs, 0);
-        c_neighbor_voxels_[19] = Eigen::Vector3d(-vs, -vs, 0);
-        c_neighbor_voxels_[20] = Eigen::Vector3d(-vs, 0, vs);
-        c_neighbor_voxels_[21] = Eigen::Vector3d(-vs, vs, vs);
-        c_neighbor_voxels_[22] = Eigen::Vector3d(-vs, -vs, vs);
-        c_neighbor_voxels_[23] = Eigen::Vector3d(-vs, 0, -vs);
-        c_neighbor_voxels_[24] = Eigen::Vector3d(-vs, vs, -vs);
-        c_neighbor_voxels_[25] = Eigen::Vector3d(-vs, -vs, -vs);
-    }
-
-
 
     //ros::spin()
 }
 
-bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
-  unsigned char voxel_state;
-  if ( m_frontier6 ) {
-    for (int i = 0; i < 6; ++i) {
-      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
-      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-        continue;
-      }
-      if (m_surface_frontiers ) {
-        return voxel_state == voxblox_map::VoxbloxMap::OCCUPIED;
-      } else {
-        return true;
-      }
-    }
-  } else {
-    for (int i = 0; i < 26; ++i) {
-      voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
-      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-        continue;
-      }
-      if ( m_surface_frontiers ) {
-        return voxel_state == voxblox_map::VoxbloxMap::OCCUPIED;
-      } else {
-        return true;
-      }
-    }
-  }
-  return false;
+// bool NBV_Selector::isFrontierVoxel_ESDF(const Eigen::Vector3d& voxel){
+//   unsigned char voxel_state;
+//   if ( m_frontier6 ) {
+//     for (int i = 0; i < 6; ++i) {
+//       voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+//       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+//         continue;
+//       }
+//       if (m_surface_frontiers ) {
+//         return voxel_state == voxblox_map::VoxbloxMap::OCCUPIED;
+//       } else {
+//         return true;
+//       }
+//     }
+//   } else {
+//     for (int i = 0; i < 26; ++i) {
+//       voxel_state = m_map.getVoxelState_ESDF(voxel + c_neighbor_voxels_[i]);
+//       if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
+//         continue;
+//       }
+//       if ( m_surface_frontiers ) {
+//         return voxel_state == voxblox_map::VoxbloxMap::OCCUPIED;
+//       } else {
+//         return true;
+//       }
+//     }
+//   }
+//   return false;
 
-}
+// }
 
 
 void NBV_Selector::updateFrontiers(){

@@ -35,6 +35,9 @@ private:
     //parameters for the view evaluation
     float value_frontier_ ; 
     double m_threshold_known ;
+    //NEIGHBOURS VOXELS
+    Eigen::Vector3d c_neighbor_voxels_[26];
+    bool m_frontier6;
 
 public:
     ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold) ;
@@ -89,6 +92,47 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   c_split_distances_.push_back(0.0);
   std::reverse(c_split_distances_.begin(), c_split_distances_.end());
   std::reverse(c_split_widths_.begin(), c_split_widths_.end());
+
+
+  //Frontiers data 
+  m_frontier6 = false;
+  if(m_frontier6 == true){
+    c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
+    c_neighbor_voxels_[1] = Eigen::Vector3d(-vs, 0, 0);
+    c_neighbor_voxels_[2] = Eigen::Vector3d(0, vs, 0);
+    c_neighbor_voxels_[3] = Eigen::Vector3d(0, -vs, 0);
+    c_neighbor_voxels_[4] = Eigen::Vector3d(0, 0, vs);
+    c_neighbor_voxels_[5] = Eigen::Vector3d(0, 0, -vs);
+  }
+  else{
+    c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
+    c_neighbor_voxels_[1] = Eigen::Vector3d(vs, vs, 0);
+    c_neighbor_voxels_[2] = Eigen::Vector3d(vs, -vs, 0);
+    c_neighbor_voxels_[3] = Eigen::Vector3d(vs, 0, vs);
+    c_neighbor_voxels_[4] = Eigen::Vector3d(vs, vs, vs);
+    c_neighbor_voxels_[5] = Eigen::Vector3d(vs, -vs, vs);
+    c_neighbor_voxels_[6] = Eigen::Vector3d(vs, 0, -vs);
+    c_neighbor_voxels_[7] = Eigen::Vector3d(vs, vs, -vs);
+    c_neighbor_voxels_[8] = Eigen::Vector3d(vs, -vs, -vs);
+    c_neighbor_voxels_[9] = Eigen::Vector3d(0, vs, 0);
+    c_neighbor_voxels_[10] = Eigen::Vector3d(0, -vs, 0);
+    c_neighbor_voxels_[11] = Eigen::Vector3d(0, 0, vs);
+    c_neighbor_voxels_[12] = Eigen::Vector3d(0, vs, vs);
+    c_neighbor_voxels_[13] = Eigen::Vector3d(0, -vs, vs);
+    c_neighbor_voxels_[14] = Eigen::Vector3d(0, 0, -vs);
+    c_neighbor_voxels_[15] = Eigen::Vector3d(0, vs, -vs);
+    c_neighbor_voxels_[16] = Eigen::Vector3d(0, -vs, -vs);
+    c_neighbor_voxels_[17] = Eigen::Vector3d(-vs, 0, 0);
+    c_neighbor_voxels_[18] = Eigen::Vector3d(-vs, vs, 0);
+    c_neighbor_voxels_[19] = Eigen::Vector3d(-vs, -vs, 0);
+    c_neighbor_voxels_[20] = Eigen::Vector3d(-vs, 0, vs);
+    c_neighbor_voxels_[21] = Eigen::Vector3d(-vs, vs, vs);
+    c_neighbor_voxels_[22] = Eigen::Vector3d(-vs, -vs, vs);
+    c_neighbor_voxels_[23] = Eigen::Vector3d(-vs, 0, -vs);
+    c_neighbor_voxels_[24] = Eigen::Vector3d(-vs, vs, -vs);
+    c_neighbor_voxels_[25] = Eigen::Vector3d(-vs, -vs, -vs);
+  } 
+
 
 }
 
