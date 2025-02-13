@@ -823,7 +823,7 @@ void NBV_Selector::select_next_best_view(){
   }
 
 
-  select views
+  //select views
 
   if (views.size() > 0){
     ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
