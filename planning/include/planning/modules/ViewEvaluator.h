@@ -53,7 +53,7 @@ public:
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
-    float evaluate_view_angular(const ViewCandidate& vc);
+    float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);

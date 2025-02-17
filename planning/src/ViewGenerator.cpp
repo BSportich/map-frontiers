@@ -104,6 +104,8 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         float temp_y = frontier.y();
         float temp_z = frontier.z(); 
 
+        
+
 
         
 
