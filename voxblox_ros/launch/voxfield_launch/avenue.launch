@@ -1,6 +1,7 @@
 <launch>
   <arg name="timer" default="false" />
   <arg name="verbose" default="false" />
+  <arg name="extra_viz" default="false" />
 
   <param name="use_sim_time" value="true" />
   <arg name="process_every_nth_frame" default="1" />
@@ -22,6 +23,7 @@
 
     <arg name="timer" value="$(arg timer)" />
     <arg name="verbose" value="$(arg verbose)" />
+    <arg name="extra_viz" value="$(arg extra_viz)" />
   </include>
 
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>

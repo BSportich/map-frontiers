@@ -57,7 +57,7 @@ public:
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
     void markNeighboringRays(int x, int y, int segment, int value);
-    float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set,const std::vector<Eigen::Vector3d>& frontiers_set);
+    float count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set);
 
 };
 
@@ -255,7 +255,7 @@ void ViewEvaluator::markNeighboringRays(int x, int y, int segment,
 }
 
 //potential inefficiency : testing frontiers with dedicated method might be more efficient
-float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set, const std::vector<Eigen::Vector3d>& frontiers_set){
+float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& voxels_set){
   float evaluation = 0 ;
   for(int i=0; i< voxels_set.size(); i++) {
 
@@ -272,6 +272,32 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
 
   return evaluation; 
 
+
+}
+
+float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set){
+  float evaluation = 0 ;
+  float closer_surface = ; 
+  for(int i=0; i< voxels_set.size(); i++) {
+
+    Eigen::Vector3d voxel_test = voxels_set[i];
+
+    if( isFrontierVoxel_TSDF(voxel_test, m_threshold_known) ){
+
+          evaluation = evaluation + value_frontier_ ; 
+        }
+    else if ( m_map.getVoxelState_TSDF(voxel_test, 0) == voxblox_map::VoxbloxMap::UNKNOWN ){
+
+      closer_surface = 
+
+
+    }
+
+
+    }
+
+
+  return evaluation; 
 
 }
 

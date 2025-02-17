@@ -1,4 +1,5 @@
 #include "planning/modules/ViewGenerator.h"
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <math.h>
 #include "ros/ros.h"
 
@@ -93,55 +94,94 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 }
 
 void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set ){
-    // view_candidates.clear();
+    view_candidates.clear();
 
-    // for(int i=0; i< frontiers_set.size(); i++){
+    for(int i=0; i< frontiers_set.size(); i++){
 
 
-    //     Eigen::Vector3d frontier = frontiers_set[i];
-    //     float temp_x = frontier.x();
-    //     float temp_y = frontier.y();
-    //     float temp_z = frontier.z(); 
+        Eigen::Vector3d frontier = frontiers_set[i];
+        float temp_x = frontier.x();
+        float temp_y = frontier.y();
+        float temp_z = frontier.z(); 
+
+
+        m_map
 
 
         
 
-    // }
+    }
 
 
 
 }
 
 
-void findOrientation(ViewCandidate& vc){
+// void findOrientation(ViewCandidate& vc){
 
-    Eigen::Vector3d view_pos( vc.x, vc.y, vc.z ) ;
-    Eigen::Vector3d frontier_pos( vc.o_x, vc.o_y, vc.o_z ) ;
+//     Eigen::Vector3d view_pos( vc.x, vc.y, vc.z ) ;
+//     Eigen::Vector3d frontier_pos( vc.o_x, vc.o_y, vc.o_z ) ;
 
-    //Computes direction vector
-    Eigen::Vector3d direction =  frontier_pos - view_pos ; 
+//     //Computes direction vector
+//     Eigen::Vector3d direction =  frontier_pos - view_pos ; 
     
-    // Normalize the direction vector to get the forward vector
-    Eigen::Vector3d forward = direction.normalized();
+//     // Normalize the direction vector to get the forward vector
+//     Eigen::Vector3d forward = direction.normalized();
 
-    float heading_angle =  atan2( forward.y(), forward.x() ) ;
-    float yaw = heading_angle ; 
-    // Compute the right vector as the cross product of up and forward
+//     float heading_angle =  atan2( forward.y(), forward.x() ) ;
+//     float yaw = heading_angle ; 
+//     // Compute the right vector as the cross product of up and forward
 
-    float pitch = asin( forward.z() ) ;
-    float roll = 0 ; 
+//     float pitch = asin( forward.z() ) ;
+//     float roll = 0 ; 
 
-    float qx = sin(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) - cos(roll/2.0) * sin(pitch/2.0) * sin(yaw/2.0) ;
-    float qy = cos(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) + sin(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) ;
-    float qz = cos(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) - sin(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) ;
-    float qw = cos(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) ;
+//     float qx = sin(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) - cos(roll/2.0) * sin(pitch/2.0) * sin(yaw/2.0) ;
+//     float qy = cos(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) + sin(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) ;
+//     float qz = cos(roll/2.0) * cos(pitch/2.0) * sin(yaw/2.0) - sin(roll/2.0) * sin(pitch/2.0) * cos(yaw/2.0) ;
+//     float qw = cos(roll/2.0) * cos(pitch/2.0) * cos(yaw/2.0) ;
 
-    vc.q_x = qx;
-    vc.q_y = qy;
-    vc.q_z = qz;
-    vc.q_w = qw;
+//     vc.q_x = qx;
+//     vc.q_y = qy;
+//     vc.q_z = qz;
+//     vc.q_w = qw;
 
 
+// }
+
+void findOrientation(ViewCandidate& vc){
+    // Convert the points to tf2::Vector3 for easier vector operations
+    tf2::Vector3 view_pos(vc.x, vc.y, vc.z);
+    tf2::Vector3 frontier_pos(vc.o_x, vc.o_y, vc.o_z);
+
+    // Compute the direction vector from point1 to point2
+    tf2::Vector3 direction = frontier_pos - view_pos;
+    
+    // Normalize the direction vector (to ensure it's a unit vector)
+    direction.normalize();
+
+    // The forward direction that "view_pos" should align with (now along the X-axis)
+    tf2::Vector3 forward(1.0, 0.0, 0.0); // Align with the X-axis
+
+    // Compute the axis of rotation (cross product of forward and direction)
+    tf2::Vector3 axis = forward.cross(direction);
+    axis.normalize();  // Normalize the axis
+
+    // Compute the angle of rotation (dot product gives cosine of the angle)
+    float dot = forward.dot(direction);
+    // Clamp the dot product to avoid precision errors in the acos function
+    dot = std::min(1.0f, std::max(-1.0f, dot));
+
+    // Calculate the angle between the vectors
+    float angle = acos(dot);
+
+    // Compute the quaternion representing the rotation
+    tf2::Quaternion rotation;
+    rotation.setRotation(axis, angle);
+
+    vc.q_x = rotation.x();
+    vc.q_y = rotation.y();
+    vc.q_z = rotation.z();
+    vc.q_w = rotation.w();
 }
 
 bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
