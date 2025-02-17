@@ -105,7 +105,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         float temp_z = frontier.z(); 
 
 
-        m_map
+        
 
 
         
@@ -115,6 +115,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
 
 }
+
 
 
 // void findOrientation(ViewCandidate& vc){

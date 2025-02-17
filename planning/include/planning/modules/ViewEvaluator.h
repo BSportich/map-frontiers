@@ -35,12 +35,13 @@ private:
     //parameters for the view evaluation
     float value_frontier_ ; 
     double m_threshold_known ;
+    int distance_surface_radius_max_ ; 
     //NEIGHBOURS VOXELS
     Eigen::Vector3d c_neighbor_voxels_[26];
     bool m_frontier6;
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface) ;
     ViewEvaluator(){};
     ~ViewEvaluator();
 
@@ -61,7 +62,7 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface) 
 {
   m_map = map ;
   m_method_type = method_name ;
@@ -69,6 +70,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   p_downsampling_factor_ = 1.0 ;
   sensor_model = sensor_lidar ; 
   m_threshold_known = threshold ; 
+  distance_surface_radius_max_ = radius_max_surface ; 
 
   // Downsample to voxel size resolution at max range
   c_res_x_ = std::min(static_cast<int>(std::ceil(
@@ -277,7 +279,9 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
 
 float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set){
   float evaluation = 0 ;
-  float closer_surface = ; 
+  float closer_surface = 0 ; 
+  float dist_to_voxel = 0 ;
+
   for(int i=0; i< voxels_set.size(); i++) {
 
     Eigen::Vector3d voxel_test = voxels_set[i];
@@ -288,7 +292,20 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
         }
     else if ( m_map.getVoxelState_TSDF(voxel_test, 0) == voxblox_map::VoxbloxMap::UNKNOWN ){
 
-      closer_surface = 
+      for(int j= - distance_surface_radius_max_; j<= distance_surface_radius_max_;j++){
+        for(int k= - distance_surface_radius_max_; k<= distance_surface_radius_max_;k++){
+          for(int l= - distance_surface_radius_max_; l<= distance_surface_radius_max_;l++){
+            
+            Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
+            if( m_map.getVoxelState_TSDF(  voxel_test + shift, m_threshold_known ) == voxblox_map::VoxbloxMap::OCCUPIED ){
+
+
+                closer_surface = closer_surface + (1/ dist_to_voxel) ; 
+            }
+          }
+        }
+      }
+       
 
 
     }
@@ -297,7 +314,8 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
     }
 
 
-  return evaluation; 
+
+  return evaluation + closer_surface ; 
 
 }
 
