@@ -808,6 +808,7 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
 
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
+    //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
     temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
     values_views.push_back(temp_value);
@@ -867,8 +868,8 @@ int main(int argc, char** argv) {
     sys_params.p_fov_y = 360;  // Total fields of view [deg], expected symmetric w.r.t.
     // sensor facing direction
     sys_params.p_fov_x = 63.05;
-    sys_params.p_resolution_x = 40 ;
-    sys_params.p_resolution_y = 40; // high number attendu
+    sys_params.p_resolution_x = 1000 ;
+    sys_params.p_resolution_y = 1000; // high number attendu
     sys_params.p_sampling_time =1; 
 
     sys_params.p_fov_x *= M_PI / 180.0;
