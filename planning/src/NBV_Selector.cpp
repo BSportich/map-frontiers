@@ -786,6 +786,7 @@ void NBV_Selector::select_next_best_view(){
   float max_value_nbv = -1 ; 
   float temp_value = -1 ; 
   m_current_goal = m_current_pos;
+  float temp_value_angular = 0 ;
   ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
@@ -806,7 +807,7 @@ void NBV_Selector::select_next_best_view(){
 
     ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
 
-    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels, frontiers_set);
+    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
     temp_value_angular = m_view_evaluator.evaluate_view_angular( view ) ; 
     values_views.push_back(temp_value);
     if( temp_value > max_value_nbv){
