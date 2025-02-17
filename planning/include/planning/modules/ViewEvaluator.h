@@ -173,7 +173,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
 
 // }
 
-float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos){
+float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos){
   Eigen::Vector3d view_pos = Eigen::Vector3d(vc.x, vc.y, vc.z) ;
   Eigen::Vector3d comp = (view_pos - robot_pos) / (view_pos - robot_pos).norm() ;
   Eigen::Vector3d vel(1,1,1);
