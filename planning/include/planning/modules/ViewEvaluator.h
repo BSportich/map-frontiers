@@ -261,7 +261,7 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
 
     Eigen::Vector3d voxel_test = voxels_set[i];
 
-    if( isFrontierVoxel_TSDF(voxel_test, m_threshold_known) ){
+    if( isFrontierVoxel_TSDF(voxel_test, m_threshold_known) ){ // replaced by hashmap 
 
           evaluation = evaluation + value_frontier_ ; 
         }
