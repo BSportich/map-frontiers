@@ -33,6 +33,7 @@ struct system_parameters
     double threshold_known ;
 
     //////////////View Generation parameters
+    std::string method_view_generation ; 
     float distance_min ;
     float distance_max ;
     int subsampling_views ;
@@ -216,7 +217,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //modules
     //m_view_generator.set_map(m_map);
-    std::string method = "sphere";
+    std::string method = sys_params.method_view_generation ;
     m_view_generator = ViewGenerator(method, 5, 10, m_map, sys_param.robot_radius);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max );
@@ -862,7 +863,8 @@ int main(int argc, char** argv) {
 
 
     //////////////View Generation parameters
-    sys_params.distance_min = 0;
+    sys_params..method_view_generation = "sphere" ; 
+    sys_params.distance_min = 1;
     sys_params.distance_max = 2;
     sys_params.subsampling_views = 10 ;
     sys_params.robot_radius = 5; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube

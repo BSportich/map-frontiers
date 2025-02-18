@@ -24,6 +24,9 @@ void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_
 
         ViewGenerator::generateViews_sphere( frontiers_set );
     }
+    else if(m_method_type == "gradient"){
+        ViewGenerator::generateViews_gradients_ESDF( frontiers_set ) ; 
+    }
     else{
         throw std::invalid_argument("Methods not defined ! ");
     }
