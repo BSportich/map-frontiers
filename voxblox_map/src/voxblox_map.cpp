@@ -189,8 +189,28 @@ double VoxbloxMap::getVoxelWeight_TSDF(const Eigen::Vector3d& point) {
   }
   return 0.0;
 }
-
 //ESDF Voxel has no weight
+
+
+//CREATED BUT SHOULD NOT BE USED FOR VIEW GENERATION
+double VoxbloxMap::getVoxelGradient_TSDF(const Eigen::Vector3d& point) {
+  voxblox::Point voxblox_point(point.x(), point.y(), point.z());
+  voxblox::Block<voxblox::TsdfVoxel>::Ptr block =
+      tsdf_map_pointer
+          ->getTsdfLayerPtr()
+          ->getBlockPtrByCoordinates(voxblox_point);
+  if (block) {
+    voxblox::TsdfVoxel* tsdf_voxel =
+        block->getVoxelPtrByCoordinates(voxblox_point);
+    if (tsdf_voxel) {
+      return tsdf_voxel->gradient;
+    }
+  }
+  return 0.0;
+}
+
+
+
 
 // get the maximum allowed weight (return 0 if using uncapped weights)
 double VoxbloxMap::getMaximumWeight() { return c_maximum_weight_; }

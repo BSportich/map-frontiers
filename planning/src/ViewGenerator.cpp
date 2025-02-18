@@ -71,6 +71,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
                 //isFree = isSafeView(voxel); // never converges
                 ROS_INFO(" Is safe ?%s ", isFree ? "true " : "false");
+                ROS_INFO_STREAM("Vector3d: " << .transpose());
                 //ROS_INFO("Generating views %f %f %f ", o_x, o_y, o_z );
 
 
@@ -93,21 +94,53 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
     }
 }
 
-void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set ){
+void ViewGenerator::generateViews_gradient_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set ){
+    view_candidates.clear();
+    int nb_steps = m_distance_max / m_map.getVoxelSize() ;
+    Eigen::Vector3d gradient ; 
+    Eigen::Vector3d last_voxel, next_voxel ; 
+    float distance = 0 ;
+    bool isSafeView_bool ; 
+
     view_candidates.clear();
 
     for(int i=0; i< frontiers_set.size(); i++){
 
 
         Eigen::Vector3d frontier = frontiers_set[i];
-        float temp_x = frontier.x();
-        float temp_y = frontier.y();
-        float temp_z = frontier.z(); 
-
-        
+        next_voxel = frontier ; 
 
 
-        
+        for(int j=0;j<= nb_steps; j++ ){
+            
+            last_voxel = next_voxel ;
+            //find gradient
+            gradient = computeGradient(last_voxel) ; 
+
+            //find corresponding voxel
+            m_map.getVoxelCenter_ESDF(next_voxel, (gradient + last_voxel)) ;
+            distance = (frontier - next_voxel).norm() ; 
+            isSafeView_bool = isSafeView(next_voxel);
+            if( (distance  >  (( m_distance_max + m_distance_min)/2)) && (isSafeView) ){
+                break; 
+            } 
+
+
+        }
+
+        if(isSafeView_bool){
+
+            ViewCandidate vc = { next_voxel.x() , next_voxel.y() , next_voxel.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+            view_candidates.push_back( vc )
+
+
+        }
+        else{
+            ROS_INFO("Impossible to generate view for frontier %d ",i);
+
+            
+        }
+
 
 
         
@@ -208,6 +241,31 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
         }
     }
     return true;
+
+}
+
+Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
+
+    Eigen::Vector3d gradient_vector(0,0,0); 
+    Eigen::Vector3d shift_x(1,0,0) ; 
+    Eigen::Vector3d shift_y(0,1,0) ; 
+    Eigen::Vector3d shift_z(0,0,1) ; 
+
+    gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
+    gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
+    gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
+    gradient_vector.x() = gradient_vector.x / 2 ; 
+    gradient_vector.y() = gradient_vector.y /2 ;
+    gradient_vector.z() = gradient_vector.z / 2;
+
+    return gradient_vector; 
+    
+
+    
+
+    
+
+
 
 }
 

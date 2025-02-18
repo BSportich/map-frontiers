@@ -55,6 +55,8 @@ public:
     // void generateViews_echo(std::vector<Eigen::Vector3d> frontiers_set);
     void generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set);
     // void generateViews_gradients(std::vector<Eigen::Vector3d> frontiers_set);
+
+    float computeGradient(const Eigen::Vector3d& voxel);
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
