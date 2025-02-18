@@ -58,7 +58,7 @@ public:
 
 
 
-    float computeGradient(const Eigen::Vector3d& voxel);
+    Eigen::Vector3d computeGradient(const Eigen::Vector3d& voxel);
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
