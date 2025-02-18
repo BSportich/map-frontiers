@@ -141,6 +141,7 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
         if(isSafeView_bool){
 
             ViewCandidate vc = { next_voxel.x() , next_voxel.y() , next_voxel.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+            findOrientation( vc )
             view_candidates.push_back( vc );
 
 
