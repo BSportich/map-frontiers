@@ -101,7 +101,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
     }
 }
 
-void ViewGenerator::generateViews_gradient_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set ){
+void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set ){
     view_candidates.clear();
     int nb_steps = m_distance_max / m_map.getVoxelSize() ;
     Eigen::Vector3d gradient ; 
