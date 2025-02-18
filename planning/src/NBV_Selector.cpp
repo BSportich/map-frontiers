@@ -217,7 +217,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //modules
     //m_view_generator.set_map(m_map);
-    std::string method = sys_params.method_view_generation ;
+    std::string method = sys_param.method_view_generation ;
     m_view_generator = ViewGenerator(method, 5, 10, m_map, sys_param.robot_radius);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max );
