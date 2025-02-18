@@ -653,7 +653,8 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
     updateFrontiers();
     ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
-    //publish_all_frontiers();
+    if (extra_viz_)
+      publish_all_frontiers();
     ROS_INFO_COND(verbose_, "Frontiers published !");
     generate_views() ; 
     ROS_INFO_COND(verbose_, "Views generated !" );
