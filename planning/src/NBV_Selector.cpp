@@ -814,8 +814,8 @@ void NBV_Selector::select_next_best_view(){
 
     ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
 
-    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
-    //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
+    //temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
+    temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
     temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
     values_views.push_back(temp_value);
