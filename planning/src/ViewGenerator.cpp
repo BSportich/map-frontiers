@@ -261,9 +261,9 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
     gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
     gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
-    gradient_vector.x() = gradient_vector.x / 2 ; 
-    gradient_vector.y() = gradient_vector.y /2 ;
-    gradient_vector.z() = gradient_vector.z / 2;
+    gradient_vector.x() = gradient_vector.x() / 2 ; 
+    gradient_vector.y() = gradient_vector.y() /2 ;
+    gradient_vector.z() = gradient_vector.z() / 2;
 
     return gradient_vector; 
     
