@@ -816,8 +816,8 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
     
     ros::Time start_view_evaluation = ros::Time::now();
-    //temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
-    temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
+    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
+    //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
     ros::Time end_view_evaluation = ros::Time::now();
     duration = end_view_evaluation - start_view_evaluation;
     ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
@@ -830,7 +830,7 @@ void NBV_Selector::select_next_best_view(){
 
     }
 
-    break ; 
+    //break ; 
 
 
   }
