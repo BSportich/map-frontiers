@@ -825,6 +825,8 @@ void NBV_Selector::select_next_best_view(){
 
     }
 
+    break ; 
+
 
   }
 
