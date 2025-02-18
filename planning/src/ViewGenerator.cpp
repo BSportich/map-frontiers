@@ -128,7 +128,7 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             m_map.getVoxelCenter_ESDF( &next_voxel, (gradient + last_voxel)) ;
             distance = (frontier - next_voxel).norm() ; 
             isSafeView_bool = isSafeView(next_voxel);
-            if( (distance  >  (( m_distance_max + m_distance_min)/2)) && (isSafeView) ){
+            if( (distance  >  (( m_distance_max + m_distance_min)/2)) && (isSafeView_bool) ){
                 break; 
             } 
 
