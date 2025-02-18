@@ -36,6 +36,8 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
     for(int i=0; i< frontiers_set.size(); i++){
 
+        int numberOfOccupiedVoxels = 0;
+        int numberOfUnknownVoxels = 0;
 
         Eigen::Vector3d frontier = frontiers_set[i];
         float temp_x = frontier.x();
@@ -51,6 +53,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
             float o_z = 0 ; 
 
             while((isFree == false)){
+                ROS_INFO_THROTTLE(10, "Looking for an unoccupied view...");
             
                 float r = ( (static_cast<float>(rand()) / RAND_MAX) * ( m_distance_max - m_distance_min ) + m_distance_min) ;
                 float theta = ( (static_cast<float>(rand()) / RAND_MAX)  * 2 * M_PI) ;
@@ -70,13 +73,17 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
                 unsigned char current_state = m_map.getVoxelState_ESDF(voxel);
                 isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
                 //isFree = isSafeView(voxel); // never converges
-                ROS_INFO(" Is safe ?%s ", isFree ? "true " : "false");
-                ROS_INFO_STREAM("Vector3d: " << .transpose());
+                if (current_state == voxblox_map::VoxbloxMap::OCCUPIED)
+                    numberOfOccupiedVoxels++;
+                if (current_state == voxblox_map::VoxbloxMap::UNKNOWN)
+                    numberOfUnknownVoxels++;
                 //ROS_INFO("Generating views %f %f %f ", o_x, o_y, o_z );
 
 
                 //formula = (o_x - temp_x ) * (o_x - temp_x ) + (o_y - temp_y ) * (o_y - temp_y ) + (o_z - temp_z ) * (o_z - temp_z ) ;
             }
+
+            ROS_INFO("While looking for an unoccupied view, found %i occupied and %i unknown voxels", numberOfOccupiedVoxels, numberOfUnknownVoxels);
 
             ViewCandidate vc = {o_x,o_y,o_z, 0,0,0,0, temp_x, temp_y, temp_z};
             

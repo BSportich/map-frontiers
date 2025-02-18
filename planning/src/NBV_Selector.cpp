@@ -22,6 +22,7 @@
 #include <geometry_msgs/PoseArray.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point.h>
 
 
 struct system_parameters
@@ -652,7 +653,8 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
     updateFrontiers();
     ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
-    //publish_all_frontiers();
+    if (extra_viz_)
+      publish_all_frontiers();
     ROS_INFO_COND(verbose_, "Frontiers published !");
     generate_views() ; 
     ROS_INFO_COND(verbose_, "Views generated !" );
@@ -761,11 +763,16 @@ void NBV_Selector::publish_views(){
   for(int i = 0; i < views.size(); i++){
     geometry_msgs::Pose temp_view;
     map_frontiers::conversions::ViewCandidateToGeometryPose(views[i], temp_view);
+    geometry_msgs::Point temp_frontier;
+    temp_frontier.x = views[i].o_x;
+    temp_frontier.y = views[i].o_y;
+    temp_frontier.z = views[i].o_z;
     views_set.poses.push_back(temp_view);
 
     // Create markers to represent the fov the view would have
     marker_array.markers.push_back(map_frontiers::visualization::CreateHorizontalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
+    marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
   }
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
