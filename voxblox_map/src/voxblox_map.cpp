@@ -65,6 +65,7 @@ double VoxbloxMap::getDistancePrecise_ESDF(const Eigen::Vector3d& position) {
     return distance;
   }
   return std::numeric_limits<double>::max() ; 
+}
 
 
 bool VoxbloxMap::isObserved_ESDF(const Eigen::Vector3d& point) {
