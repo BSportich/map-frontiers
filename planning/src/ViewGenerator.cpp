@@ -130,6 +130,7 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             //find corresponding voxel
             m_map.getVoxelCenter_ESDF( &next_voxel, (gradient + last_voxel)) ;
             distance = (frontier - next_voxel).norm() ; 
+            ROS_INFO(" Moved from %f to %f now at distance %f", m_map.getVoxelDistance_ESDF(last_voxel), m_map.getVoxelDistance_ESDF(next_voxel), distance );
             //isSafeView_bool = isSafeView(next_voxel);
             isSafeView_bool = true ; 
             if( (distance  >  (( m_distance_max + m_distance_min)/2)) && (isSafeView_bool) ){

@@ -858,7 +858,7 @@ int main(int argc, char** argv) {
     /////////////// NAVIGATION
     sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
 
-    sys_params.threshold_known = 0.3 ; //from Hardouin
+    sys_params.threshold_known = 0.0 ; //from Hardouin
     
 
 
