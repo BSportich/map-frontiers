@@ -1,4 +1,5 @@
 #include <voxblox_map/voxblox_map.h>
+#include <limits>
 
 //#include "active_3d_planning_core/data/system_constraints.h"
 
@@ -56,6 +57,14 @@ bool VoxbloxMap::isTraversable_ESDF(const Eigen::Vector3d& position,
   return false;
 }
 //getDisanceAtPosition unavailable in TSDF_map.h
+
+double VoxbloxMap::getDistancePrecise_ESDF(const Eigen::Vector3d& position) {
+  double distance = 0.0;
+  if (esdf_map_pointer->getDistanceAtPosition(position,
+                                &distance)) {
+    return distance;
+  }
+  return std::numeric_limits<double>::max() ; 
 
 
 bool VoxbloxMap::isObserved_ESDF(const Eigen::Vector3d& point) {
