@@ -111,6 +111,8 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
     Eigen::Vector3d last_voxel, next_voxel ; 
     float distance = 0 ;
     bool isSafeView_bool ; 
+    double vertical_angle_rad = 0 ;
+    double vertical_angle_deg = 0 ;
 
     view_candidates.clear();
 
@@ -139,9 +141,9 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             direction_proj.normalize() ;
 
             //Compute signed vertical angle
-            double vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
+            vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
             //double angle_rad_atan2 = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
-            double vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
+            vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
             
 
 
