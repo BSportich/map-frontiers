@@ -735,9 +735,10 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
 void NBV_Selector::isIdleCallback(const std_msgs::Bool& msg_is_idle) {
   if (verbose_ && m_is_idle != msg_is_idle.data) {
-    std::string previous_state = m_is_idle ? "idle" : "moving";
-    std::string new_state = msg_is_idle.data ? "idle" : "moving";
-    ROS_INFO("drone went from %s to %s", previous_state, new_state);
+    if (m_is_idle)
+      ROS_INFO("drone went from %s to %s", "idle", "moving");
+    else
+      ROS_INFO("drone went from %s to %s", "moving", "idle");
   }
   m_is_idle = msg_is_idle.data;
 }
