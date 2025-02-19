@@ -136,14 +136,14 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             
             //Angle verification
             //Compute direction with frontier
-            Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; 
-            Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
-            direction_proj.normalize() ;
+            // Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; 
+            // Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
+            // direction_proj.normalize() ;
 
-            //Compute signed vertical angle
-            vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
-            //double angle_rad_atan2 = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
-            vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
+            // //Compute signed vertical angle
+            // vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
+            // //double angle_rad_atan2 = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
+            // vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
             
 
 
