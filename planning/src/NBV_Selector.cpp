@@ -12,6 +12,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <std_msgs/Bool.h>
 #include <std_srvs/Empty.h>
 #include "voxblox/utils/timing.h"
 #include "voxblox_ros/conversions.h"
@@ -91,12 +92,14 @@ private:
     ViewCandidate m_current_goal;
     ViewCandidate m_current_pos;
     bool m_availability;
+    bool m_is_idle;
 
     //ROS COMMUNICATION
     ros::NodeHandle n;
     ros::Subscriber sub_map_tsdf;
     ros::Subscriber sub_map_esdf;
     ros::Subscriber sub_pos;
+    ros::Subscriber sub_idle;
     ros::Publisher pub_goal;
     ros::ServiceServer start_server;
     ros::ServiceServer stop_server;
@@ -166,6 +169,7 @@ public:
     void tSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void eSDFCallback(const voxblox_msgs::Layer& layer_msg);
     void posCallback(const nav_msgs::Odometry& msg_odom);
+    void isIdleCallback(const std_msgs::Bool& msg_is_idle);
     bool startCallback(
       std_srvs::Empty::Request& request,     // NOLINT
       std_srvs::Empty::Response& response);  // NOLINT
@@ -186,6 +190,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_team = robot_team;
     // m_team_pos();
     m_availability = AVAILABLE;
+    m_is_idle = true;
     last_nbv_ = ros::Time::now();
 
     // Get ros params
@@ -243,6 +248,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     sub_map_tsdf = n.subscribe("tsdf_map_out", 10, &NBV_Selector::tSDFCallback, this);
     sub_map_esdf = n.subscribe("esdf_map_out", 10, &NBV_Selector::eSDFCallback, this);
     sub_pos = n.subscribe("groundtruth/odom", 20, &NBV_Selector::posCallback, this);
+    sub_idle = n.subscribe("is_idle", 20, &NBV_Selector::isIdleCallback, this);
     pub_goal = n.advertise<geometry_msgs::PoseStamped>("pos_goal", 20); //to redefine msg type
     pub_pointcloud = n.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "test_point_cloud", 1, true);
@@ -725,6 +731,16 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   }
 
 
+}
+
+void NBV_Selector::isIdleCallback(const std_msgs::Bool& msg_is_idle) {
+  if (verbose_ && m_is_idle != msg_is_idle.data) {
+    if (m_is_idle)
+      ROS_INFO("drone went from %s to %s", "idle", "moving");
+    else
+      ROS_INFO("drone went from %s to %s", "moving", "idle");
+  }
+  m_is_idle = msg_is_idle.data;
 }
 
 bool NBV_Selector::startCallback(
