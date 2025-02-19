@@ -106,7 +106,7 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
 void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set){
     view_candidates.clear();
-    float step_size = 0.2 ; 
+    float step_size = 0.5 ; 
     //int nb_steps = m_distance_max / m_map.getVoxelSize() ;
     int nb_steps = m_distance_max / step_size ;
     Eigen::Vector3d gradient ; 
@@ -284,7 +284,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     
 
-    float vs = 0.2 ; 
+    float vs = 0.5 ; 
     Eigen::Vector3d gradient_vector(0,0,0); 
     Eigen::Vector3d shift_x(vs,0,0) ; 
     Eigen::Vector3d shift_y(0,vs,0) ; 
