@@ -106,7 +106,9 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
 void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set){
     view_candidates.clear();
+    float step_size = 0.2 ; 
     int nb_steps = m_distance_max / m_map.getVoxelSize() ;
+    int nb_steps = m_distance_max / step_size ;
     Eigen::Vector3d gradient ; 
     Eigen::Vector3d last_voxel, next_voxel ; 
     float distance = 0 ;
@@ -280,11 +282,13 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 }
 
 Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
+    
 
+    float vs = 0.2 ; 
     Eigen::Vector3d gradient_vector(0,0,0); 
-    Eigen::Vector3d shift_x(1,0,0) ; 
-    Eigen::Vector3d shift_y(0,1,0) ; 
-    Eigen::Vector3d shift_z(0,0,1) ; 
+    Eigen::Vector3d shift_x(vs,0,0) ; 
+    Eigen::Vector3d shift_y(0,vs,0) ; 
+    Eigen::Vector3d shift_z(0,0,vs) ; 
 
     // gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
     // gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
@@ -294,9 +298,9 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     gradient_vector.y() = m_map.getDistancePrecise_ESDF( voxel + shift_y) - m_map.getDistancePrecise_ESDF( voxel - shift_y);
     gradient_vector.z() = m_map.getDistancePrecise_ESDF( voxel + shift_z) - m_map.getDistancePrecise_ESDF( voxel - shift_z);
 
-    gradient_vector.x() = gradient_vector.x() / 2 ; 
-    gradient_vector.y() = gradient_vector.y() /2 ;
-    gradient_vector.z() = gradient_vector.z() / 2;
+    gradient_vector.x() = gradient_vector.x() / (2 *vs) ; 
+    gradient_vector.y() = gradient_vector.y() / (2*vs) ;
+    gradient_vector.z() = gradient_vector.z() / (2*vs);
 
     //Correction
 
