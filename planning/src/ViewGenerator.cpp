@@ -130,9 +130,10 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             gradient = computeGradient(last_voxel) ; 
 
             //find corresponding voxel
-            m_map.getVoxelCenter_ESDF( &next_voxel, (gradient + last_voxel)) ;
+            //m_map.getVoxelCenter_ESDF( &next_voxel, (gradient + last_voxel)) ;
+            next_voxel = (last_voxel + gradient) ; 
             distance = (frontier - next_voxel).norm() ; 
-            ROS_INFO(" Moved from %f to %f now at distance %f", m_map.getVoxelDistance_ESDF(last_voxel), m_map.getVoxelDistance_ESDF(next_voxel), distance );
+            ROS_INFO(" Moved from %f to %f now at distance %f", m_map.getDistancePrecise_ESDF(last_voxel), m_map.getDistancePrecise_ESDF(next_voxel), distance );
             
             //Angle verification
             //Compute direction with frontier
@@ -285,46 +286,44 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     Eigen::Vector3d shift_y(0,1,0) ; 
     Eigen::Vector3d shift_z(0,0,1) ; 
 
-    gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
-    gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
-    gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
+    // gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
+    // gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
+    // gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
+
+    gradient_vector.x() = m_map.getDistancePrecise_ESDF( voxel + shift_x) - m_map.getDistancePrecise_ESDF( voxel - shift_x);
+    gradient_vector.y() = m_map.getDistancePrecise_ESDF( voxel + shift_y) - m_map.getDistancePrecise_ESDF( voxel - shift_y);
+    gradient_vector.z() = m_map.getDistancePrecise_ESDF( voxel + shift_z) - m_map.getDistancePrecise_ESDF( voxel - shift_z);
+
     gradient_vector.x() = gradient_vector.x() / 2 ; 
     gradient_vector.y() = gradient_vector.y() /2 ;
     gradient_vector.z() = gradient_vector.z() / 2;
 
     //Correction
 
-    if( gradient_vector.x() > 0){
-        gradient_vector.x() = std::ceil( gradient_vector.x() ) ;
-    }
-    else{
-        gradient_vector.x() = std::floor( gradient_vector.x() ) ;
-    }
+    // if( gradient_vector.x() > 0){
+    //     gradient_vector.x() = std::ceil( gradient_vector.x() ) ;
+    // }
+    // else{
+    //     gradient_vector.x() = std::floor( gradient_vector.x() ) ;
+    // }
 
-    if( gradient_vector.y() > 0){
-        gradient_vector.y() = std::ceil( gradient_vector.y() ) ;
-    }
-    else{
-        gradient_vector.y() = std::floor( gradient_vector.y() ) ;
-    }
+    // if( gradient_vector.y() > 0){
+    //     gradient_vector.y() = std::ceil( gradient_vector.y() ) ;
+    // }
+    // else{
+    //     gradient_vector.y() = std::floor( gradient_vector.y() ) ;
+    // }
 
-    if( gradient_vector.z() > 0){
-        gradient_vector.z() = std::ceil( gradient_vector.z() ) ;
-    }
-    else{
-        gradient_vector.z() = std::floor( gradient_vector.z() ) ;
-    }
+    // if( gradient_vector.z() > 0){
+    //     gradient_vector.z() = std::ceil( gradient_vector.z() ) ;
+    // }
+    // else{
+    //     gradient_vector.z() = std::floor( gradient_vector.z() ) ;
+    // }
 
     
 
     return gradient_vector; 
-    
-
-    
-
-    
-
-
 
 }
 
