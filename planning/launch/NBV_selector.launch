@@ -13,6 +13,7 @@
 
         <remap from="pos_goal" to="/$(arg namespace)/next_best_viewpoint" />
         <remap from="groundtruth/odom" to="/$(arg namespace)/groundtruth/odom" />
+        <remap from="is_idle" to="/$(arg namespace)/mav_local_planner/is_idle" />
 
         <param name="voxel_size" value="$(arg voxel_size)" />
         <param name="voxels_per_side" value="$(arg voxels_per_side)" />
