@@ -120,7 +120,7 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
         Eigen::Vector3d frontier = frontiers_set[i];
         next_voxel = frontier ; 
 
-
+        ROS_INFO(" Generating view for frontier %d ",i);
         for(int j=0;j<= nb_steps; j++ ){
             
             last_voxel = next_voxel ;
@@ -131,6 +131,23 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             m_map.getVoxelCenter_ESDF( &next_voxel, (gradient + last_voxel)) ;
             distance = (frontier - next_voxel).norm() ; 
             ROS_INFO(" Moved from %f to %f now at distance %f", m_map.getVoxelDistance_ESDF(last_voxel), m_map.getVoxelDistance_ESDF(next_voxel), distance );
+            
+            //Angle verification
+            //Compute direction with frontier
+            Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; 
+            Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
+            direction_proj.normalize() ;
+
+            //Compute signed vertical angle
+            double vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
+            //double angle_rad_atan2 = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
+            double vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
+            
+
+
+
+            
+            
             //isSafeView_bool = isSafeView(next_voxel);
             isSafeView_bool = true ; 
             if( (distance  >  (( m_distance_max + m_distance_min)/2)) && (isSafeView_bool) ){
@@ -144,6 +161,8 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
 
             ViewCandidate vc = { next_voxel.x() , next_voxel.y() , next_voxel.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
             findOrientation( vc );
+            ROS_INFO(" Angle found is %f", vertical_angle_deg);
+            
             view_candidates.push_back( vc );
 
 
