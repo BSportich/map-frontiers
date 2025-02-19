@@ -271,6 +271,31 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     gradient_vector.y() = gradient_vector.y() /2 ;
     gradient_vector.z() = gradient_vector.z() / 2;
 
+    //Correction
+
+    if( gradient_vector.x() > 0){
+        gradient_vector.x() = std::ceil( gradient_vector.x() ) ;
+    }
+    else{
+        gradient_vector.x() = std::floor( gradient_vector.x() ) ;
+    }
+
+    if( gradient_vector.y() > 0){
+        gradient_vector.y() = std::ceil( gradient_vector.y() ) ;
+    }
+    else{
+        gradient_vector.y() = std::floor( gradient_vector.y() ) ;
+    }
+
+    if( gradient_vector.z() > 0){
+        gradient_vector.z() = std::ceil( gradient_vector.z() ) ;
+    }
+    else{
+        gradient_vector.z() = std::floor( gradient_vector.z() ) ;
+    }
+
+    
+
     return gradient_vector; 
     
 

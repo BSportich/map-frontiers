@@ -581,7 +581,17 @@ void NBV_Selector::publish_all_frontiers(){
 void NBV_Selector::publish_sub_frontiers(){
   frontiers_sub_pointcloud.header.frame_id = world_frame_;
   pub_sub_frontiers.publish(frontiers_sub_pointcloud);
+
+  //Analyse ESDF
 }
+
+// void NBV_Selector::publish_analysis_map(){
+
+//   values_for_eval_pointcloud.header.frame_id = world_frame_;
+//   values_for_eval_pointcloud2.header.frame_id = world_frame_;
+//   pub_test_values.publish( values_for_eval_pointcloud);
+//   pub_test_values2.publish( values_for_eval_pointcloud2);
+// }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
   ROS_INFO_COND(verbose_, "[TSDF callback] Entering TSDF callback");
