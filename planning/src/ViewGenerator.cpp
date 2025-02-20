@@ -281,6 +281,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         if(generated){
             view_candidates.push_back( vc );
         }
+    }
         
      
 
