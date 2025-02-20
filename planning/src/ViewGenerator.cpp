@@ -314,7 +314,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     //find gradient 
     gradient = computeGradient(frontier) ; 
     current_pos = frontier ;
-    ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y().gradient.z());
+    ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
 
 
     //go along the gradient direction
