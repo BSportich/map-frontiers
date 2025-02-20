@@ -387,9 +387,10 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
 }
 
-bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier,const Eigen::Vector3d& next_voxel, float& angle){
+bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier,const ViewCandidate& vc, float& angle){
     double vertical_angle_rad = 0 ;
     double vertical_angle_deg = 0 ;
+    Eigen::Vector3d next_voxel( vc.x, vc.y, vc.z );
 
     //Compute direction with frontier
     Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; 

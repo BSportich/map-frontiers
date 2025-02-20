@@ -61,7 +61,7 @@ public:
     void generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set);
 
 
-    bool verify_angle(const Eigen::Vector3d& frontier,const Eigen::Vector3d& next_voxel, float& angle);
+    bool verify_angle(const Eigen::Vector3d& frontier,const ViewCandidate& vc, float& angle);
     Eigen::Vector3d computeGradient(const Eigen::Vector3d& voxel);
     
 
