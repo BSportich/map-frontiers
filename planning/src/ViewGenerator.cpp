@@ -4,12 +4,14 @@
 #include "ros/ros.h"
 
 
-ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius){
+ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high){
     m_method_type = method_name;
     m_distance_max = distance_max;
     m_distance_min = distance_min;
     m_map = map;
     robot_radius_ = robot_radius ; 
+    m_angle_low = angle_low ;
+    m_angle_high = angle_high ; 
 
     max_sampling = 1;
     if(distance_min > distance_max) {
@@ -25,7 +27,8 @@ void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_
         ViewGenerator::generateViews_sphere( frontiers_set );
     }
     else if(m_method_type == "gradient"){
-        ViewGenerator::generateViews_gradients_ESDF( frontiers_set ) ; 
+        //ViewGenerator::generateViews_gradients_ESDF( frontiers_set ) ; 
+        ViewGenerator::generateViews_normals(frontiers_set);
     }
     else{
         throw std::invalid_argument("Methods not defined ! ");
@@ -134,7 +137,7 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
             //find corresponding voxel
             //m_map.getVoxelCenter_ESDF( &next_voxel, (gradient + last_voxel)) ;
             next_voxel = (last_voxel + gradient) ; 
-            distance = (frontier - next_voxel).norm() ; 
+            distance = (frontier - next_voxel).norm() * m_map.getVoxelSize(); 
             ROS_INFO(" Moved from %f to %f now at distance %f", m_map.getDistancePrecise_ESDF(last_voxel), m_map.getDistancePrecise_ESDF(next_voxel), distance );
             
             //Angle verification
@@ -257,20 +260,170 @@ void findOrientation(ViewCandidate& vc){
     vc.q_w = rotation.w();
 }
 
+
+void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set){
+    view_candidates.clear();
+
+
+    double vertical_angle_rad = 0 ;
+    double vertical_angle_deg = 0 ;
+    bool generated = false;
+    float angle_diff; 
+
+    view_candidates.clear();
+
+    for(int i=0; i< frontiers_set.size(); i++){
+
+        ViewCandidate vc(); 
+        Eigen::Vector3d frontier = frontiers_set[i];
+        ROS_INFO(" Generating view for frontier %d ",i);
+        generated = generateview_normal(frontier, 0, angle_diff, vc);
+        if(generated){
+            view_candidates.push_back( vc );
+        }
+        
+     
+
+}
+
+bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float rotation, float& angle_diff, ViewCandidate& vc){
+    ViewCandidate min_view ; 
+    ViewCandidate mid_view;
+    ViewCandidate max_view ;
+    
+    Eigen::Vector3d close_point;
+    Eigen::Vector3d mid_point;
+    Eigen::Vector3d far_point;
+
+    double angle_min;
+    double angle_mid;
+    double angle_max;
+
+    Eigen::Vector3d gradient ; 
+    Eigen::Vector3d current_pos ; 
+    float distance = 0 ;
+    float angle = 0 ; 
+    bool isSafeView_bool ; 
+
+    bool minimum = false ;
+    bool mid = false ; 
+
+    //find gradient 
+    gradient = computeGradient(frontier) ; 
+    current_pos = frontier ;
+
+    //go along the gradient direction
+    while( distance < m_distance_max){
+
+        current_pos = current_pos + gradient ;  
+        distance = (current_pos - frontier).norm() ; 
+        
+        //if we are in the correct range 
+        //compute is position safe 
+        if(distance > m_distance_min){
+            isSafeView_bool = isSafeView(current_pos); 
+        }
+
+        //closest point possible 
+        if ((minimum == false) && (distance >  m_distance_min) && (distance < (m_distance_min + m_distance_max)/2 ) && isSafeView_bool) {
+            min_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+            minimum = true ; 
+        }
+        //closest point from the center
+        else if( (mid == false) && (distance < m_distance_max) && (distance > (m_distance_min + m_distance_max)/2 ) && isSafeView_bool ){
+            mid_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+            mid = true ; 
+        }
+
+
+    }
+    if( isSafeView_bool ){
+        max_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+
+    }
+
+    ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
+    //We prioritize the value in the middle
+    if(mid){
+        findOrientation(mid_view) ; 
+        isAngleok = verify_angle( frontier, mid_view , angle_mid ) ; 
+        ROS_INFO(" Angle found is %f", angle_mid);
+        if( isAngleok ){
+            ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
+            vc= mid_view ; 
+            return true;
+        }
+    }
+    else if(minimum){
+        findOrientation(min_view) ; 
+        isAngleok = verify_angle( frontier, min_view , angle_min ) ; 
+        ROS_INFO(" Angle found is  %f", angle_min);
+        if( isAngleok ){
+            ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
+            vc = min_view ; 
+            return true;
+        }
+    }
+    else {
+        findOrientation(max_view) ; 
+        isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
+        ROS_INFO(" Angle found is  %f", angle_max);
+        if( isAngleok ){
+            ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
+            vc = max_view  ; 
+            return true;
+
+        }
+
+    }
+
+    ROS_INFO("No position found : angle mid is  %f", angle_mid);
+    angle_diff = angle_mid; 
+    return false;
+
+
+
+
+}
+
+bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier,const Eigen::Vector3d& next_voxel, float& angle){
+    double vertical_angle_rad = 0 ;
+    double vertical_angle_deg = 0 ;
+
+    //Compute direction with frontier
+    Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; 
+    Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
+    direction_proj.normalize() ;
+    
+    //Compute signed vertical angle
+    //vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
+    vertical_angle_rad = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
+    vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
+
+    if( (vertical_angle_deg < m_angle_high ) && (vertical_angle_deg > m_angle_low) ){
+        angle = vertical_angle_deg;
+        return true;
+    }
+
+    return false;
+
+}
+
+
+
 bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
-    //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
-    //const voxblox::EsdfVoxel& voxel = 
-    float dist = m_map.getVoxelDistance_ESDF(voxel) ;
-    if( dist < (robot_radius_ * m_map.getVoxelSize() * 0.5 ) ){
+    char state ;    
+    state = m_map.getVoxelState_ESDF(voxel) ;
+    if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
         return false;
     }
     for(int i= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
-        for(int j= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
+        for(int j= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; j++){
             for(int k= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; k++){
 
                 Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
-                dist = m_map.getVoxelDistance_ESDF(voxel + shift) ;
-                if( dist < m_map.getVoxelSize() ){
+                state = m_map.getVoxelState_ESDF(voxel + shift) ;
+                if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
                     return false;
                 }
 
@@ -280,6 +433,32 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     return true;
 
 }
+
+// bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
+//     //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
+//     //const voxblox::EsdfVoxel& voxel = 
+//     float dist = m_map.getVoxelDistance_ESDF(voxel) ;
+//     if( dist < (robot_radius_ * m_map.getVoxelSize() * 0.5 ) ){
+//         return false;
+//     }
+//     for(int i= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
+//         for(int j= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
+//             for(int k= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; k++){
+
+//                 Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
+//                 dist = m_map.getVoxelDistance_ESDF(voxel + shift) ;
+//                 if( dist < m_map.getVoxelSize() ){
+//                     return false;
+//                 }
+
+//             }
+//         }
+//     }
+//     return true;
+
+// }
+
+
 
 Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     

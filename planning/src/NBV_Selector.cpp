@@ -40,6 +40,8 @@ struct system_parameters
     int subsampling_views ;
     float robot_radius ; 
     int radius_surface_max ; 
+    float angle_low ;
+    float angle_high ;
     ///////////////
 
     //////////////View Evaluator parameters
@@ -223,7 +225,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     //modules
     //m_view_generator.set_map(m_map);
     std::string method = sys_param.method_view_generation ;
-    m_view_generator = ViewGenerator(method, 5, 10, m_map, sys_param.robot_radius);
+    m_view_generator = ViewGenerator(method, 5, 10, m_map, sys_param.robot_radius, sys_param.angle_low, sys_param.angle_high);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max );
     m_sub_sample_size_ = sys_param.subsampling_views ; 
@@ -895,6 +897,8 @@ int main(int argc, char** argv) {
     sys_params.subsampling_views = 10 ;
     sys_params.robot_radius = 5; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
     sys_params.radius_surface_max = 3 ; 
+    sys_params.angle_low = -25 ; // vertical angle below the drone 
+    sys_params.angle_high = 57; // vertical angle above the drone 
     ///////////////
 
     //////////////View Evaluator parameters

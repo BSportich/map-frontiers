@@ -40,13 +40,15 @@ private:
     std::vector<ViewCandidate> view_candidates;
     float m_distance_max; // max sampling distance from the frontiers
     float m_distance_min; // min sampling distance from the frontiers
+    float m_angle_low ; // vertical angle below the drone
+    float m_angle_high; // vertical angle above the drone 
     voxblox_map::VoxbloxMap m_map;
 
     int max_sampling;
     float robot_radius_ ; 
 
 public:
-    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius);
+    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high);
     ViewGenerator(){};
     ~ViewGenerator(){};
 
@@ -54,10 +56,12 @@ public:
     void generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set);
     // void generateViews_echo(std::vector<Eigen::Vector3d> frontiers_set);
     void generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set);
+    bool generateview_normal(const Eigen::Vector3d& frontier, float rotation, float& angle_diff, ViewCandidate& vc);
+
     void generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set);
 
 
-
+    bool verify_angle(const Eigen::Vector3d& frontier,const Eigen::Vector3d& next_voxel, float& angle);
     Eigen::Vector3d computeGradient(const Eigen::Vector3d& voxel);
     
 
