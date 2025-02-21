@@ -318,11 +318,12 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
 
     //go along the gradient direction
-    while( distance < m_distance_max){
+    for(int k =0 ; k< 200; k++){
+    //while( distance < m_distance_max){
 
         current_pos = current_pos + gradient ;  
         distance = (current_pos - frontier).norm() ; 
-        ROS_INFO(" Distance is %f ",distance);
+        ROS_INFO(" Distance is %f  until %f",distance, m_distance_max);
 
         
         //if we are in the correct range 
