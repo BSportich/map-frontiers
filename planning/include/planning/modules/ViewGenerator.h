@@ -68,6 +68,7 @@ public:
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
     std::string getMethod_type(){ return m_method_type; } ;
     bool isSafeView(const Eigen::Vector3d& voxel);
+    bool isCorrectPos(const Eigen::Vector3d& pos);
 
 
 

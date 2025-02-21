@@ -459,7 +459,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 
 }
 
-bool isCorrectPos(const Eigen::Vector3d& pos){
+bool ViewGenerator::isCorrectPos(const Eigen::Vector3d& pos){
     // float x = pos.x();
     // float y = pos.y();
     // float z = pos z.();
