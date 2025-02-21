@@ -281,7 +281,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         if(generated){
             view_candidates.push_back( vc );
         }
-        break;
+        // break;
     }
         
      
@@ -304,7 +304,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     Eigen::Vector3d gradient ; 
     Eigen::Vector3d current_pos ; 
     float distance = 0 ;
-    float angle = 0 ; 
+    float angle = -180 ; 
     bool isSafeView_bool = true; 
     bool isAngleok = true;
 
@@ -327,7 +327,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
         current_pos = current_pos + (1 * gradient) ;  
         distance = (current_pos - frontier).norm() * m_map.getVoxelSize(); 
-        ROS_INFO(" Distance is %f  until %f", distance, m_distance_max);
+        // ROS_INFO(" Distance is %f  until %f", distance, m_distance_max);
 
         
         //if we are in the correct range 
