@@ -335,11 +335,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         //closest point possible 
         if ((minimum == false) && (distance >  m_distance_min) && (distance < (m_distance_min + m_distance_max)/2 ) && isSafeView_bool) {
             min_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+            ROS_INFO(" View found min");
             minimum = true ; 
         }
         //closest point from the center
         else if( (mid == false) && (distance < m_distance_max) && (distance > (m_distance_min + m_distance_max)/2 ) && isSafeView_bool ){
             mid_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+            ROS_INFO(" View found mid");
             mid = true ; 
         }
 
@@ -347,7 +349,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     }
     if( isSafeView_bool ){
         max_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
-
+        ROS_INFO(" View found max");
     }
 
     ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
