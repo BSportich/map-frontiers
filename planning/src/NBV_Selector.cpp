@@ -891,7 +891,7 @@ int main(int argc, char** argv) {
 
 
     //////////////View Generation parameters
-    sys_params.method_view_generation = "gradient" ; 
+    sys_params.method_view_generation = "sphere" ; 
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
     sys_params.subsampling_views = 10 ;
