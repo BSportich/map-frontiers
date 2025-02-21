@@ -305,7 +305,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     Eigen::Vector3d current_pos ; 
     float distance = 0 ;
     float angle = -180 ; 
-    bool isSafeView_bool = true; 
+    bool isSafeView_bool = false; 
     bool isAngleok = true;
 
     bool minimum = false ;
@@ -332,7 +332,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         
         //if we are in the correct range 
         //compute is position safe 
-        if(distance > m_distance_min){
+        if(distance > m_distance_min - 0.2){ //start computing safe positions just before zone of interest
             isSafeView_bool = isSafeView(current_pos); 
         }
 

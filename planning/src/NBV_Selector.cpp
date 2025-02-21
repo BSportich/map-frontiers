@@ -895,14 +895,14 @@ int main(int argc, char** argv) {
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
     sys_params.subsampling_views = 10 ;
-    sys_params.robot_radius = 5; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
-    sys_params.radius_surface_max = 3 ; 
+    sys_params.robot_radius = 8; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
     sys_params.angle_low = -25 ; // vertical angle below the drone 
     sys_params.angle_high = 57; // vertical angle above the drone 
     ///////////////
 
     //////////////View Evaluator parameters
     sys_params.value_frontier = 1 ;
+    sys_params.radius_surface_max = 3 ; // zone around the frontier to search for surface voxels
     ///////////////
 
     //////////////LIDAR Parameters
