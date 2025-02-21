@@ -618,8 +618,8 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     LOG(ERROR) << "layer_msg voxel per side = " << layer_msg.voxels_per_side << " map layer voxel per side = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
   } else {
     ROS_INFO_COND(verbose_, "[TSDF callback] Got an TSDF map from ROS topic!");
-    publishAllUpdatedTsdfVoxels();
-    ROS_INFO_COND(verbose_, "[TSDF callback] Published pointclouds");
+    // publishAllUpdatedTsdfVoxels();
+    // ROS_INFO_COND(verbose_, "[TSDF callback] Published pointclouds");
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
@@ -886,7 +886,7 @@ int main(int argc, char** argv) {
     /////////////// NAVIGATION
     sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
 
-    sys_params.threshold_known = 0.0 ; //from Hardouin
+    sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
     
 
 
