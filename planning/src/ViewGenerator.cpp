@@ -330,11 +330,11 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         // ROS_INFO(" Distance is %f  until %f", distance, m_distance_max);
 
         
-        //if we are in the correct range 
-        //compute is position safe 
-        // if(distance > m_distance_min){
-        //     isSafeView_bool = isSafeView(current_pos); 
-        // }
+        if we are in the correct range 
+        compute is position safe 
+        if(distance > m_distance_min){
+            isSafeView_bool = isSafeView(current_pos); 
+        }
 
         //closest point possible 
         if ((minimum == false) && (distance >  m_distance_min) && (distance < (m_distance_min + m_distance_max)/2 ) && isSafeView_bool) {
