@@ -322,12 +322,12 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
 
     //go along the gradient direction
-    for(int k =0 ; k< 200; k++){
-    //while( distance < m_distance_max){
+    //for(int k =0 ; k< 200; k++){
+    while( distance < m_distance_max){
 
-        current_pos = current_pos + (10 * gradient) ;  
+        current_pos = current_pos + (1 * gradient) ;  
         distance = (current_pos - frontier).norm() * m_map.getVoxelSize(); 
-        ROS_INFO(" Distance is %f  until %f",distance, m_distance_max);
+        ROS_INFO(" Distance is %f  until %f", distance, m_distance_max);
 
         
         //if we are in the correct range 
@@ -358,41 +358,41 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
     ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
     //We prioritize the value in the middle
-    // if(mid){
-    //     findOrientation(mid_view) ; 
-    //     //isAngleok = verify_angle( frontier, mid_view , angle_mid ) ; 
-    //     ROS_INFO(" Angle found is %f", angle_mid);
-    //     if( isAngleok ){
-    //         ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
-    //         vc= mid_view ; 
-    //         return true;
-    //     }
-    // }
-    // else if(minimum){
-    //     findOrientation(min_view) ; 
-    //     //isAngleok = verify_angle( frontier, min_view , angle_min ) ; 
-    //     ROS_INFO(" Angle found is  %f", angle_min);
-    //     if( isAngleok ){
-    //         ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
-    //         vc = min_view ; 
-    //         return true;
-    //     }
-    // }
-    // else {
-    //     findOrientation(max_view) ; 
-    //     //isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
-    //     ROS_INFO(" Angle found is  %f", angle_max);
-    //     if( isAngleok ){
-    //         ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
-    //         vc = max_view  ; 
-    //         return true;
+    if(mid){
+        findOrientation(mid_view) ; 
+        isAngleok = verify_angle( frontier, mid_view , angle_mid ) ; 
+        ROS_INFO(" Angle found is %f", angle_mid);
+        if( isAngleok ){
+            ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
+            vc= mid_view ; 
+            return true;
+        }
+    }
+    else if(minimum){
+        findOrientation(min_view) ; 
+        isAngleok = verify_angle( frontier, min_view , angle_min ) ; 
+        ROS_INFO(" Angle found is  %f", angle_min);
+        if( isAngleok ){
+            ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
+            vc = min_view ; 
+            return true;
+        }
+    }
+    else {
+        findOrientation(max_view) ; 
+        isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
+        ROS_INFO(" Angle found is  %f", angle_max);
+        if( isAngleok ){
+            ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
+            vc = max_view  ; 
+            return true;
 
-    //     }
+        }
 
-    // }
+    }
 
-    // ROS_INFO("No position found : angle mid is  %f", angle_mid);
-    // angle_diff = angle_mid; 
+    ROS_INFO("No position found : angle mid is  %f", angle_mid);
+    angle_diff = angle_mid; 
     return false;
 
 
