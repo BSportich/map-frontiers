@@ -436,7 +436,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 
     char state ;    
     state = m_map.getVoxelState_ESDF(voxel) ;
-    ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%c'", voxel.x(), voxel.y(), voxel.z(), state ) ;
+    // ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%c'", voxel.x(), voxel.y(), voxel.z(), state ) ;
     if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
         return false;
 
@@ -449,7 +449,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 
                 Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
                 state = m_map.getVoxelState_ESDF(voxel + shift) ;
-                ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%c'", (voxel+shift).x(), (voxel+shift).y(), (voxel+shift).z(), state ) ;
+                // ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%c'", (voxel+shift).x(), (voxel+shift).y(), (voxel+shift).z(), state ) ;
                 if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
                     ROS_INFO("FALSE");
                     return false;
