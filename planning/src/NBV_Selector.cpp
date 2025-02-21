@@ -817,14 +817,14 @@ void NBV_Selector::select_next_best_view(){
   
   // ROS_INFO_COND(verbose_, "EMPTY SPACE");
 
-  //evaluate views
-  // std::vector<float> values_views;
-  // int index_of_nbv = -1 ;
-  // float max_value_nbv = -1 ; 
-  // float temp_value = -1 ; 
-  // m_current_goal = m_current_pos;
-  // float temp_value_angular = 0 ;
-  // ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  evaluate views
+  std::vector<float> values_views;
+  int index_of_nbv = -1 ;
+  float max_value_nbv = -1 ; 
+  float temp_value = -1 ; 
+  m_current_goal = m_current_pos;
+  float temp_value_angular = 0 ;
+  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
   // for(int i=0;i< views.size();i++){
 
   //   ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
@@ -862,15 +862,15 @@ void NBV_Selector::select_next_best_view(){
     //break ; 
 
 
-  }
+  // }
 
 
-  //select views
+  // //select views
 
-  if (views.size() > 0){
-    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
-    m_current_goal = views[index_of_nbv];
-  }
+  // if (views.size() > 0){
+  //   ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
+  //   m_current_goal = views[index_of_nbv];
+  // }
 
 
 
