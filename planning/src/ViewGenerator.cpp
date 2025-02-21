@@ -305,7 +305,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     Eigen::Vector3d current_pos ; 
     float distance = 0 ;
     float angle = 0 ; 
-    bool isSafeView_bool ; 
+    bool isSafeView_bool = true; 
     bool isAngleok = true;
 
     bool minimum = false ;
