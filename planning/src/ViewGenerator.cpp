@@ -415,6 +415,8 @@ bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier, const ViewCand
     vertical_angle_rad = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
     vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
 
+    ROS_INFO("Angle found is function is  %f", vertical_angle_deg);
+    angle = vertical_angle_deg;
     if( (vertical_angle_deg < m_angle_high ) && (vertical_angle_deg > m_angle_low) ){
         angle = vertical_angle_deg;
         return true;
@@ -432,9 +434,11 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
         return false;
     }
-    for(int i= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; i++){
-        for(int j= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; j++){
-            for(int k= -std::ceil(robot_radius_/2) ; i < std::ceil(robot_radius_/2) ; k++){
+    int min_radius = static_cast<int>(std::floor(-robot_radius_/2)) ; 
+    int max_radius = static_cast<int>(std::ceil(robot_radius_/2)) ;
+    for(int i= min_radius ; i < max_radius ; i++){
+        for(int j= min_radius ; j < max_radius ; j++){
+            for(int k= min_radius ; k < max_radius ; k++){
 
                 Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
                 state = m_map.getVoxelState_ESDF(voxel + shift) ;
