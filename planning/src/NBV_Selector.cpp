@@ -625,7 +625,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     //sample frontiers
     //sample_subset_frontiers_shells();
     int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
-    sample_size = static_cast<int>(frontiers_pointcloud.size()) ; 
+    m_sub_sample_size_ = 300; 
     if(frontiers_set.size() > m_sub_sample_size_){
        frontiers_subset.assign(frontiers_set.begin(), frontiers_set.begin() + m_sub_sample_size_ );
 
