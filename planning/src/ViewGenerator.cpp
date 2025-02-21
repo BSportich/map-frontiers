@@ -429,10 +429,16 @@ bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier, const ViewCand
 
 
 bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
+
+    if( isCorrectPos(voxel) == false ){
+        return false;
+    }
+
     char state ;    
     state = m_map.getVoxelState_ESDF(voxel) ;
     if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
         return false;
+
     }
     int min_radius = static_cast<int>(std::floor(-robot_radius_/2)) ; 
     int max_radius = static_cast<int>(std::ceil(robot_radius_/2)) ;
@@ -452,6 +458,20 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     return true;
 
 }
+
+bool isCorrectPos(const Eigen::Vector3d& pos){
+    // float x = pos.x();
+    // float y = pos.y();
+    // float z = pos z.();
+
+    if( pos.z() < 0 ){
+        return false;
+    }
+    return true ; 
+
+  
+}
+
 
 // bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 //     //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
