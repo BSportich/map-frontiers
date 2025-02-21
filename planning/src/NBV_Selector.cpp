@@ -817,7 +817,7 @@ void NBV_Selector::select_next_best_view(){
   
   // ROS_INFO_COND(verbose_, "EMPTY SPACE");
 
-  evaluate views
+  //evaluate views
   std::vector<float> values_views;
   int index_of_nbv = -1 ;
   float max_value_nbv = -1 ; 
