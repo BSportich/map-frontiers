@@ -315,6 +315,10 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     gradient = computeGradient(frontier) ; 
     current_pos = frontier ;
     ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
+    if( (gradient.x() == 0) && (gradient.y() == 0) && (gradient.z() ==0) ){
+        ROS_INFO(" Gradient is 0 : view can not be found");
+        return false; 
+    }
 
 
     //go along the gradient direction
@@ -474,7 +478,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     
 
-    float vs = 0.5 ; 
+    float vs = 1 ; 
     Eigen::Vector3d gradient_vector(0,0,0); 
     Eigen::Vector3d shift_x(vs,0,0) ; 
     Eigen::Vector3d shift_y(0,vs,0) ; 
