@@ -231,6 +231,11 @@ void findOrientation(ViewCandidate& vc){
 
     // Compute the direction vector from point1 to point2
     tf2::Vector3 direction = frontier_pos - view_pos;
+
+    if (direction.length2() <= 0.0) {
+        ROS_WARN("Direction vector is zero! Cannot normalize.");
+        return;
+    }
     
     // Normalize the direction vector (to ensure it's a unit vector)
     direction.normalize();
@@ -240,6 +245,12 @@ void findOrientation(ViewCandidate& vc){
 
     // Compute the axis of rotation (cross product of forward and direction)
     tf2::Vector3 axis = forward.cross(direction);
+
+    if (axis.length2() <= 0.0) {
+        ROS_WARN("Rotation axis is zero! Possible parallel vectors.");
+        return;
+    }
+
     axis.normalize();  // Normalize the axis
 
     // Compute the angle of rotation (dot product gives cosine of the angle)
@@ -253,6 +264,10 @@ void findOrientation(ViewCandidate& vc){
     // Compute the quaternion representing the rotation
     tf2::Quaternion rotation;
     rotation.setRotation(axis, angle);
+
+    if( (std::isnan(rotation.x())) ||  (std::isnan(rotation.y())) || (std::isnan(rotation.z())) || (std::isnan(rotation.w()))  ){
+        
+    }
 
     vc.q_x = rotation.x();
     vc.q_y = rotation.y();
@@ -326,13 +341,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     while( distance < m_distance_max){
 
         current_pos = current_pos + (1 * gradient) ;  
-        distance = (current_pos - frontier).norm() * m_map.getVoxelSize(); 
+        distance = ((current_pos - frontier).norm()) * m_map.getVoxelSize(); 
         // ROS_INFO(" Distance is %f  until %f", distance, m_distance_max);
 
         
         //if we are in the correct range 
         //compute is position safe 
-        if(distance > m_distance_min - 0.2){ //start computing safe positions just before zone of interest
+        if(distance > (m_distance_min - 0.2) ){ //start computing safe positions just before zone of interest
             isSafeView_bool = isSafeView(current_pos); 
         }
 
