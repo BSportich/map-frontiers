@@ -382,7 +382,7 @@ bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double th
     }
 
 
-    for (int i = 6; i < 26; ++i) {
+    for (int i = 0; i < 6; ++i) {
 
 
       voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], threshold_known);
