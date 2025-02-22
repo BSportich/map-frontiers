@@ -7,6 +7,13 @@
 #include <planning/modules/SensorModel.h>
 
 
+struct FrontierPoint
+{
+  Eigen::Vector3d frontier ; 
+  Eigen::Vector3d occ_point ; 
+};
+
+
 class ViewEvaluator
 {
 private:

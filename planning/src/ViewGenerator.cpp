@@ -569,18 +569,18 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
 }
 
 
-Eigen::Vector3d ViewGenerator::computeGradient2(const Eigen::Vector3d& voxel){
+// Eigen::Vector3d ViewGenerator::computeGradient2(const Eigen::Vector3d& voxel){
     
 
-    float vs = 1 ; 
-    Eigen::Vector3d gradient_vector(0,0,0); 
-    Eigen::Vector3d shift_x(vs,0,0) ; 
-    Eigen::Vector3d shift_y(0,vs,0) ; 
-    Eigen::Vector3d shift_z(0,0,vs) ; 
+//     float vs = 1 ; 
+//     Eigen::Vector3d gradient_vector(0,0,0); 
+//     Eigen::Vector3d shift_x(vs,0,0) ; 
+//     Eigen::Vector3d shift_y(0,vs,0) ; 
+//     Eigen::Vector3d shift_z(0,0,vs) ; 
 
-    
 
-}
+
+// }
 
 
 // ViewGenerator::ViewGenerator(/* args */)
