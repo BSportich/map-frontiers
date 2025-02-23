@@ -337,7 +337,8 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        if ( m_view_evaluator.isFrontierVoxel_TSDF(coord_3d, m_threshold_known)){
+        //if ( m_view_evaluator.isFrontierVoxel_TSDF(coord_3d, m_threshold_known)){
+        if ( m_view_evaluator.isSurfaceFrontier_TSDF(coord_3d) ){
           frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;

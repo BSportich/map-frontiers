@@ -577,6 +577,7 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
 //     Eigen::Vector3d shift_x(vs,0,0) ; 
 //     Eigen::Vector3d shift_y(0,vs,0) ; 
 //     Eigen::Vector3d shift_z(0,0,vs) ; 
+    
 
 
 
