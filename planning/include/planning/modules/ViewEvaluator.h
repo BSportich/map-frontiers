@@ -410,6 +410,10 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel){
   bool is_surface ;
   bool close_unknown;
 
+  if( voxel.z() <=0){
+    return false;
+  }
+
   current_state = m_map.getVoxelState_TSDF(voxel, 0);
   if( current_state == voxblox_map::VoxbloxMap::OCCUPIED){
     is_surface = true;
