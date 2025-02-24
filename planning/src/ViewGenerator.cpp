@@ -293,10 +293,25 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         Eigen::Vector3d frontier = frontiers_set[i];
         ROS_INFO(" Generating view for frontier %d ",i);
         generated = generateview_normal(frontier, 0, angle_diff, vc);
+
+        //if worked 
         if(generated){
             view_candidates.push_back( vc );
+            continue;
         }
-        // break;
+        
+        // search for new view with a corrected vertical angle
+        generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
+        //if worked
+        if(generated){
+            view_candidates.push_back( vc );
+            continue;
+        }
+
+        //search for new view with a different horizontal angle
+
+
+        
     }
         
      
@@ -317,11 +332,16 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     float angle_max = 0;
 
     Eigen::Vector3d gradient ; 
-    Eigen::Vector3d current_pos ; 
+    Eigen::Vector3d current_pos ;
+    Eigen::Vector3d vector_director ;  
     float distance = 0 ;
     float angle = -180 ; 
     bool isSafeView_bool = false; 
     bool isAngleok = true;
+
+    float rotation_angle_radian =  rotation * (M_PI / 180.0);  
+    float rotation_cosinus = cos( rotation_angle_radian) ;
+    float rotation_sinus = sin( rotation_angle_radian) ; 
 
     bool minimum = false ;
     bool mid = false ; 
@@ -334,6 +354,38 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         ROS_INFO(" Gradient is 0 : view can not be found");
         return false; 
     }
+
+    //change of angle if necessary 
+    if( rotation != 0){
+
+        gradient.normalize() ;
+
+        // Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
+        // //mat(row, col) = value
+        // mat_rot(0,0) = ( gradient.x() * gradient.x() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+        // mat_rot(0,1) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) - ( gradient.z() * rotation_sinus ) ;
+        // mat_rot(0,2) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.y() * rotation_sinus ) ;
+        
+        // mat_rot(1,0) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) + ( gradient.z() * rotation_sinus ) ;
+        // mat_rot(1,1) = ( gradient.y() * gradient.y() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+        // mat_rot(1,2) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.x() * rotation_sinus ) ;
+
+        // mat_rot(2,0) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.y() * rotation_sinus ) ;
+        // mat_rot(2,1) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.x() * rotation_sinus ) ;
+        // mat_rot(2,2) = ( gradient.z() * gradient.z() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+
+        Eigen::Matrix3d mat_rot = Eigen::AngleAxisd(rotation_angle_radian, gradient).toRotationMatrix();
+
+        
+
+        vector_director = mat_rot * gradient ; 
+
+    }
+    else{
+        vector_director = gradient ; 
+    }
+
+
 
 
     //go along the gradient direction
@@ -407,7 +459,16 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     }
 
     ROS_INFO("No position found : angle mid is  %f", angle_mid);
-    angle_diff = angle_mid; 
+    if( angle_mid > m_angle_high ){
+        angle_diff = m_angle_high - angle_mid ;
+    }
+    else if( angle_mid < m_angle_low ){
+        angle_diff = m_angle_low - angle_mid ;
+    }
+    else {
+        angle_diff = angle_mid;
+
+    }
     return false;
 
 
@@ -421,7 +482,7 @@ bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier, const ViewCand
     Eigen::Vector3d next_voxel( vc.x, vc.y, vc.z );
 
     //Compute direction with frontier
-    Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; 
+    Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; // from view candidate, towards frontier
     Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
     direction_proj.normalize() ;
     

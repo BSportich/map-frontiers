@@ -268,5 +268,15 @@ double VoxbloxMap::evaluation_TSDF(float truncationdist){
 
 }
 
+bool VoxbloxMap::isValidPos(const Eigen::Vector3d pos){
+  if(pos.z() <=0){
+    return false;
+  }
+
+
+  return true;
+
+}
+
 
 }
