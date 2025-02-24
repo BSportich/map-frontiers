@@ -60,6 +60,8 @@ class VoxbloxMap {
   // get the maximum allowed weight (return 0 if using uncapped weights)
   double getMaximumWeight() ;
 
+  bool isValidPos(const Eigen::Vector3d& pos)
+
     //states
   const static unsigned char OCCUPIED = 0;  // NOLINT
   const static unsigned char FREE = 1;      // NOLINT
