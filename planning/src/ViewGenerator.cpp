@@ -284,6 +284,9 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
     double vertical_angle_deg = 0 ;
     bool generated = false;
     float angle_diff; 
+    float nb_rotation = 0 ; 
+    float nb_sucess = 0 ; 
+    float total = 0 ;
 
     view_candidates.clear();
 
@@ -297,15 +300,24 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         //if worked 
         if(generated){
             view_candidates.push_back( vc );
+            nb_sucess = nb_sucess +1 ; 
             continue;
         }
+
+        if(generated == false && angle_diff == 0 ){
+            ROS_INFO(" FAILURE : Gradient failed  %d ",i);
+            continue ; 
+
+        }
         
+
         ROS_INFO(" ROTATION %d ",i);
         // search for new view with a corrected vertical angle
         generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
         //if worked
         if(generated){
             view_candidates.push_back( vc );
+            nb_rotation = nb_rotation +1 ;
             continue;
         }
 
@@ -314,6 +326,11 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         
     }
+    total = (nb_rotation + nb_sucess) / frontiers_set.size() ; 
+    ROS_INFO(" SUCCESS RATE VIEWS IS %d ",total);
+
+
+
         
      
 
@@ -353,6 +370,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
     if( (gradient.x() == 0) && (gradient.y() == 0) && (gradient.z() ==0) ){
         ROS_INFO(" Gradient is 0 : view can not be found");
+        angle_diff = 0 ;
         return false; 
     }
 
