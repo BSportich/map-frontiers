@@ -300,6 +300,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
             continue;
         }
         
+        ROS_INFO(" ROTATION %d ",i);
         // search for new view with a corrected vertical angle
         generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
         //if worked
@@ -600,6 +601,18 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     gradient_vector.y() = gradient_vector.y() / (2*vs) ;
     gradient_vector.z() = gradient_vector.z() / (2*vs);
 
+    if (gradient.norm() == 0){
+        //if gradient = 0 use central difference
+
+        gradient_vector.x() = m_map.getDistancePrecise_ESDF( voxel + shift_x) - m_map.getDistancePrecise_ESDF( voxel );
+        gradient_vector.y() = m_map.getDistancePrecise_ESDF( voxel + shift_y) - m_map.getDistancePrecise_ESDF( voxel );
+        gradient_vector.z() = m_map.getDistancePrecise_ESDF( voxel + shift_z) - m_map.getDistancePrecise_ESDF( voxel );
+
+    }
+    
+    
+
+
     //Correction
 
     // if( gradient_vector.x() > 0){
@@ -623,9 +636,7 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     //     gradient_vector.z() = std::floor( gradient_vector.z() ) ;
     // }
 
-    
-
-    return gradient_vector; 
+    return gradient_vector;
 
 }
 
