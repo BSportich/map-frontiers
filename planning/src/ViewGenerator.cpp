@@ -705,8 +705,8 @@ Eigen::Vector3d ViewGenerator::computeGradient_26(const Eigen::Vector3d& voxel){
     double weight = 0 ; 
     for(int i = 0; i< 26;i++){
         
-        weight = m_map.getVoxelWeight_TSDF( voxel ) ; 
-        if( weight > 0 && m_map.getVoxelDistance_TSDF() < m_map.getVoxelSize() ){
+        weight = m_map.getVoxelWeight_TSDF( voxel + c_neighbor_voxels_[i] ) ; 
+        if( weight > 0 && m_map.getVoxelDistance_TSDF( voxel + c_neighbor_voxels_[i] ) < m_map.getVoxelSize() ){
             weight = -weight ; 
         }
         temp_dir = c_neighbor_voxels_[i].normalized() ; 
