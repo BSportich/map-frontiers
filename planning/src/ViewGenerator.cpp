@@ -715,7 +715,7 @@ Eigen::Vector3d ViewGenerator::computeGradient_26(const Eigen::Vector3d& voxel){
 
     }
 
-    grad_dir.normalize()
+    grad_dir.normalize();
 
     return grad_dir ; 
 
