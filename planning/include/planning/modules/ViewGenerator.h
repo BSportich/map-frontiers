@@ -43,6 +43,7 @@ private:
     float m_angle_low ; // vertical angle below the drone
     float m_angle_high; // vertical angle above the drone 
     voxblox_map::VoxbloxMap m_map;
+    Eigen::Vector3d c_neighbor_voxels_[26];
 
     int max_sampling;
     float robot_radius_ ; 
@@ -63,6 +64,9 @@ public:
 
     bool verify_angle(const Eigen::Vector3d& frontier,const ViewCandidate& vc, float& angle);
     Eigen::Vector3d computeGradient(const Eigen::Vector3d& voxel);
+    Eigen::Vector3d computeGradient_26(const Eigen::Vector3d& voxel);
+    Eigen::Vector3d computeGradient_Sobel(const Eigen::Vector3d& voxel);
+
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };

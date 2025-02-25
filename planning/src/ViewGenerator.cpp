@@ -19,6 +19,35 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
         //throw exception
         throw std::string(" Distances values are incorrect. Can not initialize ViewGenerator");
     }
+
+    int vs = 1 ;
+    c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
+    c_neighbor_voxels_[1] = Eigen::Vector3d(-vs, 0, 0);
+    c_neighbor_voxels_[2] = Eigen::Vector3d(0, vs, 0);
+    c_neighbor_voxels_[3] = Eigen::Vector3d(0, -vs, 0);
+    c_neighbor_voxels_[4] = Eigen::Vector3d(0, 0, vs);
+    c_neighbor_voxels_[5] = Eigen::Vector3d(0, 0, -vs);
+    
+    c_neighbor_voxels_[6] = Eigen::Vector3d(vs, 0, -vs);
+    c_neighbor_voxels_[7] = Eigen::Vector3d(vs, vs, -vs);
+    c_neighbor_voxels_[8] = Eigen::Vector3d(vs, -vs, -vs);
+    c_neighbor_voxels_[9] = Eigen::Vector3d(vs, vs, 0);
+    c_neighbor_voxels_[10] = Eigen::Vector3d(vs, -vs, 0);
+    c_neighbor_voxels_[11] = Eigen::Vector3d(vs, 0, vs);
+    c_neighbor_voxels_[12] = Eigen::Vector3d(0, vs, vs);
+    c_neighbor_voxels_[13] = Eigen::Vector3d(0, -vs, vs);
+    c_neighbor_voxels_[14] = Eigen::Vector3d(vs, vs, vs);
+    c_neighbor_voxels_[15] = Eigen::Vector3d(0, vs, -vs);
+    c_neighbor_voxels_[16] = Eigen::Vector3d(0, -vs, -vs);
+    c_neighbor_voxels_[17] = Eigen::Vector3d(vs, -vs, vs);
+    c_neighbor_voxels_[18] = Eigen::Vector3d(-vs, vs, 0);
+    c_neighbor_voxels_[19] = Eigen::Vector3d(-vs, -vs, 0);
+    c_neighbor_voxels_[20] = Eigen::Vector3d(-vs, 0, vs);
+    c_neighbor_voxels_[21] = Eigen::Vector3d(-vs, vs, vs);
+    c_neighbor_voxels_[22] = Eigen::Vector3d(-vs, -vs, vs);
+    c_neighbor_voxels_[23] = Eigen::Vector3d(-vs, 0, -vs);
+    c_neighbor_voxels_[24] = Eigen::Vector3d(-vs, vs, -vs);
+    c_neighbor_voxels_[25] = Eigen::Vector3d(-vs, -vs, -vs);
 }
 
 void ViewGenerator::generateViews(const std::vector<Eigen::Vector3d>& frontiers_set ){
@@ -327,7 +356,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         
     }
     total = (nb_rotation + nb_sucess) / frontiers_set.size() ; 
-    ROS_INFO(" SUCCESS RATE VIEWS IS %d ",total);
+    ROS_INFO(" SUCCESS RATE VIEWS IS %f ",total);
 
 
 
@@ -627,6 +656,13 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
         gradient_vector.z() = (m_map.getDistancePrecise_ESDF( voxel + shift_z) - m_map.getDistancePrecise_ESDF( voxel ) ) /vs ;
 
     }
+
+    if (gradient_vector.norm() == 0){
+        //if gradient = 0 use hardouin weighted based method 
+
+        return computeGradient_26(voxel); 
+
+    }
     
     
 
@@ -658,6 +694,38 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
 
 }
 
+
+//Hardouin method 
+Eigen::Vector3d ViewGenerator::computeGradient_26(const Eigen::Vector3d& voxel){
+    ROS_INFO("Gradient hardouin");
+
+
+    Eigen::Vector3d grad_dir ; 
+    Eigen::Vector3d temp_dir ; 
+    double weight = 0 ; 
+    for(int i = 0; i< 26;i++){
+        
+        weight = m_map.getVoxelWeight_TSDF( voxel ) ; 
+        if( weight > 0 && m_map.getVoxelDistance_TSDF() < m_map.getVoxelSize() ){
+            weight = -weight ; 
+        }
+        temp_dir = c_neighbor_voxels_[i].normalized() ; 
+        grad_dir = grad_dir + (weight * temp_dir) ; 
+        
+
+    }
+
+    grad_dir.normalize()
+
+    return grad_dir ; 
+
+
+}
+
+Eigen::Vector3d ViewGenerator::computeGradient_Sobel(const Eigen::Vector3d& voxel){
+    
+
+}
 
 // Eigen::Vector3d ViewGenerator::computeGradient2(const Eigen::Vector3d& voxel){
     
