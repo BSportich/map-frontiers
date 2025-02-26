@@ -394,6 +394,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
     bool minimum = false ;
     bool mid = false ; 
+    bool max_bool = true ; 
 
     //find gradient 
     gradient = computeGradient(frontier) ; 
@@ -477,6 +478,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if( isSafeView_bool ){
         max_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
         ROS_INFO(" View found max");
+        max_bool = true ; 
     }
 
     // ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
@@ -501,7 +503,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
             return true;
         }
     }
-    else {
+    else if (max_bool)
         findOrientation(max_view) ; 
         isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
         // ROS_INFO(" Angle found is  %f", angle_max);
