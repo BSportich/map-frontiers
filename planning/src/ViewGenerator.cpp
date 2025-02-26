@@ -503,7 +503,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
             return true;
         }
     }
-    else if (max_bool)
+    else if (max_bool){
         findOrientation(max_view) ; 
         isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
         // ROS_INFO(" Angle found is  %f", angle_max);
