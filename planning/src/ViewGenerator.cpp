@@ -481,32 +481,35 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         max_bool = true ; 
     }
 
-    // ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
+    ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
     //We prioritize the value in the middle
     if(mid){
         findOrientation(mid_view) ; 
         isAngleok = verify_angle( frontier, mid_view , angle_mid ) ; 
-        // ROS_INFO(" Angle found is %f", angle_mid);
+        ROS_INFO(" Angle found is %f", angle_mid);
         if( isAngleok ){
             // ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
             vc= mid_view ; 
             return true;
         }
     }
-    else if(minimum){
+
+
+    if(minimum){
         findOrientation(min_view) ; 
         isAngleok = verify_angle( frontier, min_view , angle_min ) ; 
-        // ROS_INFO(" Angle found is  %f", angle_min);
+        ROS_INFO(" Angle found is  %f", angle_min);
         if( isAngleok ){
             // ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
             vc = min_view ; 
             return true;
         }
     }
-    else if (max_bool){
+
+    if (max_bool){
         findOrientation(max_view) ; 
         isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
-        // ROS_INFO(" Angle found is  %f", angle_max);
+        ROS_INFO(" Angle found is  %f", angle_max);
         if( isAngleok ){
             // ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
             vc = max_view  ; 
