@@ -448,7 +448,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     //for(int k =0 ; k< 200; k++){
     while( distance < m_distance_max){
 
-        current_pos = current_pos + (1 * gradient) ;  
+        current_pos = current_pos + (1 * vector_director) ;  
         distance = ((current_pos - frontier).norm()) * m_map.getVoxelSize(); 
         // ROS_INFO(" Distance is %f  until %f", distance, m_distance_max);
 
