@@ -81,6 +81,7 @@ private:
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_sub_pointcloud ;
+    pcl::PointCloud<pcl::PointXYZRGB> rejected_frontiers_pointcloud ;
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud ; 
     pcl::PointCloud<pcl::PointXYZRGB> values_for_eval_pointcloud2 ; 
 
@@ -109,6 +110,7 @@ private:
     ros::Publisher pub_pointcloud;
     ros::Publisher pub_frontiers;
     ros::Publisher pub_sub_frontiers;
+    ros::Publisher pub_rejected;
     ros::Publisher pub_test_values;
     ros::Publisher pub_test_values2;
     //views and selected views
@@ -237,6 +239,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     frontiers_subset = std::vector<Eigen::Vector3d>();
     frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     frontiers_sub_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
+    rejected_frontiers_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud = pcl::PointCloud<pcl::PointXYZRGB>(); 
     values_for_eval_pointcloud2 = pcl::PointCloud<pcl::PointXYZRGB>(); 
 
@@ -259,6 +262,9 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_sub_frontiers = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "subfrontiers_point_cloud", 1, true);
 
+    pub_rejected =  n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
+            "rejected_point_cloud", 1, true);
+
     pub_test_values = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "empty_point_cloud", 1, true);
     
@@ -268,6 +274,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
     pub_views_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
+
+
 
     start_server = n.advertiseService("start_NBV_selector", &NBV_Selector::startCallback, this);
     stop_server = n.advertiseService("stop_NBV_selector", &NBV_Selector::stopCallback, this);
@@ -626,7 +634,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     //sample frontiers
     //sample_subset_frontiers_shells();
     int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
-    m_sub_sample_size_ = 100; 
+    m_sub_sample_size_ = 10; 
     if(frontiers_set.size() > m_sub_sample_size_){
        frontiers_subset.assign(frontiers_set.end() - m_sub_sample_size_ , frontiers_set.end() );
 
@@ -816,6 +824,30 @@ void NBV_Selector::publish_views(){
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
   pub_views_marker.publish(marker_array);
+
+
+
+  //publishing of rejected frontiers
+  std::vector<Eigen::Vector3d> rejected_frontiers = m_view_generator.getRejectedFrontiers();
+  for(int i=0; i< rejected_frontiers.size(); i++){
+    pcl::PointXYZRGB point;
+    point.x = rejected_frontiers[i].x();
+    point.y = rejected_frontiers[i].y();
+    point.z = rejected_frontiers[i].z();
+    point.r = 0;
+    point.g = 0;
+    point.b = 0;
+    rejected_frontiers_pointcloud.push_back(point);
+
+  }
+
+
+  rejected_frontiers_pointcloud.header.frame_id = world_frame_;
+  pub_rejected.publish(rejected_frontiers_pointcloud);
+
+
+
+
 }
 
 

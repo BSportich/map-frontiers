@@ -352,6 +352,9 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         //search for new view with a different horizontal angle
 
+        //if didn't manage to find a solution
+        rejected_frontiers.push_back( frontier ) ; 
+
 
         
     }
@@ -531,6 +534,12 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 }
 
 bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle){
+
+    //if find orientation failed to find a direction
+    if( vc.q_x == 0 &&  vc.q_y == 0 && vc.q_z == 0 && vc.q_w == 0 ){
+        return false;
+    }
+
     double vertical_angle_rad = 0 ;
     double vertical_angle_deg = 0 ;
     Eigen::Vector3d next_voxel( vc.x, vc.y, vc.z );

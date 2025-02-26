@@ -44,6 +44,7 @@ private:
     float m_angle_high; // vertical angle above the drone 
     voxblox_map::VoxbloxMap m_map;
     Eigen::Vector3d c_neighbor_voxels_[26];
+    std::vector<Eigen::Vector3d> rejected_frontiers; 
 
     int max_sampling;
     float robot_radius_ ; 
@@ -70,6 +71,7 @@ public:
     
 
     std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
+    std::vector<Eigen::Vector3d> getRejectedFrontiers(){ return rejected_frontiers; }
     std::string getMethod_type(){ return m_method_type; } ;
     bool isSafeView(const Eigen::Vector3d& voxel);
     bool isCorrectPos(const Eigen::Vector3d& pos);
