@@ -730,8 +730,8 @@ Eigen::Vector3d ViewGenerator::computeGradient_26(const Eigen::Vector3d& voxel){
 }
 
 Eigen::Vector3d ViewGenerator::computeGradient_Sobel(const Eigen::Vector3d& voxel){
-    
-
+    Eigen::Vector3d vect;
+    return vect;
 }
 
 // Eigen::Vector3d ViewGenerator::computeGradient2(const Eigen::Vector3d& voxel){
