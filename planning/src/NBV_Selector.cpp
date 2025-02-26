@@ -718,7 +718,14 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
   }
 
+
   ros::Duration duration = ros::Time::now() - last_nbv_ ; 
+  // if the robot has been on a standstill for more than one sec, we allow it to have a new goal
+  if( m_is_idle &&  ( duration.toSec() > 1.0 ) ){
+    m_availability = AVAILABLE ; 
+  }
+
+  //if the robot hasn't had a new goal in the last second and is available, find nbv
   if( (m_availability == AVAILABLE) && ( duration.toSec() > 1.0 ) ) {
 
     select_next_best_view();
