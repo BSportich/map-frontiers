@@ -569,9 +569,9 @@ bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier, const ViewCand
 
 bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 
-    // if( isCorrectPos(voxel) == false ){
-    //     return false;
-    // }
+    if( isCorrectPos(voxel) == false ){
+        return false;
+    }
 
     char state ;    
     state = m_map.getVoxelState_ESDF(voxel) ;
