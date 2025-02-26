@@ -408,21 +408,24 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
         gradient.normalize() ;
 
-        // Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
-        // //mat(row, col) = value
-        // mat_rot(0,0) = ( gradient.x() * gradient.x() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
-        // mat_rot(0,1) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) - ( gradient.z() * rotation_sinus ) ;
-        // mat_rot(0,2) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.y() * rotation_sinus ) ;
+        Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
+        //mat(row, col) = value
+        mat_rot(0,0) = ( gradient.x() * gradient.x() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+        mat_rot(0,1) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) - ( gradient.z() * rotation_sinus ) ;
+        mat_rot(0,2) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.y() * rotation_sinus ) ;
         
-        // mat_rot(1,0) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) + ( gradient.z() * rotation_sinus ) ;
-        // mat_rot(1,1) = ( gradient.y() * gradient.y() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
-        // mat_rot(1,2) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.x() * rotation_sinus ) ;
+        mat_rot(1,0) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) + ( gradient.z() * rotation_sinus ) ;
+        mat_rot(1,1) = ( gradient.y() * gradient.y() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+        mat_rot(1,2) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.x() * rotation_sinus ) ;
 
-        // mat_rot(2,0) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.y() * rotation_sinus ) ;
-        // mat_rot(2,1) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.x() * rotation_sinus ) ;
-        // mat_rot(2,2) = ( gradient.z() * gradient.z() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+        mat_rot(2,0) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.y() * rotation_sinus ) ;
+        mat_rot(2,1) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.x() * rotation_sinus ) ;
+        mat_rot(2,2) = ( gradient.z() * gradient.z() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
+        ROS_INFO(" Rotation goal is %f ", rotation);
+        ROS_INFO(" Rotation goal gradient is  %f ", rotation_angle_radian);
 
-        Eigen::Matrix3d mat_rot = Eigen::AngleAxisd(rotation_angle_radian, gradient).toRotationMatrix();
+
+        // Eigen::Matrix3d mat_rot = Eigen::AngleAxisd(rotation_angle_radian, gradient).toRotationMatrix();
 
         
 
