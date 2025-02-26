@@ -408,7 +408,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
         gradient.normalize() ;
 
-        Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
+        //Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
         //mat(row, col) = value
         // mat_rot(0,0) = ( gradient.x() * gradient.x() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
         // mat_rot(0,1) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) - ( gradient.z() * rotation_sinus ) ;
