@@ -13,6 +13,7 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
     m_angle_low = angle_low ;
     m_angle_high = angle_high ; 
 
+    rejected_frontiers = std::vector<Eigen::Vector3d>();
     max_sampling = 1;
     if(distance_min > distance_max) {
 
@@ -148,7 +149,6 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
     double vertical_angle_rad = 0 ;
     double vertical_angle_deg = 0 ;
 
-    view_candidates.clear();
 
     for(int i=0; i< frontiers_set.size(); i++){
 
@@ -306,8 +306,6 @@ void findOrientation(ViewCandidate& vc){
 
 
 void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set){
-    view_candidates.clear();
-
 
     double vertical_angle_rad = 0 ;
     double vertical_angle_deg = 0 ;
@@ -318,6 +316,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
     float total = 0 ;
 
     view_candidates.clear();
+    rejected_frontiers.clear();
 
     for(int i=0; i< frontiers_set.size(); i++){
 
