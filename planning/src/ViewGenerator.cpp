@@ -567,9 +567,9 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     }
     int min_radius = static_cast<int>(std::floor(-robot_radius_/2)) ; 
     int max_radius = static_cast<int>(std::ceil(robot_radius_/2)) ;
-    for(int i= min_radius ; i < max_radius ; i++){
-        for(int j= min_radius ; j < max_radius ; j++){
-            for(int k= min_radius ; k < max_radius ; k++){
+    for(int i= min_radius ; i <= max_radius ; i++){
+        for(int j= min_radius ; j <= max_radius ; j++){
+            for(int k= min_radius ; k <= max_radius ; k++){
 
                 Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
                 state = m_map.getVoxelState_ESDF(voxel + shift) ;
