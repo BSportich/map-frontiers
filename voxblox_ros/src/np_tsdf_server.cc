@@ -475,6 +475,10 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
 
 void NpTsdfServer::insertPointcloud(
     const sensor_msgs::PointCloud2::Ptr& pointcloud_msg_in) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    return;
+  }
   if (pointcloud_msg_in->header.stamp - last_msg_time_ptcloud_ >=
       min_time_between_msgs_) {
     last_msg_time_ptcloud_ = pointcloud_msg_in->header.stamp;
