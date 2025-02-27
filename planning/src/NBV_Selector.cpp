@@ -658,7 +658,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
 
     //SEND PROCEDURE
-    voxblox_msgs::Layer layer_msg;
+    //voxblox_msgs::Layer layer_msg;
   
 
 
