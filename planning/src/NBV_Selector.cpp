@@ -634,7 +634,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     //sample frontiers
     //sample_subset_frontiers_shells();
     int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
-    m_sub_sample_size_ = 100; 
+    m_sub_sample_size_ = frontiers_set.size() ; // Change here for experiments 
     if(frontiers_set.size() > m_sub_sample_size_){
        frontiers_subset.assign(frontiers_set.end() - m_sub_sample_size_ , frontiers_set.end() );
 
@@ -865,53 +865,53 @@ void NBV_Selector::select_next_best_view(){
   float temp_value = -1 ; 
   m_current_goal = m_current_pos;
   float temp_value_angular = 0 ;
-  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
-  for(int i=0;i< views.size();i++){
+  // ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  // for(int i=0;i< views.size();i++){
 
-    ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
+  //   ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
 
 
-    ViewCandidate view = views[i] ; 
-    std::vector<Eigen::Vector3d> visible_voxels; 
-    Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
-    Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
+  //   ViewCandidate view = views[i] ; 
+  //   std::vector<Eigen::Vector3d> visible_voxels; 
+  //   Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
+  //   Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
 
-    ros::Time start_get_visible_voxels_lidar = ros::Time::now();
-    m_view_evaluator.getVisibleVoxels_LIDAR(
-    &visible_voxels, pos, orient) ;
-    ros::Time end_get_visible_voxels_lidar = ros::Time::now();
-    ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
-    ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
+  //   ros::Time start_get_visible_voxels_lidar = ros::Time::now();
+  //   m_view_evaluator.getVisibleVoxels_LIDAR(
+  //   &visible_voxels, pos, orient) ;
+  //   ros::Time end_get_visible_voxels_lidar = ros::Time::now();
+  //   ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
+  //   ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
 
-    ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
+  //   ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
     
-    ros::Time start_view_evaluation = ros::Time::now();
-    temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
-    //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
-    ros::Time end_view_evaluation = ros::Time::now();
-    duration = end_view_evaluation - start_view_evaluation;
-    ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
-    Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
-    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
-    values_views.push_back(temp_value);
-    if( temp_value > max_value_nbv){
-      index_of_nbv = i;
-      max_value_nbv = temp_value;
+  //   ros::Time start_view_evaluation = ros::Time::now();
+  //   temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
+  //   //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
+  //   ros::Time end_view_evaluation = ros::Time::now();
+  //   duration = end_view_evaluation - start_view_evaluation;
+  //   ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
+  //   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
+  //   temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
+  //   values_views.push_back(temp_value);
+  //   if( temp_value > max_value_nbv){
+  //     index_of_nbv = i;
+  //     max_value_nbv = temp_value;
 
-    }
+  //   }
 
     //break ; 
 
 
-  }
+  // }
 
 
   //select views
 
-  if (views.size() > 0){
-    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
-    m_current_goal = views[index_of_nbv];
-  }
+  // if (views.size() > 0){
+  //   ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
+  //   m_current_goal = views[index_of_nbv];
+  // }
 
 
 

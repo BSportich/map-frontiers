@@ -401,6 +401,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     gradient = computeGradient(frontier) ; 
     current_pos = frontier ;
     ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
+    ROS_INFO(" Position is %f %f %f ",frontier.x(), frontier.y(), frontier.z());
     if( (gradient.x() == 0) && (gradient.y() == 0) && (gradient.z() ==0) ){
         ROS_INFO(" Gradient is 0 : view can not be found");
         angle_diff = 0 ;
