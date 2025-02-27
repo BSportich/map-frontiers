@@ -399,6 +399,8 @@ void NBV_Selector::updateFrontiers(){
  }
 
 
+
+
 void NBV_Selector::sample_subset_frontiers(){
   ros::Time start_sample_subset_frontiers = ros::Time::now();
   frontiers_sub_pointcloud.clear();
@@ -632,26 +634,20 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
-    //sample_subset_frontiers_shells();
+    sample_subset_frontiers_shells();
 
-    m_sub_sample_size_= frontiers_pointcloud.size() ; 
-    int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
-    //m_sub_sample_size_ = frontiers_set.size() ; // Change here for experiments 
-    // if(frontiers_set.size() > m_sub_sample_size_){
-    //    frontiers_subset.assign(frontiers_set.end() - m_sub_sample_size_ , frontiers_set.end() );
-    
-      // Ensure we don't exceed the original point cloud size
+    // m_sub_sample_size_= frontiers_pointcloud.size() ; 
+    // int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
+    // // Clear the destination point cloud
+    // frontiers_sub_pointcloud.clear();
+    // // Copy the first 'sample_size' points
+    // frontiers_subset.assign( frontiers_set.begin(), frontiers_set.begin() + sample_size );
+    // for (int i = 0; i < sample_size; i++) {
+    //     frontiers_sub_pointcloud.push_back(frontiers_pointcloud.points[i]);
+    // }
 
-      // Clear the destination point cloud
-    frontiers_sub_pointcloud.clear();
-      // Copy the first 'sample_size' points
-    frontiers_subset.assign( frontiers_set.begin(), frontiers_set.begin() + sample_size );
-    for (int i = 0; i < sample_size; i++) {
-        frontiers_sub_pointcloud.push_back(frontiers_pointcloud.points[i]);
-    }
-
-       ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
-    }
+    //    ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
+    // }
     
     
     publish_sub_frontiers();
@@ -935,7 +931,7 @@ int main(int argc, char** argv) {
     sys_params.method_view_generation = "gradient" ; 
     sys_params.distance_min = 1;
     sys_params.distance_max = 2;
-    sys_params.subsampling_views = 10 ;
+    sys_params.subsampling_views = 100 ;
     sys_params.robot_radius = 8; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
     sys_params.angle_low = -25 ; // vertical angle below the drone 
     sys_params.angle_high = 57; // vertical angle above the drone 
