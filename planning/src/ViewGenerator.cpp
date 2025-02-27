@@ -334,21 +334,21 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         if(generated == false && angle_diff == 0 ){
             ROS_INFO(" FAILURE : Gradient failed  %d ",i);
-
+            rejected_frontiers.push_back( frontier ) ;
             continue ; 
 
         }
         
 
-        ROS_INFO(" ROTATION %d ",i);
-        // search for new view with a corrected vertical angle
-        generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
-        //if worked
-        if(generated){
-            view_candidates.push_back( vc );
-            nb_rotation = nb_rotation +1 ;
-            continue;
-        }
+        // ROS_INFO(" ROTATION %d ",i);
+        // // search for new view with a corrected vertical angle
+        // generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
+        // //if worked
+        // if(generated){
+        //     view_candidates.push_back( vc );
+        //     nb_rotation = nb_rotation +1 ;
+        //     continue;
+        // }
 
         //search for new view with a different horizontal angle
 
