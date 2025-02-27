@@ -394,7 +394,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
     bool minimum = false ;
     bool mid = false ; 
-    bool max_bool = true ; 
+    bool max_bool = false ; 
 
     //find gradient 
     gradient = computeGradient(frontier) ; 
