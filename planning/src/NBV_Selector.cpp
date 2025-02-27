@@ -474,6 +474,7 @@ void NBV_Selector::sample_subset_frontiers(){
 
 void NBV_Selector::sample_subset_frontiers_shells(){
   int sample_value = m_sub_sample_size_; 
+  ROS_INFO("[Sampling] sampling value is %d", sample_value);
   if( m_sub_sample_size_ > frontiers_set.size()){
     sample_value = frontiers_set.size();
   }
