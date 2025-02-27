@@ -334,6 +334,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         if(generated == false && angle_diff == 0 ){
             ROS_INFO(" FAILURE : Gradient failed  %d ",i);
+
             continue ; 
 
         }
@@ -436,6 +437,8 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         
 
         vector_director = mat_rot * gradient ; 
+        ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
+
 
     }
     else{
@@ -549,7 +552,7 @@ bool ViewGenerator::verify_angle(const Eigen::Vector3d& frontier, const ViewCand
     Eigen::Vector3d next_voxel( vc.x, vc.y, vc.z );
 
     //Compute direction with frontier
-    Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; // from view candidate, towards frontier
+    Eigen::Vector3d direction_original = (next_voxel - frontier).normalized() ; // from view candidate, towards frontier
     Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
     direction_proj.normalize() ;
     
