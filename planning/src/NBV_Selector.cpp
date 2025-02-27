@@ -659,10 +659,6 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     //SEND PROCEDURE
     voxblox_msgs::Layer layer_msg;
-
-
-
-    }
   
 
 
