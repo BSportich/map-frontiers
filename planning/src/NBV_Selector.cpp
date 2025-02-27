@@ -473,18 +473,23 @@ void NBV_Selector::sample_subset_frontiers(){
 }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
+  int sample_value; 
+  if( m_sub_sample_size_ > frontiers_set.size()){
+    sample_value = frontiers_set.size();
+  }
+
   ROS_INFO_COND(verbose_, "[Sampling] shells start");
   float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
   int index_id = -1 ; 
   frontiers_sub_pointcloud.clear();
   frontiers_subset.clear();
 
-  for(int i =0 ; i < m_sub_sample_size_; i++ ){
+  for(int i =0 ; i < sample_value; i++ ){
 
-    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * (m_sub_sample_size_ -1) ; 
+    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * (sample_value -1) ; 
     index_id = static_cast<int>(value_tirage) ;
     frontiers_subset.push_back( frontiers_set[index_id] ) ; 
-    frontiers_sub_pointcloud.push_back(frontiers_pointcloud.points[index_id]);
+    frontiers_sub_pointcloud.push_back( frontiers_pointcloud.points[index_id] );
 
   }
 
