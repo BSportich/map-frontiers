@@ -477,6 +477,7 @@ void NBV_Selector::sample_subset_frontiers_shells(){
   if( m_sub_sample_size_ > frontiers_set.size()){
     sample_value = frontiers_set.size();
   }
+  ROS_INFO("[Sampling] samplign value is %d", sample_value);
 
   ROS_INFO_COND(verbose_, "[Sampling] shells start");
   float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
