@@ -633,10 +633,12 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
     //sample frontiers
     //sample_subset_frontiers_shells();
-    int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
-    m_sub_sample_size_ = frontiers_set.size() ; // Change here for experiments 
-    if(frontiers_set.size() > m_sub_sample_size_){
-       frontiers_subset.assign(frontiers_set.end() - m_sub_sample_size_ , frontiers_set.end() );
+
+    // int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
+    // m_sub_sample_size_ = frontiers_set.size() ; // Change here for experiments 
+    // if(frontiers_set.size() > m_sub_sample_size_){
+    //    frontiers_subset.assign(frontiers_set.end() - m_sub_sample_size_ , frontiers_set.end() );
+    frontiers_subset = frontiers_set ; 
 
        // Ensure we don't exceed the original point cloud size
 
