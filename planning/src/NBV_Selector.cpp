@@ -476,12 +476,15 @@ void NBV_Selector::sample_subset_frontiers_shells(){
   ROS_INFO_COND(verbose_, "[Sampling] shells start");
   float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
   int index_id = -1 ; 
+  frontiers_sub_pointcloud.clear();
+  frontiers_subset.clear();
+
   for(int i =0 ; i < m_sub_sample_size_; i++ ){
 
-    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * m_sub_sample_size_ ; 
+    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * (m_sub_sample_size_ -1) ; 
     index_id = static_cast<int>(value_tirage) ;
     frontiers_subset.push_back( frontiers_set[index_id] ) ; 
-
+    frontiers_sub_pointcloud.push_back(frontiers_pointcloud.points[index_id]);
 
   }
 
@@ -636,18 +639,9 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     //sample frontiers
     sample_subset_frontiers_shells();
 
-    // m_sub_sample_size_= frontiers_pointcloud.size() ; 
-    // int sample_size = std::min(m_sub_sample_size_, static_cast<int>(frontiers_pointcloud.size()));
-    // // Clear the destination point cloud
-    // frontiers_sub_pointcloud.clear();
-    // // Copy the first 'sample_size' points
-    // frontiers_subset.assign( frontiers_set.begin(), frontiers_set.begin() + sample_size );
-    // for (int i = 0; i < sample_size; i++) {
-    //     frontiers_sub_pointcloud.push_back(frontiers_pointcloud.points[i]);
-    // }
 
-    //    ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
-    // }
+    ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
+  
     
     
     publish_sub_frontiers();
