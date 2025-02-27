@@ -400,8 +400,8 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     //find gradient 
     gradient = computeGradient(frontier) ; 
     current_pos = frontier ;
-    ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
-    ROS_INFO(" Position is %f %f %f ",frontier.x(), frontier.y(), frontier.z());
+    // ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
+    // ROS_INFO(" Position is %f %f %f ",frontier.x(), frontier.y(), frontier.z());
     if( (gradient.x() == 0) && (gradient.y() == 0) && (gradient.z() ==0) ){
         ROS_INFO(" Gradient is 0 : view can not be found");
         angle_diff = 0 ;
@@ -426,8 +426,9 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         // mat_rot(2,0) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.y() * rotation_sinus ) ;
         // mat_rot(2,1) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.x() * rotation_sinus ) ;
         // mat_rot(2,2) = ( gradient.z() * gradient.z() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
-        ROS_INFO(" Rotation goal is %f ", rotation);
-        ROS_INFO(" Rotation goal gradient is  %f ", rotation_angle_radian);
+        
+        // ROS_INFO(" Rotation goal is %f ", rotation);
+        // ROS_INFO(" Rotation goal gradient is  %f ", rotation_angle_radian);
 
         Eigen::Vector3d temp_vect_calc( gradient.x(), gradient.y(), gradient.z() + 1) ; 
         Eigen::Vector3d axis_rotation = gradient.cross( temp_vect_calc);
@@ -438,7 +439,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         
 
         vector_director = mat_rot * gradient ; 
-        ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
+        // ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
 
 
     }
@@ -467,13 +468,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         //closest point possible 
         if ((minimum == false) && (distance >  m_distance_min) && (distance < (m_distance_min + m_distance_max)/2 ) && isSafeView_bool) {
             min_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
-            ROS_INFO(" View found min");
+            // ROS_INFO(" View found min");
             minimum = true ; 
         }
         //closest point from the center
         else if( (mid == false) && (distance < m_distance_max) && (distance > (m_distance_min + m_distance_max)/2 ) && isSafeView_bool ){
             mid_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
-            ROS_INFO(" View found mid");
+            // ROS_INFO(" View found mid");
             mid = true ; 
         }
 
@@ -481,16 +482,16 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     }
     if( isSafeView_bool ){
         max_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
-        ROS_INFO(" View found max");
+        // ROS_INFO(" View found max");
         max_bool = true ; 
     }
 
-    ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
+    // ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
     //We prioritize the value in the middle
     if(mid){
         findOrientation(mid_view) ; 
         isAngleok = verify_angle( frontier, mid_view , angle_mid ) ; 
-        ROS_INFO(" Angle found is %f", angle_mid);
+        // ROS_INFO(" Angle found is %f", angle_mid);
         if( isAngleok ){
             // ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
             vc= mid_view ; 
@@ -502,7 +503,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if(minimum){
         findOrientation(min_view) ; 
         isAngleok = verify_angle( frontier, min_view , angle_min ) ; 
-        ROS_INFO(" Angle found is  %f", angle_min);
+        // ROS_INFO(" Angle found is  %f", angle_min);
         if( isAngleok ){
             // ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
             vc = min_view ; 
@@ -513,7 +514,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if (max_bool){
         findOrientation(max_view) ; 
         isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
-        ROS_INFO(" Angle found is  %f", angle_max);
+        // ROS_INFO(" Angle found is  %f", angle_max);
         if( isAngleok ){
             // ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
             vc = max_view  ; 
@@ -523,7 +524,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
     }
 
-    ROS_INFO("No position found : angle mid is  %f", angle_mid);
+    // ROS_INFO("No position found : angle mid is  %f", angle_mid);
     if( angle_mid > m_angle_high ){
         angle_diff = m_angle_high - angle_mid ;
     }
