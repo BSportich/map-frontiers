@@ -473,7 +473,7 @@ void NBV_Selector::sample_subset_frontiers(){
 }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
-  int sample_value; 
+  int sample_value = m_sub_sample_size_; 
   if( m_sub_sample_size_ > frontiers_set.size()){
     sample_value = frontiers_set.size();
   }
