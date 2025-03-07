@@ -5,14 +5,10 @@ FROM osrf/ros:noetic-desktop-full
 WORKDIR /opt/catkin_ws/src
 
 # Install necessary packages
-RUN apt-get update && apt-get install -y \
-    git \
-    vim \
-    build-essential \
-    python3-rosdep \
-    python3-catkin-tools \
-    libtool \
-    && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt /tmp/requirements.txt
+RUN apt-get update && \
+    apt-get install -y $(cat /tmp/requirements.txt | cut -d'=' -f1) && \
+    rm -rf /var/lib/apt/lists/*
 
 # Clone the repository and get the commit to be checkout at from the docker-compose.yaml file
 ARG BRANCH='merge/px4_nbv_selector'
