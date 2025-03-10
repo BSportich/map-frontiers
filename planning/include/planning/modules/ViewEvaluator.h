@@ -360,7 +360,7 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 }
 
 bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
-  Eigen::Vector3d frontier(vc.o_x, vc_oy, vc.o_z);
+  Eigen::Vector3d frontier(vc.o_x, vc.o_y, vc.o_z);
   Eigen::Vector3d view( vc.x, vc.y, vc.z);
   Eigen::Vector3d direction = (view - frontier).normalize() ; 
   float distance = (view - frontier).norm() ;
