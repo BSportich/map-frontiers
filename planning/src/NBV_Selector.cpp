@@ -165,6 +165,8 @@ public:
     void publish_goal();
 
     void select_next_best_view(); 
+    void next_best_view_closest_frontier();
+
 
     //Tests functions
     //void test_publish();
@@ -911,6 +913,34 @@ void NBV_Selector::select_next_best_view(){
 
 
 
+
+}
+
+void NBV_Selector::next_best_view_closest_frontier(){
+  ROS_INFO_COND(verbose_, "CLOSEST FRONTIER MODE");
+  
+  // ROS_INFO_COND(verbose_, "EMPTY SPACE");
+
+  //evaluate views
+  std::vector<float> values_views;
+  int index_of_nbv = -1 ;
+  float max_value_nbv = -1 ; 
+  float temp_value = -1 ; 
+  m_current_goal = m_current_pos;
+  float temp_value_angular = 0 ;
+  float max_value_angular = 0 ; 
+  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  for(int i=0;i< views.size();i++){
+
+    ViewCandidate view = views[i] ; 
+    std::vector<Eigen::Vector3d> visible_voxels; 
+    Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
+
+    Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
+    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
+
+
+  }
 
 }
 
