@@ -362,7 +362,7 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
   Eigen::Vector3d frontier(vc.o_x, vc.o_y, vc.o_z);
   Eigen::Vector3d view( vc.x, vc.y, vc.z);
-  Eigen::Vector3d direction = (view - frontier).normalize() ; 
+  Eigen::Vector3d direction = (view - frontier).normalized() ; 
   float distance = (view - frontier).norm() ;
   Eigen::Vector3d new_pos = frontier ; 
   Eigen::Vector3d old_pos = frontier ; 
@@ -379,7 +379,7 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
     if ( abs(old_pos.x() - new_pos.x()) >= 1 || abs(old_pos.y() - new_pos.y()) >= 1 || abs(old_pos.z() - new_pos.z()) >= 1 ){
 
       old_pos = new_pos;
-      state = m_map.getVoxelState_TSDF(new_pos, m_threshold ); 
+      state = m_map.getVoxelState_TSDF(new_pos, m_threshold_known ); 
       if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
         return false;
       }
