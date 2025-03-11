@@ -601,7 +601,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
                 state = m_map.getVoxelState_ESDF(voxel + shift) ;
                 distance = m_map.getVoxelDistance_ESDF(voxel + shift) ;
                 //state = m_map.getVoxelState_TSDF(voxel + shift, 0);
-                ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%f'", (voxel+shift).x(), (voxel+shift).y(), (voxel+shift).z(), distance ) ;
+                ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%d'", (voxel+shift).x(), (voxel+shift).y(), (voxel+shift).z(),  static_cast<int>(state) ) ;
                 //if ( distance <= 1 ){
                 if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
                     //ROS_INFO("FALSE");
