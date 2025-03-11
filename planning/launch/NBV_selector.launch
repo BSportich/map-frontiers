@@ -1,6 +1,4 @@
 <launch>
-  <arg name="voxel_size" default="0.2" />
-  <arg name="voxels_per_side" default="16" />
   <arg name="sub_sample_size" default="10" />
   <arg name="namespace" default="" />
   <arg name="timer" default="false" />
@@ -15,8 +13,8 @@
         <remap from="groundtruth/odom" to="/$(arg namespace)/groundtruth/odom" />
         <remap from="is_idle" to="/$(arg namespace)/mav_local_planner/is_idle" />
 
-        <param name="voxel_size" value="$(arg voxel_size)" />
-        <param name="voxels_per_side" value="$(arg voxels_per_side)" />
+        <param name="voxel_size" command="rosparam get /voxel_size" />
+        <param name="voxels_per_side" command="rosparam get /voxels_per_side" />
         
         <param name="sub_sample_size" value="$(arg sub_sample_size)" />
 
