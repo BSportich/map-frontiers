@@ -188,6 +188,10 @@ void VoxfieldServer::publishTraversable() {
 }
 
 void VoxfieldServer::publishMap(bool reset_remote_map) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    return;
+  }
   if (!publish_esdf_map_) {
     return;
   }
@@ -267,6 +271,10 @@ void VoxfieldServer::setTraversabilityRadius(float traversability_radius) {
 }
 
 void VoxfieldServer::newPoseCallback(const Transformation& T_G_C) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting callback because voxfield has not been activated.");
+    return;
+  }
   // if update_esdf_every_n_sec_ is negative
   // we regard it as the update interval
   if (update_esdf_every_n_ > 0 && frame_count_ != 0 &&
@@ -287,6 +295,10 @@ void VoxfieldServer::newPoseCallback(const Transformation& T_G_C) {
 }
 
 void VoxfieldServer::esdfMapCallback(const voxblox_msgs::Layer& layer_msg) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting callback because voxfield has not been activated.");
+    return;
+  }
   timing::Timer receive_map_timer("map/receive_esdf");
 
   bool success =

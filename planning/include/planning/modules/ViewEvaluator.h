@@ -61,6 +61,8 @@ public:
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
+    bool lineOfSightCheck(const ViewCandidate& vc);
+
     float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
@@ -355,6 +357,39 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 
   return evaluation + closer_surface ; 
 
+}
+
+bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
+  Eigen::Vector3d frontier(vc.o_x, vc.o_y, vc.o_z);
+  Eigen::Vector3d view( vc.x, vc.y, vc.z);
+  Eigen::Vector3d direction = (view - frontier).normalized() ; 
+  float distance = (view - frontier).norm() ;
+  Eigen::Vector3d new_pos = frontier ; 
+  Eigen::Vector3d old_pos = frontier ; 
+  char state ;
+
+  for(int i=0; i< ( 2* distance) ; i++  ){
+
+    new_pos = new_pos + direction ; 
+
+    if( (frontier - new_pos).norm() > distance ){
+      break ;
+    } 
+
+    if ( abs(old_pos.x() - new_pos.x()) >= 1 || abs(old_pos.y() - new_pos.y()) >= 1 || abs(old_pos.z() - new_pos.z()) >= 1 ){
+
+      old_pos = new_pos;
+      state = m_map.getVoxelState_TSDF(new_pos, m_threshold_known ); 
+      if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
+        return false;
+      }
+
+    }
+
+
+  }
+
+  return true;
 }
 
 bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known){

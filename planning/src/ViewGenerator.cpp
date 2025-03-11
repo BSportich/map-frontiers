@@ -463,6 +463,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         //compute is position safe 
         if(distance > (m_distance_min - 0.2) ){ //start computing safe positions just before zone of interest
             isSafeView_bool = isSafeView(current_pos); 
+            isSafeView_bool = true; 
         }
 
         //closest point possible 

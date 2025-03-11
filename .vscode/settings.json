@@ -1,5 +1,6 @@
 {
     "files.associations": {
+<<<<<<< HEAD
         "iterator": "cpp",
         "core": "cpp",
         "array": "cpp",
@@ -18,6 +19,13 @@
         "cstdarg": "cpp",
         "cstddef": "cpp",
         "cstdint": "cpp",
+=======
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+>>>>>>> 2b7017182182581a2a54994b9c470f9fe9715560
         "cstdio": "cpp",
         "cstdlib": "cpp",
         "cstring": "cpp",

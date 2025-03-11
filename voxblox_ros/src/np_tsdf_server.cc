@@ -22,6 +22,7 @@ NpTsdfServer::NpTsdfServer(
     const MeshIntegratorConfig& mesh_config)
     : nh_(nh),
       nh_private_(nh_private),
+      is_activated_(false),
       verbose_(true),
       world_frame_("world"),
       icp_corrected_frame_("icp_corrected"),
@@ -121,7 +122,9 @@ NpTsdfServer::NpTsdfServer(
 
   // Advertise services.
   generate_mesh_srv_ = nh_private_.advertiseService(
-      "generate_mesh", &NpTsdfServer::generateMeshCallback, this);
+      "generate_mesh", &NpTsdfServer::generateMeshCallback, this); 
+  activate_node_srv_ = nh_private_.advertiseService(
+      "activate_node", &NpTsdfServer::activateNodeCallback, this);
   clear_map_srv_ = nh_private_.advertiseService(
       "clear_map", &NpTsdfServer::clearMapCallback, this);
   save_map_srv_ = nh_private_.advertiseService(
@@ -472,6 +475,10 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
 
 void NpTsdfServer::insertPointcloud(
     const sensor_msgs::PointCloud2::Ptr& pointcloud_msg_in) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    return;
+  }
   if (pointcloud_msg_in->header.stamp - last_msg_time_ptcloud_ >=
       min_time_between_msgs_) {
     last_msg_time_ptcloud_ = pointcloud_msg_in->header.stamp;
@@ -588,6 +595,10 @@ void NpTsdfServer::publishSlices() {
 }
 
 void NpTsdfServer::publishMap(bool reset_remote_map) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    return;
+  }
   if (!publish_tsdf_map_) {
     return;
   }
@@ -625,6 +636,10 @@ void NpTsdfServer::publishPointclouds() {
 }
 
 void NpTsdfServer::updateMesh() {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    return;
+  }
   if (verbose_) {
     ROS_INFO("Updating mesh.");
   }
@@ -719,6 +734,13 @@ bool NpTsdfServer::clearMapCallback(
   return true;
 }
 
+bool NpTsdfServer::activateNodeCallback(
+    std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
+    /*response*/) {  // NOLINT
+  is_activated_ = true;
+  return is_activated_;
+}
+
 bool NpTsdfServer::generateMeshCallback(
     std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
     /*response*/) {  // NOLINT
@@ -772,6 +794,10 @@ void NpTsdfServer::clear() {
 }
 
 void NpTsdfServer::tsdfMapCallback(const voxblox_msgs::Layer& layer_msg) {
+  if (!is_activated_) {
+    ROS_INFO_THROTTLE(60.0, "Exiting callback because voxfield has not been activated.");
+    return;
+  }
   timing::Timer receive_map_timer("map/receive_tsdf");
 
   bool success =

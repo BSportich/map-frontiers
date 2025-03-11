@@ -91,6 +91,9 @@ class NpTsdfServer {
   bool loadMapCallback(
       voxblox_msgs::FilePath::Request& request,     // NOLINT
       voxblox_msgs::FilePath::Response& response);  // NOLINT
+  bool activateNodeCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
   bool generateMeshCallback(
       std_srvs::Empty::Request& request,     // NOLINT
       std_srvs::Empty::Response& response);  // NOLINT
@@ -178,6 +181,8 @@ class NpTsdfServer {
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;
 
+  bool is_activated_;
+
   /// Data subscribers.
   ros::Subscriber pointcloud_sub_;
   ros::Subscriber freespace_pointcloud_sub_;
@@ -200,6 +205,7 @@ class NpTsdfServer {
   ros::Subscriber tsdf_map_sub_;
 
   // Services.
+  ros::ServiceServer activate_node_srv_;
   ros::ServiceServer generate_mesh_srv_;
   ros::ServiceServer clear_map_srv_;
   ros::ServiceServer save_map_srv_;

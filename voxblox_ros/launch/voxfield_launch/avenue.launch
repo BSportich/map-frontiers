@@ -6,16 +6,12 @@
   <param name="use_sim_time" value="true" />
   <arg name="process_every_nth_frame" default="1" />
 
-  <arg name="voxel_size" default="0.25" />
-  <arg name="voxels_per_side" default="8" />
   <arg name="drone"      default="intelaero_bugwright"/>
   <arg name="number_of_drones"      default= "2" />
 
   <arg name="sub_sample_size" default="10" />
 
   <include file="$(find map_frontiers)/launch/NBV_selector.launch">
-    <arg name="voxel_size" value="$(arg voxel_size)"/>
-    <arg name="voxels_per_side" value="$(arg voxels_per_side)"/>
     <arg name="sub_sample_size" value="$(arg sub_sample_size)"/>
     <!-- TODO: Should launch this node as many time as $(arg number_of_drones)-->
     <!-- <arg name="id"      value= "0" /> -->
@@ -38,14 +34,14 @@
     <rosparam file="$(find voxblox_ros)/cfg/param/avenue_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/avenue_calib.yaml"/>
     <!-- Have to set the following parameters manually but should be improved in ros 2 -->
-    <param name="voxel_size"           value="$(arg voxel_size)"/>
-    <param name="occ_voxel_size"           value="$(arg voxel_size)"/>
-    <param name="tsdf_voxel_size"           value="$(arg voxel_size)"/>
-    <param name="esdf_voxel_size"           value="$(arg voxel_size)"/>
-    <param name="voxels_per_side_in_block"           value="$(arg voxels_per_side)"/>
-    <param name="occ_voxels_per_side"           value="$(arg voxels_per_side)"/>
-    <param name="tsdf_voxels_per_side"           value="$(arg voxels_per_side)"/>
-    <param name="esdf_voxels_per_side"           value="$(arg voxels_per_side)"/>
+    <param name="voxel_size" command="rosparam get /voxel_size" />
+    <param name="occ_voxel_size" command="rosparam get /voxel_size" />
+    <param name="tsdf_voxel_size" command="rosparam get /voxel_size" />
+    <param name="esdf_voxel_size" command="rosparam get /voxel_size" />
+    <param name="voxels_per_side_in_block" command="rosparam get /voxels_per_side" />
+    <param name="occ_voxels_per_side" command="rosparam get /voxels_per_side" />
+    <param name="tsdf_voxels_per_side" command="rosparam get /voxels_per_side" />
+    <param name="esdf_voxels_per_side" command="rosparam get /voxels_per_side" />
     <param name="robot_model_file" value="$(arg robot_model_file)"/>
   </node>
 

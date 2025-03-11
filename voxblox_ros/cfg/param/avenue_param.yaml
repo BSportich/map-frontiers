@@ -1,16 +1,4 @@
 # Map 
-voxel_size: &voxel_size $(arg voxel_size)
-voxels_per_side_in_block: &voxels_per_side_in_block $(arg voxels_per_side)
-
-occ_voxel_size: *voxel_size
-occ_voxels_per_side: *voxels_per_side_in_block
-
-tsdf_voxel_size: *voxel_size
-tsdf_voxels_per_side: *voxels_per_side_in_block
-
-esdf_voxel_size: *voxel_size
-esdf_voxels_per_side: *voxels_per_side_in_block
-
 truncation_distance: -3.0
 
 # TSDF integration
