@@ -270,7 +270,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
             "rejected_point_cloud", 1, true);
 
     pub_test_values = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
-          "empty_point_cloud", 1, true);
+          "occupied_point_cloud", 1, true);
     
     pub_test_values2 = n.advertise<pcl::PointCloud<pcl::PointXYZRGB> >(
           "unknown_point_cloud", 1, true);
