@@ -159,7 +159,7 @@ public:
     void publishAllUpdatedTsdfVoxels() ;
     void publish_all_frontiers();
     void publish_sub_frontiers();
-    void publish_test_voxels(){;
+    void publish_test_voxels();
 
     void generate_views();
     void publish_views();
@@ -1075,5 +1075,6 @@ int main(int argc, char** argv) {
     ros::spin();
     return 0;
 }
+
 
 
