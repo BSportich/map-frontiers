@@ -754,7 +754,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
   } else {
     ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
 
-    
+    visualize_voxels_ESDF();
     ROS_INFO_COND(verbose_, "[ESDF callback] Sorted ESDF voxels ! ");
     publish_test_voxels(); 
     ROS_INFO_COND(verbose_, "[ESDF callback] Published test voxels ! ");
