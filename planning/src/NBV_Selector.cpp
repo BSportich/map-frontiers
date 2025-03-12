@@ -431,7 +431,7 @@ void NBV_Selector::updateFrontiers(){
       Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
       //empty pointcloud
-      current_state = m_map.getVoxelState_ESDF(coord_3d, m_threshold_known);
+      current_state = m_map.getVoxelState_ESDF(coord_3d);
       if ( current_state == voxblox_map::VoxbloxMap::OCCUPIED ){
 
         pcl::PointXYZRGB point;
