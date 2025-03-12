@@ -159,6 +159,7 @@ public:
     void publishAllUpdatedTsdfVoxels() ;
     void publish_all_frontiers();
     void publish_sub_frontiers();
+    void publish_test_voxels(){;
 
     void generate_views();
     void publish_views();
@@ -169,6 +170,7 @@ public:
 
 
     //Tests functions
+    void visualize_voxels_ESDF();
     //void test_publish();
 
     //callbacks
@@ -327,9 +329,9 @@ void NBV_Selector::updateFrontiers(){
     voxblox::BlockIndexList blocks;
     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
-    values_for_eval_pointcloud.clear();
-    values_for_eval_pointcloud2.clear();
     frontiers_set.clear();
+    // values_for_eval_pointcloud.clear();
+    // values_for_eval_pointcloud2.clear();
 
     // Cache layer settings.
     size_t vps = m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
@@ -362,31 +364,31 @@ void NBV_Selector::updateFrontiers(){
         }
 
         //empty pointcloud
-        current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
-        if ( current_state == voxblox_map::VoxbloxMap::FREE ){
+        // current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
+        // if ( current_state == voxblox_map::VoxbloxMap::FREE ){
 
-          pcl::PointXYZRGB point;
-          point.x = coord.x();
-          point.y = coord.y();
-          point.z = coord.z();
-          point.r = 0;
-          point.g = 0;
-          point.b = 0;
-          values_for_eval_pointcloud.push_back(point);
-        }
+        //   pcl::PointXYZRGB point;
+        //   point.x = coord.x();
+        //   point.y = coord.y();
+        //   point.z = coord.z();
+        //   point.r = 0;
+        //   point.g = 0;
+        //   point.b = 0;
+        //   values_for_eval_pointcloud.push_back(point);
+        // }
 
         //unknown pointcloud
-        if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
+        // if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
 
-          pcl::PointXYZRGB point;
-          point.x = coord.x();
-          point.y = coord.y();
-          point.z = coord.z();
-          point.r = 0;
-          point.g = 0;
-          point.b = 0;
-          values_for_eval_pointcloud2.push_back(point);
-        }
+        //   pcl::PointXYZRGB point;
+        //   point.x = coord.x();
+        //   point.y = coord.y();
+        //   point.z = coord.z();
+        //   point.r = 0;
+        //   point.g = 0;
+        //   point.b = 0;
+        //   values_for_eval_pointcloud2.push_back(point);
+        // }
 
       }
 
@@ -400,6 +402,67 @@ void NBV_Selector::updateFrontiers(){
 
  }
 
+
+ void NBV_Selector::visualize_voxels_ESDF(){
+  ros::Time start_update_frontiers = ros::Time::now();
+
+  unsigned char current_state;
+  ROS_INFO_COND(verbose_, "Updated frontiers: %lu found", frontiers_set.size());
+
+  voxblox::BlockIndexList blocks;
+  m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
+  values_for_eval_pointcloud.clear();
+  values_for_eval_pointcloud2.clear();
+
+  // Cache layer settings.
+  size_t vps = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->voxels_per_side();
+  size_t num_voxels_per_block = vps * vps * vps;
+
+  for (const voxblox::BlockIndex& index : blocks) {
+  // Iterate over all voxels in said blocks.
+  const voxblox::Block<voxblox::EsdfVoxel>& block = m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getBlockByIndex(index);
+
+    voxblox::Point origin = block.origin();
+
+    for (size_t linear_index = 0; linear_index < num_voxels_per_block;
+        ++linear_index) {
+      voxblox::Point coord = block.computeCoordinatesFromLinearIndex(linear_index);
+      const voxblox::EsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
+      Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
+
+      //empty pointcloud
+      current_state = m_map.getVoxelState_ESDF(coord_3d, m_threshold_known);
+      if ( current_state == voxblox_map::VoxbloxMap::OCCUPIED ){
+
+        pcl::PointXYZRGB point;
+        point.x = coord.x();
+        point.y = coord.y();
+        point.z = coord.z();
+        point.r = 0;
+        point.g = 0;
+        point.b = 0;
+        values_for_eval_pointcloud.push_back(point);
+      }
+
+      //unknown pointcloud
+      if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
+
+        pcl::PointXYZRGB point;
+        point.x = coord.x();
+        point.y = coord.y();
+        point.z = coord.z();
+        point.r = 0;
+        point.g = 0;
+        point.b = 0;
+        values_for_eval_pointcloud2.push_back(point);
+      }
+
+    }
+
+  //block.voxel_size()
+  }
+
+}
 
 
 
@@ -601,12 +664,14 @@ void NBV_Selector::publishAllUpdatedTsdfVoxels() {
 
 void NBV_Selector::publish_all_frontiers(){
   frontiers_pointcloud.header.frame_id = world_frame_;
+  pub_frontiers.publish(frontiers_pointcloud);
+}
+
+void NBV_Selector::publish_test_voxels(){
   values_for_eval_pointcloud.header.frame_id = world_frame_;
   values_for_eval_pointcloud2.header.frame_id = world_frame_;
-  pub_frontiers.publish(frontiers_pointcloud);
   pub_test_values.publish( values_for_eval_pointcloud);
   pub_test_values2.publish( values_for_eval_pointcloud2);
-
 }
 
 void NBV_Selector::publish_sub_frontiers(){
@@ -644,7 +709,16 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     // publishAllUpdatedTsdfVoxels();
     // ROS_INFO_COND(verbose_, "[TSDF callback] Published pointclouds");
 
+    updateFrontiers();
+    ROS_INFO_COND(verbose_, "[TSDF callback] Updated frontiers ! ");
+
+    if (extra_viz_){
+      publish_all_frontiers();
+      ROS_INFO_COND(verbose_, "Frontiers published !");
+    }
+
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
+    
     //sample frontiers
     sample_subset_frontiers_shells();
 
@@ -679,11 +753,12 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized failed ! ");
   } else {
     ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
-    updateFrontiers();
-    ROS_INFO_COND(verbose_, "[ESDF callback] Updated frontiers ! ");
-    if (extra_viz_)
-      publish_all_frontiers();
-    ROS_INFO_COND(verbose_, "Frontiers published !");
+
+    
+    ROS_INFO_COND(verbose_, "[ESDF callback] Sorted ESDF voxels ! ");
+    publish_test_voxels(); 
+    ROS_INFO_COND(verbose_, "[ESDF callback] Published test voxels ! ");
+
     generate_views() ; 
     ROS_INFO_COND(verbose_, "Views generated !" );
     publish_views();
