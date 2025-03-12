@@ -363,7 +363,7 @@ void NBV_Selector::updateFrontiers(){
           frontiers_pointcloud.push_back(point);
         }
 
-        empty pointcloud
+        ///empty pointcloud
         current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
         if ( current_state == voxblox_map::VoxbloxMap::OCCUPIED ){
 
@@ -377,7 +377,7 @@ void NBV_Selector::updateFrontiers(){
           values_for_eval_pointcloud.push_back(point);
         }
 
-        unknown pointcloud
+        ///unknown pointcloud
         if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
 
           pcl::PointXYZRGB point;
