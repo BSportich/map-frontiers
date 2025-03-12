@@ -495,6 +495,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         // ROS_INFO(" Angle found is %f", angle_mid);
         if( isAngleok ){
             // ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
+            ROS_INFO(" mid view found %d %d %d", mid_view.x, mid_view.y, mid_view.z);
             vc= mid_view ; 
             return true;
         }
@@ -507,6 +508,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         // ROS_INFO(" Angle found is  %f", angle_min);
         if( isAngleok ){
             // ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
+            ROS_INFO(" min view found %d %d %d", min_view.x, min_view.y, min_view.z);
             vc = min_view ; 
             return true;
         }
@@ -518,6 +520,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         // ROS_INFO(" Angle found is  %f", angle_max);
         if( isAngleok ){
             // ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
+            ROS_INFO(" max view found %d %d %d", max_view.x, max_view.y, max_view.z);
             vc = max_view  ; 
             return true;
 
@@ -601,7 +604,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
                 state = m_map.getVoxelState_ESDF(voxel + shift) ;
                 distance = m_map.getVoxelDistance_ESDF(voxel + shift) ;
                 //state = m_map.getVoxelState_TSDF(voxel + shift, 0);
-                ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%d'", (voxel+shift).x(), (voxel+shift).y(), (voxel+shift).z(),  static_cast<int>(state) ) ;
+                // ROS_INFO("state of voxel (%f %f %f) in the ESDF is  '%d'", (voxel+shift).x(), (voxel+shift).y(), (voxel+shift).z(),  static_cast<int>(state) ) ;
                 //if ( distance <= 1 ){
                 if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
                     //ROS_INFO("FALSE");
