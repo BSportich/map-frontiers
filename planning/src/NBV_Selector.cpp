@@ -990,11 +990,18 @@ void NBV_Selector::select_next_best_view(){
 
   //select views
   ros::Time total_view_evaluation_end = ros::Time::now();
-  ros::Duration duration = total_view_evaluation_start - total_view_evaluation_end ; 
+  ros::Duration duration_total = total_view_evaluation_start - total_view_evaluation_end ; 
+  ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] Total %.4f s", duration_total.toSec());
+
 
 
   if (views.size() > 0){
     ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
+    ROS_INFO_COND(verbose_, "NEW GOAL IS VIEW %d", index_of_nbv);
+    ROS_INFO_COND(verbose_, " %f %f %f ", views[index_of_nbv].x , views[index_of_nbv].y , views[index_of_nbv].z );
+    ROS_INFO_COND(verbose_, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
+
+
     m_current_goal = views[index_of_nbv];
   }
 
