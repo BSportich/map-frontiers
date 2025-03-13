@@ -20,7 +20,7 @@ private:
     /* data */
     std::string m_method_type;
     voxblox_map::VoxbloxMap m_map;
-    SensorModel sensor_model ; 
+    SensorModel sensor_model_ ; 
 
     // params
     double p_ray_step_;
@@ -62,6 +62,8 @@ public:
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
     bool lineOfSightCheck(const ViewCandidate& vc);
+    float inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set );
+
 
     float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos);
 
@@ -78,7 +80,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   m_method_type = method_name ;
   p_ray_step_ = m_map.getVoxelSize() ;
   p_downsampling_factor_ = 1.0 ;
-  sensor_model = sensor_lidar ; 
+  sensor_model_ = sensor_lidar ; 
   m_threshold_known = threshold ; 
   distance_surface_radius_max_ = radius_max_surface ; 
 
@@ -242,7 +244,7 @@ void ViewEvaluator::getVisibleVoxels_LIDAR(
       if (current_segment < 0) {
         continue;  // already occluded ray
       }
-      sensor_model.getDirectionVector_LIDAR(
+      sensor_model_.getDirectionVector_LIDAR(
           &camera_direction,
           static_cast<double>(i) / (static_cast<double>(c_res_x_) - 1.0),
           static_cast<double>(j) / (static_cast<double>(c_res_y_) - 1.0));
@@ -359,24 +361,56 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 
 }
 
+float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set ){
+  float result = 0 ; 
+  Eigen::Vector3d frontier ;
+  Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
+  ViewCandidate vc_2 ;
+  float range = sensor_model_.p_ray_length_ ; 
+  for(int i =0; i< frontiers_set.size();i++){
+
+    frontier = frontiers_set[i];
+
+    if( (frontier - pos).norm() < range ){
+
+      vc_2 = vc ; //deep copy only for simple types
+      vc_2.o_x = frontier.x();
+      vc_2.o_y = frontier.y();
+      vc_2.o_z = frontier.z(); 
+
+      if( lineofSightCheck(vc_2) ){
+        result = result +1 ;
+
+      }
+
+
+    }
+
+
+
+  }
+
+}
+
 bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
   Eigen::Vector3d frontier(vc.o_x, vc.o_y, vc.o_z);
   Eigen::Vector3d view( vc.x, vc.y, vc.z);
   Eigen::Vector3d direction = (view - frontier).normalized() ; 
-  float distance = (view - frontier).norm() ;
+  float distance = (view - frontier).norm() ; //not sure at all, not correct (my count is squared of this norm)
   Eigen::Vector3d new_pos = frontier ; 
-  Eigen::Vector3d old_pos = frontier ; 
+  Eigen::Vector3d old_pos = frontier ; // deepcopy ? yes. 
   char state ;
 
-  for(int i=0; i< ( 2* distance) ; i++  ){
+  for(int i=0; i< ( 2* distance) ; i++  ){ // while ?
 
     new_pos = new_pos + direction ; 
 
-    if( (frontier - new_pos).norm() > distance ){
+    if( (frontier - new_pos).norm() > distance || (frontier - new_pos).norm() > sensor_model_.p_ray_length_ ){ 
       break ;
     } 
 
-    if ( abs(old_pos.x() - new_pos.x()) >= 1 || abs(old_pos.y() - new_pos.y()) >= 1 || abs(old_pos.z() - new_pos.z()) >= 1 ){
+    // only checks voxel status, if we changed voxels ie one of the dimension has a change > 1
+    if ( abs(old_pos.x() - new_pos.x()) >= 1 || abs(old_pos.y() - new_pos.y()) >= 1 || abs(old_pos.z() - new_pos.z()) >= 1 ){ 
 
       old_pos = new_pos;
       state = m_map.getVoxelState_TSDF(new_pos, m_threshold_known ); 
