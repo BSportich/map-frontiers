@@ -368,7 +368,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   ViewCandidate vc_2 ;
 
   if ( !lineOfSightCheck(vc) ){
-    return -0.5;
+    return -2;
   }
 
   float range = sensor_model_.p_ray_length_ ; 
@@ -394,6 +394,9 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
 
 
   }
+
+  result = (result / frontiers_set.size()); 
+  return result;
 
 }
 
