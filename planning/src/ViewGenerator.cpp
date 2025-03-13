@@ -322,19 +322,19 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         ViewCandidate vc; 
         Eigen::Vector3d frontier = frontiers_set[i];
-        ROS_INFO(" Generating view for frontier %d ",i);
+        // ROS_INFO(" Generating view for frontier %d ",i);
         generated = generateview_normal(frontier, 0, angle_diff, vc);
 
         //if worked 
         if(generated){
             view_candidates.push_back( vc );
-            ROS_INFO(" %d Found view  %f %f %f ",i, vc.x, vc.y, vc.z);
+            // ROS_INFO(" %d Found view  %f %f %f ",i, vc.x, vc.y, vc.z);
             nb_sucess = nb_sucess +1 ; 
             continue;
         }
 
         if(generated == false && angle_diff == 0 ){
-            ROS_INFO(" FAILURE : Gradient failed  %d ",i);
+            // ROS_INFO(" FAILURE : Gradient failed  %d ",i);
             rejected_frontiers.push_back( frontier ) ;
             continue ; 
 
@@ -401,10 +401,10 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     //find gradient 
     gradient = computeGradient(frontier) ; 
     current_pos = frontier ;
-    ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
+    // ROS_INFO(" Gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
     // ROS_INFO(" Position is %f %f %f ",frontier.x(), frontier.y(), frontier.z());
     if( (gradient.x() == 0) && (gradient.y() == 0) && (gradient.z() ==0) ){
-        ROS_INFO(" Gradient is 0 : view can not be found");
+        // ROS_INFO(" Gradient is 0 : view can not be found");
         angle_diff = 0 ;
         return false; 
     }
