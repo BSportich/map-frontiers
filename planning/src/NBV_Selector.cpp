@@ -966,8 +966,9 @@ void NBV_Selector::select_next_best_view(){
     temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
     //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
     temp_value = m_view_evaluator.inverseRayCast(view, frontiers_set ); 
+    
     ros::Time end_view_evaluation = ros::Time::now();
-    duration = end_view_evaluation - start_view_evaluation;
+    ros::Duration duration = end_view_evaluation - start_view_evaluation;
     ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
     temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
