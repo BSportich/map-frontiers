@@ -378,7 +378,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
       vc_2.o_y = frontier.y();
       vc_2.o_z = frontier.z(); 
 
-      if( lineofSightCheck(vc_2) ){
+      if( lineOfSightCheck(vc_2) ){
         result = result +1 ;
 
       }
