@@ -409,10 +409,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         return false; 
     }
 
+    //very important ! 
+    gradient.normalize() ;
+
     //change of angle if necessary 
     if( rotation != 0){
 
-        gradient.normalize() ;
+        //gradient.normalize() ;
 
         //Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
         //mat(row, col) = value
@@ -449,8 +452,10 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     }
 
 
+    //current_pos = current_pos + ( (m_distance_min / m_map.getVoxelSize() ) -1 ) * vector_director ; 
 
-    int number_it = (m_distance_max + 0.2) / (vector_director.norm() * m_map.getVoxelSize()) ; 
+    int number_it = (m_distance_max + 0.2 - m_distance_min) / ( m_map.getVoxelSize()) ; //UNSURE! !!!!!!!!!!!!
+    //int number_it = (m_distance_max + 0.2) / (vector_director.norm() * m_map.getVoxelSize()) ; 
     //go along the gradient direction
     for(int k =0 ; k< number_it; k++){
     //while( distance < m_distance_max){
