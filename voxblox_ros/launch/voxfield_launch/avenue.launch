@@ -6,21 +6,10 @@
   <param name="use_sim_time" value="true" />
   <arg name="process_every_nth_frame" default="1" />
 
-  <arg name="drone"      default="intelaero_bugwright"/>
-  <arg name="number_of_drones"      default= "2" />
-
   <arg name="sub_sample_size" default="10" />
 
-  <include file="$(find map_frontiers)/launch/NBV_selector.launch">
-    <arg name="sub_sample_size" value="$(arg sub_sample_size)"/>
-    <!-- TODO: Should launch this node as many time as $(arg number_of_drones)-->
-    <!-- <arg name="id"      value= "0" /> -->
-    <arg name="namespace"           value="/$(arg drone)_0"/>
-
-    <arg name="timer" value="$(arg timer)" />
-    <arg name="verbose" value="$(arg verbose)" />
-    <arg name="extra_viz" value="$(arg extra_viz)" />
-  </include>
+  <!-- Assigning one nbv selector per existing drone-->
+  <node pkg="voxblox_ros" type="nbv_selector.sh" name="nbv_selector_assigner" output="screen" args="$(arg sub_sample_size) $(arg timer) $(arg verbose) $(arg extra_viz)" />
 
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
 

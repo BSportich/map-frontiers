@@ -5,6 +5,7 @@
   <arg name="verbose" default="false" />
   <arg name="extra_viz" default="false" />
 
+  <group ns="$(arg namespace)">
     <node name="drone_NBV_selector" pkg="map_frontiers" type="NBV_Selector" output="screen">
         <remap from="esdf_map_out" to="/voxblox_node/esdf_map_out" />
         <remap from="tsdf_map_out" to="/voxblox_node/tsdf_map_out" />
@@ -22,5 +23,5 @@
         <param name="verbose" value="$(arg verbose)" />
         <param name="extra_viz" value="$(arg extra_viz)" />
     </node>
-
+  </group>
 </launch>
