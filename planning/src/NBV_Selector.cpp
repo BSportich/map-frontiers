@@ -71,6 +71,7 @@ private:
 
     ViewGenerator m_view_generator;
     std::vector<ViewCandidate> views;
+    std::vector<ViewCandidate> views_history;
     std::vector<Eigen::Vector3d> frontiers_set ;
     std::vector<Eigen::Vector3d> frontiers_subset ;
 
@@ -249,6 +250,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     //views
     views = std::vector<ViewCandidate>();
+    views_history = std::vector<ViewCandidate>();
     views_set = geometry_msgs::PoseArray();
 
 
@@ -883,6 +885,23 @@ void NBV_Selector::publish_views(){
   float range_for_viz = 0.3;
 
   views_set.poses.clear();
+
+  //History of selected views
+  for(int i = 0; i < views_history.size(); i++){
+    geometry_msgs::Pose temp_view;
+    map_frontiers::conversions::ViewCandidateToGeometryPose(views[i], temp_view);
+    geometry_msgs::Point temp_frontier;
+    temp_frontier.x = views[i].o_x;
+    temp_frontier.y = views[i].o_y;
+    temp_frontier.z = views[i].o_z;
+    views_set.poses.push_back(temp_view);
+
+    // Create markers to represent the fov the view would have
+    marker_array.markers.push_back(map_frontiers::visualization::CreateHorizontalFOVMarker(temp_view, i, range_for_viz));
+    marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
+    marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
+  }
+  
   for(int i = 0; i < views.size(); i++){
     geometry_msgs::Pose temp_view;
     map_frontiers::conversions::ViewCandidateToGeometryPose(views[i], temp_view);
@@ -1005,7 +1024,7 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(verbose_, " %f %f %f ", views[index_of_nbv].x , views[index_of_nbv].y , views[index_of_nbv].z );
     ROS_INFO_COND(verbose_, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
 
-
+    views_history.push_back( views[index_of_nbv]) ;
     m_current_goal = views[index_of_nbv];
   }
 

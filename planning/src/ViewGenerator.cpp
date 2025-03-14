@@ -253,51 +253,110 @@ void ViewGenerator::generateViews_gradients_ESDF(const std::vector<Eigen::Vector
 
 // }
 
-void findOrientation(ViewCandidate& vc){
+// void findOrientation(ViewCandidate& vc){
+//     // Convert the points to tf2::Vector3 for easier vector operations
+//     tf2::Vector3 view_pos(vc.x, vc.y, vc.z);
+//     tf2::Vector3 frontier_pos(vc.o_x, vc.o_y, vc.o_z);
+
+//     // Compute the direction vector from point1 to point2
+//     tf2::Vector3 direction = frontier_pos - view_pos;
+
+//     if (direction.length2() <= 0.0) {
+//         ROS_INFO("Direction vector is zero! Cannot normalize.");
+//         return;
+//     }
+    
+//     // Normalize the direction vector (to ensure it's a unit vector)
+//     direction.normalize();
+
+//     // The forward direction that "view_pos" should align with (now along the X-axis)
+//     tf2::Vector3 forward(1.0, 0.0, 0.0); // Align with the X-axis
+
+//     // Compute the axis of rotation (cross product of forward and direction)
+//     tf2::Vector3 axis = forward.cross(direction);
+
+//     if (axis.length2() <= 0.0) {
+//         ROS_INFO("Rotation axis is zero! Possible parallel vectors.");
+//         return;
+//     }
+
+//     axis.normalize();  // Normalize the axis
+
+//     // Compute the angle of rotation (dot product gives cosine of the angle)
+//     float dot = forward.dot(direction);
+//     // Clamp the dot product to avoid precision errors in the acos function
+//     dot = std::min(1.0f, std::max(-1.0f, dot));
+
+//     // Calculate the angle between the vectors
+//     float angle = acos(dot);
+
+//     // Compute the quaternion representing the rotation
+//     tf2::Quaternion rotation;
+//     rotation.setRotation(axis, angle);
+
+//     if( (std::isnan(rotation.x())) ||  (std::isnan(rotation.y())) || (std::isnan(rotation.z())) || (std::isnan(rotation.w()))  ){
+        
+//     }
+
+//     vc.q_x = rotation.x();
+//     vc.q_y = rotation.y();
+//     vc.q_z = rotation.z();
+//     vc.q_w = rotation.w();
+// }
+
+void findOrientation(ViewCandidate& vc) { // CHATGPT
     // Convert the points to tf2::Vector3 for easier vector operations
     tf2::Vector3 view_pos(vc.x, vc.y, vc.z);
     tf2::Vector3 frontier_pos(vc.o_x, vc.o_y, vc.o_z);
 
-    // Compute the direction vector from point1 to point2
+    // Compute the direction vector from view_pos to frontier_pos
     tf2::Vector3 direction = frontier_pos - view_pos;
 
     if (direction.length2() <= 0.0) {
-        ROS_INFO("Direction vector is zero! Cannot normalize.");
+        ROS_WARN("Direction vector is zero! Cannot normalize.");
         return;
     }
     
-    // Normalize the direction vector (to ensure it's a unit vector)
-    direction.normalize();
+    direction.normalize(); // Ensure it's a unit vector
 
-    // The forward direction that "view_pos" should align with (now along the X-axis)
-    tf2::Vector3 forward(1.0, 0.0, 0.0); // Align with the X-axis
+    // Define the forward vector (assuming object initially faces +X)
+    tf2::Vector3 forward(1.0, 0.0, 0.0); // Default reference
 
-    // Compute the axis of rotation (cross product of forward and direction)
+    // Compute rotation axis using cross product
     tf2::Vector3 axis = forward.cross(direction);
 
-    if (axis.length2() <= 0.0) {
-        ROS_INFO("Rotation axis is zero! Possible parallel vectors.");
-        return;
-    }
-
-    axis.normalize();  // Normalize the axis
-
-    // Compute the angle of rotation (dot product gives cosine of the angle)
+    // Compute the dot product for the angle
     float dot = forward.dot(direction);
-    // Clamp the dot product to avoid precision errors in the acos function
-    dot = std::min(1.0f, std::max(-1.0f, dot));
+    dot = std::clamp(dot, -1.0f, 1.0f); // Prevent floating-point precision issues
 
-    // Calculate the angle between the vectors
-    float angle = acos(dot);
-
-    // Compute the quaternion representing the rotation
+    // Handle parallel vectors (cross product = 0)
     tf2::Quaternion rotation;
-    rotation.setRotation(axis, angle);
+    if (axis.length2() <= 0.0) {
+        ROS_WARN("Rotation axis is zero! Vectors are parallel.");
 
-    if( (std::isnan(rotation.x())) ||  (std::isnan(rotation.y())) || (std::isnan(rotation.z())) || (std::isnan(rotation.w()))  ){
-        
+        // If vectors are identical (dot ≈ 1), set identity rotation
+        if (dot > 0.9999f) {
+            rotation.setIdentity();
+        }
+        // If vectors are opposite (dot ≈ -1), apply a 180-degree rotation around Z or Y
+        else {
+            tf2::Vector3 perpendicular(0, 0, 1); // Stable perpendicular axis
+            rotation.setRotation(perpendicular, M_PI);
+        }
+    } else {
+        axis.normalize();
+        float angle = acos(dot);
+        rotation.setRotation(axis, angle);
     }
 
+    // Prevent NaN values
+    if (std::isnan(rotation.x()) || std::isnan(rotation.y()) ||
+        std::isnan(rotation.z()) || std::isnan(rotation.w())) {
+        ROS_ERROR("Quaternion contains NaN! Resetting to identity.");
+        rotation.setIdentity();
+    }
+
+    // Store the computed quaternion in ViewCandidate
     vc.q_x = rotation.x();
     vc.q_y = rotation.y();
     vc.q_z = rotation.z();
