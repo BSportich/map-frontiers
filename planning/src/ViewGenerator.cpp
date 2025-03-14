@@ -2,6 +2,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <math.h>
 #include "ros/ros.h"
+#include <algorithm>
 
 
 ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high){
