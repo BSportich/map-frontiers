@@ -354,7 +354,7 @@ void findOrientation(ViewCandidate& vc) { // CHATGPT
     if (std::isnan(rotation.x()) || std::isnan(rotation.y()) ||
         std::isnan(rotation.z()) || std::isnan(rotation.w())) {
         ROS_ERROR("Quaternion contains NaN! Resetting to identity.");
-        rotation.setIdentity();
+        rotation = tf2::Quaternion(0, 0, 0, 1);
     }
 
     // Store the computed quaternion in ViewCandidate
