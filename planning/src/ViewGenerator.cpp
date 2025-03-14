@@ -328,7 +328,7 @@ void findOrientation(ViewCandidate& vc) { // CHATGPT
 
     // Compute the dot product for the angle
     float dot = forward.dot(direction);
-    dot = std::clamp(dot, -1.0f, 1.0f); // Prevent floating-point precision issues
+    dot = std::max(-1.0f, std::min(1.0f, dot)); // Prevent floating-point precision issues
 
     // Handle parallel vectors (cross product = 0)
     tf2::Quaternion rotation;
@@ -337,7 +337,7 @@ void findOrientation(ViewCandidate& vc) { // CHATGPT
 
         // If vectors are identical (dot ≈ 1), set identity rotation
         if (dot > 0.9999f) {
-            rotation.setIdentity();
+            rotation = tf2::Quaternion(0, 0, 0, 1);
         }
         // If vectors are opposite (dot ≈ -1), apply a 180-degree rotation around Z or Y
         else {
