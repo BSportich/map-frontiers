@@ -367,7 +367,7 @@ void NBV_Selector::updateFrontiers(){
 
         ///empty pointcloud
         current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
-        if ( current_state == voxblox_map::VoxbloxMap::OCCUPIED ){
+        if ( current_state == voxblox_map::VoxbloxMap::FREE ){
 
           pcl::PointXYZRGB point;
           point.x = coord.x();
