@@ -22,7 +22,7 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
         throw std::string(" Distances values are incorrect. Can not initialize ViewGenerator");
     }
 
-    int vs = 1 ;
+    int vs = 0.25 ;
     c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
     c_neighbor_voxels_[1] = Eigen::Vector3d(-vs, 0, 0);
     c_neighbor_voxels_[2] = Eigen::Vector3d(0, vs, 0);
@@ -731,7 +731,7 @@ bool ViewGenerator::isCorrectPos(const Eigen::Vector3d& pos){
 Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     
 
-    float vs = 1 ; 
+    float vs = 0.25 ; 
     Eigen::Vector3d gradient_vector(0,0,0); 
     Eigen::Vector3d shift_x(vs,0,0) ; 
     Eigen::Vector3d shift_y(0,vs,0) ; 
