@@ -332,8 +332,8 @@ void NBV_Selector::updateFrontiers(){
     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
     frontiers_pointcloud.clear();
     frontiers_set.clear();
-    // values_for_eval_pointcloud.clear();
-    // values_for_eval_pointcloud2.clear();
+    values_for_eval_pointcloud.clear();
+    values_for_eval_pointcloud2.clear();
 
     // Cache layer settings.
     size_t vps = m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
