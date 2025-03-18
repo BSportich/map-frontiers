@@ -365,32 +365,32 @@ void NBV_Selector::updateFrontiers(){
           frontiers_pointcloud.push_back(point);
         }
 
-        // ///empty pointcloud
-        // current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
-        // if ( current_state == voxblox_map::VoxbloxMap::OCCUPIED ){
+        ///empty pointcloud
+        current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
+        if ( current_state == voxblox_map::VoxbloxMap::OCCUPIED ){
 
-        //   pcl::PointXYZRGB point;
-        //   point.x = coord.x();
-        //   point.y = coord.y();
-        //   point.z = coord.z();
-        //   point.r = 0;
-        //   point.g = 0;
-        //   point.b = 0;
-        //   values_for_eval_pointcloud.push_back(point);
-        // }
+          pcl::PointXYZRGB point;
+          point.x = coord.x();
+          point.y = coord.y();
+          point.z = coord.z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          values_for_eval_pointcloud.push_back(point);
+        }
 
-        // ///unknown pointcloud
-        // if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
+        ///unknown pointcloud
+        if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
 
-        //   pcl::PointXYZRGB point;
-        //   point.x = coord.x();
-        //   point.y = coord.y();
-        //   point.z = coord.z();
-        //   point.r = 0;
-        //   point.g = 0;
-        //   point.b = 0;
-        //   values_for_eval_pointcloud2.push_back(point);
-        // }
+          pcl::PointXYZRGB point;
+          point.x = coord.x();
+          point.y = coord.y();
+          point.z = coord.z();
+          point.r = 0;
+          point.g = 0;
+          point.b = 0;
+          values_for_eval_pointcloud2.push_back(point);
+        }
 
       }
 
