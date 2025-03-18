@@ -352,7 +352,8 @@ void NBV_Selector::updateFrontiers(){
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
         //if ( m_view_evaluator.isFrontierVoxel_TSDF(coord_3d, m_threshold_known)){
-        if ( m_view_evaluator.isSurfaceFrontier_TSDF(coord_3d) ){
+        Eigen::Vector3d unknown_vox_frontier;
+        if ( m_view_evaluator.isSurfaceFrontier_TSDF(coord_3d, unknown_vox_frontier ) ){
           frontiers_set.push_back( coord_3d );
 
           pcl::PointXYZRGB point;
@@ -363,6 +364,17 @@ void NBV_Selector::updateFrontiers(){
           point.g = 0;
           point.b = 0;
           frontiers_pointcloud.push_back(point);
+
+          pcl::PointXYZRGB point2;
+          point2.x = unknown_vox_frontier.x();
+          point2.y = unknown_vox_frontier.y();
+          point2.z = unknown_vox_frontier.z();
+          point2.r = 255;
+          point2.g = 0;
+          point2.b = 0;
+          values_for_eval_pointcloud2.push_back(point2);
+
+
         }
 
         ///empty pointcloud
@@ -380,17 +392,17 @@ void NBV_Selector::updateFrontiers(){
         }
 
         ///unknown pointcloud
-        if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
+        // if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
 
-          pcl::PointXYZRGB point;
-          point.x = coord.x();
-          point.y = coord.y();
-          point.z = coord.z();
-          point.r = 0;
-          point.g = 0;
-          point.b = 0;
-          values_for_eval_pointcloud2.push_back(point);
-        }
+        //   pcl::PointXYZRGB point;
+        //   point.x = coord.x();
+        //   point.y = coord.y();
+        //   point.z = coord.z();
+        //   point.r = 0;
+        //   point.g = 0;
+        //   point.b = 0;
+        //   values_for_eval_pointcloud2.push_back(point);
+        // }
 
       }
 

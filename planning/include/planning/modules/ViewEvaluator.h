@@ -56,7 +56,9 @@ public:
     // float evaluate_view_pos(const ViewCandidate& vc, const ViewCandidate& current_pos);
 
     bool isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known);
-    bool isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel);
+    //bool isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel);
+    bool isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::Vector3d& unknown_vox);
+
 
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
@@ -481,7 +483,9 @@ bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double th
   }
 
 
-bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel){
+
+bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::Vector3d& unknown_vox)
+//bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel){
   unsigned char voxel_state;
   unsigned char current_state;
   bool is_surface ;
@@ -507,6 +511,7 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel){
     voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], 0);
     if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
       close_unknown = true;
+      unknown_vox = voxel + c_neighbor_voxels_[i] ;
       return true;
     }
 
