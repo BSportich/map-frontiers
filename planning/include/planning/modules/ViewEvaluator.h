@@ -484,7 +484,7 @@ bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double th
 
 
 
-bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::Vector3d& unknown_vox)
+bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::Vector3d& unknown_vox){
 //bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel){
   unsigned char voxel_state;
   unsigned char current_state;
