@@ -111,7 +111,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   std::reverse(c_split_distances_.begin(), c_split_distances_.end());
   std::reverse(c_split_widths_.begin(), c_split_widths_.end());
 
-  int vs = m_map.getVoxelSize() ;  // voxel temp variable
+  float vs = m_map.getVoxelSize() ;  // voxel temp variable
   //Frontiers data 
   m_frontier6 = false;
   if(m_frontier6 == true){

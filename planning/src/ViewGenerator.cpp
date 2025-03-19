@@ -22,7 +22,7 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
         throw std::string(" Distances values are incorrect. Can not initialize ViewGenerator");
     }
 
-    int vs = m_map.getVoxelSize() ; 
+    float vs = m_map.getVoxelSize() ; 
     c_neighbor_voxels_[0] = Eigen::Vector3d(vs, 0, 0);
     c_neighbor_voxels_[1] = Eigen::Vector3d(-vs, 0, 0);
     c_neighbor_voxels_[2] = Eigen::Vector3d(0, vs, 0);
