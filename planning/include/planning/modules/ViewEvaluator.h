@@ -512,6 +512,7 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
     if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
       close_unknown = true;
       unknown_vox = voxel + c_neighbor_voxels_[i] ;
+      ROS_INFO_COND(verbose_, "FOUND UNKNOWN %f %f %f", (voxel + c_neighbor_voxels_[i]).x(), (voxel + c_neighbor_voxels_[i]).y(), (voxel + c_neighbor_voxels_[i]).z());
       return true;
     }
 
