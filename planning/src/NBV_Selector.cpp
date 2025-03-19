@@ -359,6 +359,8 @@ void NBV_Selector::updateFrontiers(){
         if ( m_view_evaluator.isSurfaceFrontier_TSDF(coord_3d, unknown_vox_frontier ) ){
           frontiers_set.push_back( coord_3d );
 
+          ROS_INFO_COND(verbose_, "Frontier found");
+
           pcl::PointXYZRGB point;
           point.x = coord.x();
           point.y = coord.y();
