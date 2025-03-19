@@ -503,6 +503,9 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
     if( m_map.getVoxelDistance_TSDF(voxel) >=0 ){
       is_surface = true;
     }
+    else{
+      return false;
+    }
   } 
   else{
     return false;
