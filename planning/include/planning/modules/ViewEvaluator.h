@@ -69,7 +69,7 @@ public:
     float inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set );
 
 
-    float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos);
+    float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos, , const Eigen::Vector3d& vel);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
@@ -219,12 +219,19 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
 
 // }
 
-float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos){
+float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos, const Eigen::Vector3d& vel){
+  float result = -100 ; 
   Eigen::Vector3d view_pos = Eigen::Vector3d(vc.x, vc.y, vc.z) ;
   Eigen::Vector3d comp = (view_pos - robot_pos) / (view_pos - robot_pos).norm() ;
-  Eigen::Vector3d vel(1,1,1);
+  
+  //Eigen::Vector3d vel(1,1,1);
+
   vel = vel / vel.norm() ; 
-  return vel.transpose() * comp ; 
+  result = vel.transpose() * comp ;
+
+  result = acos( result ) ; 
+  result = (M_PI - result) / M_PI ; 
+  return result ;  
 }
 
 

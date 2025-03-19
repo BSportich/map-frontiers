@@ -95,6 +95,11 @@ private:
     bool m_surface_frontiers;
     ViewCandidate m_current_goal;
     ViewCandidate m_current_pos;
+    //Velocity angular or directional ?? 
+    float m_vel_x ; 
+    float m_vel_y ; 
+    float m_vel_z ;
+
     bool m_availability;
     bool m_is_idle;
 
@@ -811,6 +816,13 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.q_z = msg_odom.pose.pose.orientation.z ;
   m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
 
+  //linear speed : should be angular ? 
+  m_vel_x = msg_odom.twist.twist.linear.x ;
+  m_vel_y = msg_odom.twist.twist.linear.y ;
+  m_vel_z = msg_odom.twist.twist.linear.z ;
+
+  
+
   if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
     float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
     if(pos_test < m_tolerance_distance_ ){
@@ -1012,8 +1024,11 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
 
-    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
-    ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
+    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
+    ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    // temp_value_angular = ; 
+    // ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
     
     values_views.push_back(temp_value);
     if( temp_value > max_value_nbv){
