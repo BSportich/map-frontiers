@@ -225,7 +225,6 @@ float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen:
   Eigen::Vector3d comp = (view_pos - robot_pos) / (view_pos - robot_pos).norm() ;
   
   Eigen::Vector3d vel_temp ;
-
   vel_temp = vel / vel.norm() ; 
   result = vel_temp.transpose() * comp ;
 
