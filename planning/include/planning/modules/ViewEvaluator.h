@@ -5,6 +5,8 @@
 #include <voxblox_map/voxblox_map.h>
 #include <string>
 #include <planning/modules/SensorModel.h>
+#include "ros/ros.h"
+
 
 
 struct FrontierPoint
