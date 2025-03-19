@@ -1087,7 +1087,7 @@ void NBV_Selector::next_best_view_closest_frontier(){
 
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
     Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
-    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector ) ; 
+    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
 
 
   }
