@@ -490,8 +490,8 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
 //bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel){
   unsigned char voxel_state;
   unsigned char current_state;
-  bool is_surface ;
-  bool close_unknown;
+  bool is_surface = false;
+  bool close_unknown = false;
 
   if( voxel.z() <0){ //TO CHECK
     return false;
