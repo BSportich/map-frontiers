@@ -351,7 +351,7 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        ROS_INFO_COND(verbose_, "TESTING COORDINATES %f %f %f", coord.x(), coord.y(), coord.z());
+        // ROS_INFO_COND(verbose_, "TESTING COORDINATES %f %f %f", coord.x(), coord.y(), coord.z());
 
 
         //if ( m_view_evaluator.isFrontierVoxel_TSDF(coord_3d, m_threshold_known)){
