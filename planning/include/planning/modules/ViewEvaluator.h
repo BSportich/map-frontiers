@@ -224,10 +224,10 @@ float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen:
   Eigen::Vector3d view_pos = Eigen::Vector3d(vc.x, vc.y, vc.z) ;
   Eigen::Vector3d comp = (view_pos - robot_pos) / (view_pos - robot_pos).norm() ;
   
-  //Eigen::Vector3d vel(1,1,1);
+  Eigen::Vector3d vel_temp ;
 
-  vel = vel / vel.norm() ; 
-  result = vel.transpose() * comp ;
+  vel_temp = vel / vel.norm() ; 
+  result = vel_temp.transpose() * comp ;
 
   result = acos( result ) ; 
   result = (M_PI - result) / M_PI ; 
