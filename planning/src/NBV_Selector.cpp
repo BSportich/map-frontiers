@@ -1048,7 +1048,7 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
-    dist_view = (view_vector - current_pos_vector ).norm()
+    dist_view = (view_vector - current_pos_vector ).norm() ;
     value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_frontiers, dist_view ) ; 
     ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
