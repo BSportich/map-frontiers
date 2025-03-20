@@ -1008,6 +1008,8 @@ void NBV_Selector::select_next_best_view(){
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
 
   dist_min_frontiers = getMinViewDistance(views, current_pos_vector) ;
+  ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_frontiers);
+
 
   m_current_goal = m_current_pos;
 
@@ -1132,8 +1134,8 @@ int main(int argc, char** argv) {
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
     
     //////////////Planning parameters
-    sys_params.alpha = 1.0 // image component weight
-    sys_params.beta = 0.0 // angular/distance cost component weight 
+    sys_params.alpha = 1.0 ;// image component weight
+    sys_params.beta = 0.0 ;// angular/distance cost component weight 
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
