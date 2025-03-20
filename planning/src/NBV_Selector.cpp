@@ -1007,7 +1007,7 @@ void NBV_Selector::select_next_best_view(){
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
 
-  dist_min_frontiers = getMinViewDistance(views, current_pos_vector) ;
+  dist_min_frontiers = m_view_evaluator.getMinViewDistance(views, current_pos_vector) ;
   ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_frontiers);
 
 
@@ -1180,25 +1180,5 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-float getMinViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector){
 
-  float temp_distance = -1;
-  float min_distance = MAXFLOAT;
-  for(int i=0;i< views.size();i++){
-
-    ViewCandidate view = views[i] ;
-    Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
-    temp_distance = (view_vector - current_pos_vector).norm() ;
-
-    if ( temp_distance < min_distance ){
-      min_distance = temp_distance ; 
-    }
-    
-    
-    
-  }
-
-  return min_distance;
-
-}
 

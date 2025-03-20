@@ -71,6 +71,7 @@ public:
 
     float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos, const Eigen::Vector3d& vel);
     float evaluate_distance_angle_cost( float value_angular, float dist_min_frontiers, float dist_view );
+    float getMinViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
@@ -537,6 +538,28 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
 
 }
 
+
+float ViewEvaluator::getMinViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector){
+
+  float temp_distance = -1;
+  float min_distance = MAXFLOAT;
+  for(int i=0;i< views.size();i++){
+
+    ViewCandidate view = views[i] ;
+    Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
+    temp_distance = (view_vector - current_pos_vector).norm() ;
+
+    if ( temp_distance < min_distance ){
+      min_distance = temp_distance ; 
+    }
+    
+    
+    
+  }
+
+  return min_distance;
+
+}
 
 
 
