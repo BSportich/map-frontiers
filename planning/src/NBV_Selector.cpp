@@ -33,6 +33,10 @@ struct system_parameters
     float tolerance_distance ; 
     double threshold_known ;
 
+    //////////////Planning parameters
+    float alpha;
+    float beta ;
+
     //////////////View Generation parameters
     std::string method_view_generation ; 
     float distance_min ;
@@ -78,6 +82,10 @@ private:
     ViewEvaluator m_view_evaluator;
     SensorModel m_sensor_model;
     ros::Time last_nbv_ ;
+
+    //planning parameters
+    float m_alpha ;
+    float m_beta ; 
 
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
@@ -244,6 +252,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_tolerance_distance_ = sys_param.tolerance_distance ; 
     m_threshold_known = sys_param.threshold_known ; 
 
+    m_alpha = sys_param.alpha ;
+    m_beta = sys_param.beta ;
+
+
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
     frontiers_subset = std::vector<Eigen::Vector3d>();
@@ -375,31 +387,31 @@ void NBV_Selector::updateFrontiers(){
           point.b = 0;
           frontiers_pointcloud.push_back(point);
 
-          pcl::PointXYZRGB point2;
-          point2.x = unknown_vox_frontier.x();
-          point2.y = unknown_vox_frontier.y();
-          point2.z = unknown_vox_frontier.z();
-          point2.r = 255;
-          point2.g = 0;
-          point2.b = 0;
-          values_for_eval_pointcloud2.push_back(point2);
+          // pcl::PointXYZRGB point2;
+          // point2.x = unknown_vox_frontier.x();
+          // point2.y = unknown_vox_frontier.y();
+          // point2.z = unknown_vox_frontier.z();
+          // point2.r = 255;
+          // point2.g = 0;
+          // point2.b = 0;
+          // values_for_eval_pointcloud2.push_back(point2);
 
 
         }
 
         ///empty pointcloud
-        current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
-        if ( current_state == voxblox_map::VoxbloxMap::FREE ){
+        // current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
+        // if ( current_state == voxblox_map::VoxbloxMap::FREE ){
 
-          pcl::PointXYZRGB point;
-          point.x = coord.x();
-          point.y = coord.y();
-          point.z = coord.z();
-          point.r = 0;
-          point.g = 0;
-          point.b = 0;
-          values_for_eval_pointcloud.push_back(point);
-        }
+        //   pcl::PointXYZRGB point;
+        //   point.x = coord.x();
+        //   point.y = coord.y();
+        //   point.z = coord.z();
+        //   point.r = 0;
+        //   point.g = 0;
+        //   point.b = 0;
+        //   values_for_eval_pointcloud.push_back(point);
+        // }
 
         ///unknown pointcloud
         // if ( current_state == voxblox_map::VoxbloxMap::UNKNOWN ){
@@ -743,7 +755,7 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
 
-    publish_test_voxels(); 
+    // publish_test_voxels(); 
     ROS_INFO_COND(verbose_, "[TSDF callback] Published test voxels ! ");
     
     //sample frontiers
@@ -986,9 +998,16 @@ void NBV_Selector::select_next_best_view(){
   std::vector<float> values_views;
   int index_of_nbv = -1 ;
   float max_value_nbv = -1 ; 
-  float temp_value = -1 ; 
+  float image_value = -1 ; 
+  float total_value = -1 ;
+  float value_angular = 0 ;
+
+  float dist_min_frontiers = -1 ;
+
+  dist_min_frontiers = ;
+
   m_current_goal = m_current_pos;
-  float temp_value_angular = 0 ;
+
   ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
   ros::Time total_view_evaluation_start = ros::Time::now();
 
@@ -1015,8 +1034,8 @@ void NBV_Selector::select_next_best_view(){
     ros::Time start_view_evaluation = ros::Time::now();
     //temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
     //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
-    temp_value = m_view_evaluator.inverseRayCast(view, frontiers_set ); 
-    ROS_INFO_COND(verbose_, "IMAGE VALUE of  %d is %f", i, temp_value);
+    image_value = m_view_evaluator.inverseRayCast(view, frontiers_set ); 
+    ROS_INFO_COND(verbose_, "IMAGE VALUE of  %d is %f", i, image_value);
 
 
     ros::Time end_view_evaluation = ros::Time::now();
@@ -1025,15 +1044,20 @@ void NBV_Selector::select_next_best_view(){
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
 
     Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
-    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
-    ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
+    dist_view = (pos - current_pos_vector ).norm()
+    value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_frontiers, dist_view ) ; 
+    ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
     // ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+
+    total_value = m_alpha * image_value + m_beta * value_angular ; 
+    ROS_INFO_COND(verbose_, "TOTAL VALUE OF  %d is %f", i, total_value);
     
-    values_views.push_back(temp_value);
-    if( temp_value > max_value_nbv){
+    values_views.push_back(total_value);
+    if( total_value > max_value_nbv){
       index_of_nbv = i;
-      max_value_nbv = temp_value;
+      max_value_nbv = total_value;
 
     }
 
@@ -1106,7 +1130,9 @@ int main(int argc, char** argv) {
 
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
     
-
+    //////////////Planning parameters
+    sys_params.alpha = 1.0 // image component weight
+    sys_params.beta = 0.0 // angular/distance cost component weight 
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
