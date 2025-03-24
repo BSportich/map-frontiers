@@ -1061,6 +1061,8 @@ void NBV_Selector::select_next_best_view(){
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
+  ROS_INFO_COND(verbose_, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
+
 
   dist_min_frontiers = m_view_evaluator.getMinViewDistance(views, current_pos_vector) ;
   ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_frontiers);
