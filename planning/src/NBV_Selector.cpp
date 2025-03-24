@@ -874,7 +874,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
   m_current_pos.o_z = m_current_pos.z;
-  ROS_INFO_COND(verbose_, "CHECK 2 ");
+  // ROS_INFO_COND(verbose_, "CHECK 2 ");
   m_current_pos.x = msg_odom.pose.pose.position.x ;
   m_current_pos.y = msg_odom.pose.pose.position.y ;
   m_current_pos.z = msg_odom.pose.pose.position.z ;
@@ -883,14 +883,14 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.q_z = msg_odom.pose.pose.orientation.z ;
   m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
   
-  ROS_INFO_COND(verbose_, "CHECK 3 ");
+  // ROS_INFO_COND(verbose_, "CHECK 3 ");
   //linear speed : should be angular ? 
   m_vel_x = msg_odom.twist.twist.linear.x ;
   m_vel_y = msg_odom.twist.twist.linear.y ;
   m_vel_z = msg_odom.twist.twist.linear.z ;
-  ROS_INFO_COND(verbose_, "[First] VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
-  ROS_INFO_COND(verbose_, "[First] POS VALUES ARE %f %f %f", m_current_pos.x,  m_current_pos.y ,  m_current_pos.z);
-  ROS_INFO_COND(verbose_, "[First] OR VALUES ARE %f %f %f %f", m_current_pos.q_x,  m_current_pos.q_y ,  m_current_pos.q_z, m_current_pos.q_w );
+  // ROS_INFO_COND(verbose_, "[First] VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
+  // ROS_INFO_COND(verbose_, "[First] POS VALUES ARE %f %f %f", m_current_pos.x,  m_current_pos.y ,  m_current_pos.z);
+  // ROS_INFO_COND(verbose_, "[First] OR VALUES ARE %f %f %f %f", m_current_pos.q_x,  m_current_pos.q_y ,  m_current_pos.q_z, m_current_pos.q_w );
   
 
   if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
@@ -1071,7 +1071,7 @@ void NBV_Selector::select_next_best_view(){
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
-  ROS_INFO_COND(verbose_, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
+  // ROS_INFO_COND(verbose_, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
 
 
   dist_min_frontiers = m_view_evaluator.getMinViewDistance(views, current_pos_vector) ;
