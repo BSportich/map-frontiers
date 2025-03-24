@@ -874,7 +874,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
   m_current_pos.o_z = m_current_pos.z;
-
+  ROS_INFO_COND(verbose_, "CHECK 2 ");
   m_current_pos.x = msg_odom.pose.pose.position.x ;
   m_current_pos.y = msg_odom.pose.pose.position.y ;
   m_current_pos.z = msg_odom.pose.pose.position.z ;
@@ -882,7 +882,8 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.q_y = msg_odom.pose.pose.orientation.y ;
   m_current_pos.q_z = msg_odom.pose.pose.orientation.z ;
   m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
-
+  
+  ROS_INFO_COND(verbose_, "CHECK 3 ");
   //linear speed : should be angular ? 
   m_vel_x = msg_odom.twist.twist.linear.x ;
   m_vel_y = msg_odom.twist.twist.linear.y ;
@@ -990,15 +991,18 @@ void NBV_Selector::publish_views(){
     geometry_msgs::Pose temp_view;
     map_frontiers::conversions::ViewCandidateToGeometryPose(views[i], temp_view);
     geometry_msgs::Point temp_frontier;
-    temp_frontier.x = views[i].o_x;
-    temp_frontier.y = views[i].o_y;
-    temp_frontier.z = views[i].o_z;
+    temp_frontier.x = views_history[i].o_x;
+    temp_frontier.y = views_history[i].o_y;
+    temp_frontier.z = views_history[i].o_z;
     views_set.poses.push_back(temp_view);
 
     // Create markers to represent the fov the view would have
     marker_array.markers.push_back(map_frontiers::visualization::CreateHorizontalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
+
+    ROS_INFO_COND(verbose_, "View history %d %f %f %f %f", i, views_history[i].q_x, views_history[i].q_y, views_history[i].q_z, views_history[i].q_w);
+
   }
   
   for(int i = 0; i < views.size(); i++){
@@ -1014,6 +1018,9 @@ void NBV_Selector::publish_views(){
     marker_array.markers.push_back(map_frontiers::visualization::CreateHorizontalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
+
+    ROS_INFO_COND(verbose_, "View  %d %f %f %f %f", i, views[i].q_x, views[i].q_y, views[i].q_z, views[i].q_w);
+
   }
   views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
