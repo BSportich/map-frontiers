@@ -813,7 +813,62 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   if (!is_started_)
       return;
 
-  
+
+  ///////////////// VERIFICATION OF MESSAGE INTEGRITY 
+
+  if (std::isnan(msg_odom.twist.twist.linear.x)) {
+      ROS_WARN("Warning: Odometry linear.x is NaN.");
+  }
+  if (std::isnan(msg_odom.twist.twist.linear.y)) {
+      ROS_WARN("Warning: Odometry linear.y is NaN.");
+  }
+  if (std::isnan(msg_odom.twist.twist.linear.z)) {
+      ROS_WARN("Warning: Odometry linear.z is NaN.");
+  }
+
+  // Check for NaN in twist.angular
+  if (std::isnan(msg_odom.twist.twist.angular.x)) {
+      ROS_WARN("Warning: Odometry angular.x is NaN.");
+  }
+  if (std::isnan(msg_odom.twist.twist.angular.y)) {
+      ROS_WARN("Warning: Odometry angular.y is NaN.");
+  }
+  if (std::isnan(msg_odom.twist.twist.angular.z)) {
+      ROS_WARN("Warning: Odometry angular.z is NaN.");
+  }
+
+  // Check for NaN in pose.position
+  if (std::isnan(msg_odom.pose.pose.position.x)) {
+      ROS_WARN("Warning: Odometry position.x is NaN.");
+  }
+  if (std::isnan(msg_odom.pose.pose.position.y)) {
+      ROS_WARN("Warning: Odometry position.y is NaN.");
+  }
+  if (std::isnan(msg_odom.pose.pose.position.z)) {
+      ROS_WARN("Warning: Odometry position.z is NaN.");
+  }
+
+  // Check for NaN in pose.orientation
+  if (std::isnan(msg_odom.pose.pose.orientation.x)) {
+      ROS_WARN("Warning: Odometry orientation.x is NaN.");
+  }
+  if (std::isnan(msg_odom.pose.pose.orientation.y)) {
+      ROS_WARN("Warning: Odometry orientation.y is NaN.");
+  }
+  if (std::isnan(msg_odom.pose.pose.orientation.z)) {
+      ROS_WARN("Warning: Odometry orientation.z is NaN.");
+  }
+  if (std::isnan(msg_odom.pose.pose.orientation.w)) {
+      ROS_WARN("Warning: Odometry orientation.w is NaN.");
+  }
+
+  // Check if the message timestamp is zero
+  if (msg_odom.header.stamp.isZero()) {
+      ROS_WARN("Warning: Odometry message has no timestamp.");
+  }
+
+/////////////////////////////////////////////////////////////////
+
 
   ROS_INFO_COND(verbose_, "POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
