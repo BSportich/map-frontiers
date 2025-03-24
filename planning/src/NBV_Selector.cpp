@@ -888,7 +888,8 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_vel_y = msg_odom.twist.twist.linear.y ;
   m_vel_z = msg_odom.twist.twist.linear.z ;
   ROS_INFO_COND(verbose_, "[First] VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
-
+  ROS_INFO_COND(verbose_, "[First] POS VALUES ARE %f %f %f", m_current_pos.x,  m_current_pos.y ,  m_current_pos.z);
+  ROS_INFO_COND(verbose_, "[First] OR VALUES ARE %f %f %f %f", m_current_pos.q_x,  m_current_pos.q_y ,  m_current_pos.q_z, m_current_pos.q_w );
   
 
   if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
@@ -910,6 +911,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
   //if the robot hasn't had a new goal in the last second and is available, find nbv
   if( (m_availability == AVAILABLE) && ( duration.toSec() > 1.0 ) ) {
+    ROS_INFO_COND(verbose_, " Going into selection");
 
     select_next_best_view();
     last_nbv_ = ros::Time::now();
