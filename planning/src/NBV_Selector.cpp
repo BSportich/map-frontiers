@@ -1119,8 +1119,8 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
-    dist_view = (view_vector - current_pos_vector ).norm() ;
-    value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
+    //dist_view = (view_vector - current_pos_vector ).norm() ;
+    //value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
     ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
     // ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
@@ -1205,8 +1205,8 @@ int main(int argc, char** argv) {
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
     
     //////////////Planning parameters
-    sys_params.alpha = 1.0 ;// image component weight
-    sys_params.beta = 0.0 ;// angular/distance cost component weight 
+    sys_params.alpha = 0.0 ;// image component weight
+    sys_params.beta = 1.0 ;// angular/distance cost component weight 
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
