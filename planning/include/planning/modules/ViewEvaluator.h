@@ -24,6 +24,9 @@ private:
     voxblox_map::VoxbloxMap m_map;
     SensorModel sensor_model_ ; 
 
+    float m_dist_min;
+    float m_dist_max;
+
     // params
     double p_ray_step_;
     double p_downsampling_factor_;  // Artificially reduce the minimum resolution
@@ -67,6 +70,7 @@ public:
 
     bool lineOfSightCheck(const ViewCandidate& vc);
     float inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set );
+    float ponder_frontier_by_distance(float frontier_dist_to_vc);
 
 
     float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos, const Eigen::Vector3d& vel);
@@ -80,11 +84,14 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max) 
 {
   m_map = map ;
   m_method_type = method_name ;
   p_ray_step_ = m_map.getVoxelSize() ;
+  m_dist_max = dist_max;
+  m_dist_min = dist_min ;
+
   p_downsampling_factor_ = 1.0 ;
   sensor_model_ = sensor_lidar ; 
   m_threshold_known = threshold ; 
@@ -382,6 +389,8 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   Eigen::Vector3d frontier ;
   Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
   ViewCandidate vc_2 ;
+  float temp_distance = -1 ;
+  float total_distance = 0 ; 
 
   if ( !lineOfSightCheck(vc) ){
     return -2;
@@ -401,6 +410,8 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
 
       if( lineOfSightCheck(vc_2) ){
         result = result +1 ;
+        temp_distance = (frontier - pos).norm() ;
+        total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) ; 
 
       }
 
@@ -410,9 +421,25 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
 
 
   }
-
+  total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
   return result;
+
+}
+
+float ViewEvaluator::ponder_frontier_by_distance(float frontier_dist_to_vc){
+  if ( frontier_dist_to_vc < m_dist_min){
+    return 0.5;
+  }
+
+  if( frontier_dist_to_vc >= m_dist_min && frontier_dist_to_vc <= m_dist_max ){
+    return 1.0 ; 
+  }
+
+  if( frontier_dist_to_vc > m_dist_max){
+    return (0.5 - ( (frontier_dist_to_vc/ sensor_model_.p_ray_length_) * 0.5 ) );
+  }
+
 
 }
 

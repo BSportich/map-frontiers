@@ -353,6 +353,7 @@ void findOrientation(ViewCandidate& vc) { // CHATGPT
     // Prevent NaN values
     if (std::isnan(rotation.x()) || std::isnan(rotation.y()) ||
         std::isnan(rotation.z()) || std::isnan(rotation.w())) {
+        ROS_WARN("Quaternion contains NaN! Resetting to identity.");
         ROS_ERROR("Quaternion contains NaN! Resetting to identity.");
         rotation = tf2::Quaternion(0, 0, 0, 1);
     }
