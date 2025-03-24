@@ -989,7 +989,7 @@ void NBV_Selector::publish_views(){
   //History of selected views
   for(int i = 0; i < views_history.size(); i++){
     geometry_msgs::Pose temp_view;
-    map_frontiers::conversions::ViewCandidateToGeometryPose(views[i], temp_view);
+    map_frontiers::conversions::ViewCandidateToGeometryPose(views_history[i], temp_view);
     geometry_msgs::Point temp_frontier;
     temp_frontier.x = views_history[i].o_x;
     temp_frontier.y = views_history[i].o_y;
