@@ -887,6 +887,7 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_vel_x = msg_odom.twist.twist.linear.x ;
   m_vel_y = msg_odom.twist.twist.linear.y ;
   m_vel_z = msg_odom.twist.twist.linear.z ;
+  ROS_INFO_COND(verbose_, "[First] VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
 
   
 
