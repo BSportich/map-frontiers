@@ -1067,15 +1067,19 @@ void NBV_Selector::select_next_best_view(){
   float total_value = -1 ;
   float value_angular = 0 ;
   float dist_view = 0 ;
-  float dist_min_frontiers = -1 ;
+  float dist_min_views = -1 ;
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
   // ROS_INFO_COND(verbose_, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
 
-
-  dist_min_frontiers = m_view_evaluator.getMinViewDistance(views, current_pos_vector) ;
-  ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_frontiers);
+  if (views.size() > 0){
+    dist_min_views = m_view_evaluator.getMinViewDistance(views, current_pos_vector) ;
+  }
+  else{
+    ROS_INFO_COND(verbose_, "NO VIEWS TO CHECK FOR DISTANCE VIEWS ");
+  }
+  ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_views);
 
 
   m_current_goal = m_current_pos;
@@ -1116,7 +1120,7 @@ void NBV_Selector::select_next_best_view(){
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
     dist_view = (view_vector - current_pos_vector ).norm() ;
-    value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_frontiers, dist_view ) ; 
+    value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
     ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
     // ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
