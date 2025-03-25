@@ -77,6 +77,7 @@ private:
     ViewGenerator m_view_generator;
     std::vector<ViewCandidate> views;
     std::vector<ViewCandidate> views_history;
+    std::vector<ViewCandidate> rejected_views;
     std::vector<Eigen::Vector3d> frontiers_set ;
     std::vector<Eigen::Vector3d> frontiers_subset ;
 
@@ -1012,7 +1013,17 @@ void NBV_Selector::publish_views(){
 
   
   //rejected_views
-  for(int i = 0; i < m_view_generator.getRejectedViews() )
+  rejected_views = m_view_generator.getRejectedViews() ; 
+  for(int i = 0; i < rejected_views.size(); i++){
+    geometry_msgs::Pose temp_view;
+    map_frontiers::conversions::ViewCandidateToGeometryPose(rejected_views[i], temp_view);
+    geometry_msgs::Point temp_frontier;
+    temp_frontier.x = rejected_views[i].o_x;
+    temp_frontier.y = rejected_views[i].o_y;
+    temp_frontier.z = rejected_views[i].o_z;
+    rejected_views_set.poses.push_back(temp_view);
+
+  }
 
   //History of selected views
   for(int i = 0; i < views_history.size(); i++){
