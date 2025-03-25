@@ -807,7 +807,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     generate_views() ; 
     number_views = views.size();
     
-    while( number_views = 0 ){
+    while( number_views == 0 ){
       number_resampling = number_resampling +1 ; 
       ROS_INFO_COND(verbose_, "[ESDF callback] Found no views... Resampling for the %d times ", number_resampling);
       //sample frontiers
