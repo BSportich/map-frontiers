@@ -1229,8 +1229,8 @@ int main(int argc, char** argv) {
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
     
     //////////////Planning parameters
-    sys_params.alpha = 0.0 ;// image component weight
-    sys_params.beta = 1.0 ;// angular/distance cost component weight 
+    sys_params.alpha = 1.0 ;// image component weight
+    sys_params.beta = 0.0 ;// angular/distance cost component weight 
     sys_params.gamma = 1 ;  // BOOLEAN : 0 or 1 /// IF 0 distance is NOT taken into account in the angular/distance component 
 
     //////////////View Generation parameters
