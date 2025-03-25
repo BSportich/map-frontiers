@@ -378,6 +378,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
     view_candidates.clear();
     rejected_frontiers.clear();
+    rejected_view_candidates.clear();
 
     for(int i=0; i< frontiers_set.size(); i++){
 
@@ -606,6 +607,11 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         angle_diff = angle_mid;
 
     }
+    if( angle_diff == 0 ){
+        rejected_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
+        rejected_view_candidates.push_back(rejected_view);
+    }
+
     return false;
 
 

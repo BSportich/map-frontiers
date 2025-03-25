@@ -38,6 +38,7 @@ private:
     /* data */
     std::string m_method_type;
     std::vector<ViewCandidate> view_candidates;
+    std::vector<ViewCandidate> rejected_view_candidates;
     float m_distance_max; // max sampling distance from the frontiers
     float m_distance_min; // min sampling distance from the frontiers
     float m_angle_low ; // vertical angle below the drone
@@ -70,8 +71,10 @@ public:
 
     
 
-    std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; };
-    std::vector<Eigen::Vector3d> getRejectedFrontiers(){ return rejected_frontiers; }
+    std::vector<ViewCandidate> getViewCandidates(){ return view_candidates; }; // TO TRANSFORM BY REFERENCE
+    std::vector<Eigen::Vector3d> getRejectedFrontiers(){ return rejected_frontiers; } // TO TRANSFORM BY REFERENCE
+    std::vector<ViewCandidate> getRejectedViews(){ return rejected_view_candidates;} // TO TRANSFORM BY REFERENCE
+    
     std::string getMethod_type(){ return m_method_type; } ;
     bool isSafeView(const Eigen::Vector3d& voxel);
     bool isCorrectPos(const Eigen::Vector3d& pos);

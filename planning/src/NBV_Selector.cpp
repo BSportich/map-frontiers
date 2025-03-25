@@ -98,6 +98,7 @@ private:
 
     //views generated poses
     geometry_msgs::PoseArray views_set; 
+    geometry_msgs::PoseArray rejected_views_set; 
     int m_sub_sample_size_ ;
     float m_tolerance_distance_ ; 
     double m_threshold_known ; 
@@ -131,6 +132,7 @@ private:
     ros::Publisher pub_test_values2;
     //views and selected views
     ros::Publisher pub_views ; 
+    ros::Publisher pub_rejected_views ; 
     ros::Publisher pub_views_marker ; 
     ros::Publisher pub_nbv ; 
 
@@ -272,6 +274,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     views = std::vector<ViewCandidate>();
     views_history = std::vector<ViewCandidate>();
     views_set = geometry_msgs::PoseArray();
+    rejected_views_set = geometry_msgs::PoseArray();
 
 
     //ros initialization
@@ -298,6 +301,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
           "unknown_point_cloud", 1, true);
 
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
+    pub_rejected_views = n.advertise<geometry_msgs::PoseArray>("rejected_views", 1, true);
     pub_views_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
 
@@ -1004,6 +1008,11 @@ void NBV_Selector::publish_views(){
   float range_for_viz = 0.3;
 
   views_set.poses.clear();
+  rejected_views_set.poses.clear();
+
+  
+  //rejected_views
+  for(int i = 0; i < m_view_generator.getRejectedViews() )
 
   //History of selected views
   for(int i = 0; i < views_history.size(); i++){
@@ -1042,7 +1051,9 @@ void NBV_Selector::publish_views(){
 
   }
   views_set.header.frame_id = world_frame_;
+  rejected_views_set.header.frame_id = world_frame_;
   pub_views.publish(views_set);
+  pub_rejected_views.publish( rejected_views_set);
   pub_views_marker.publish(marker_array);
 
 
