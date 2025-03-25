@@ -1,9 +1,5 @@
 <launch>
-  <arg name="sub_sample_size" default="10" />
   <arg name="namespace" default="" />
-  <arg name="timer" default="false" />
-  <arg name="verbose" default="false" />
-  <arg name="extra_viz" default="false" />
 
   <group ns="$(arg namespace)">
     <node name="drone_NBV_selector" pkg="map_frontiers" type="NBV_Selector" output="screen">
@@ -17,11 +13,11 @@
         <param name="voxel_size" command="rosparam get /voxel_size" />
         <param name="voxels_per_side" command="rosparam get /voxels_per_side" />
         
-        <param name="sub_sample_size" value="$(arg sub_sample_size)" />
+        <param name="sub_sample_size" command="rosparam get /NBV_selector/nb_of_subsampled_views" />
 
-        <param name="timer" value="$(arg timer)" />
-        <param name="verbose" value="$(arg verbose)" />
-        <param name="extra_viz" value="$(arg extra_viz)" />
+        <param name="timer" command="rosparam get /NBV_selector/timer" />
+        <param name="verbose" command="rosparam get /NBV_selector/verbose" />
+        <param name="extra_viz" command="rosparam get /NBV_selector/extra_viz" />
     </node>
   </group>
 </launch>
