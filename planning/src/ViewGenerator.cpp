@@ -741,6 +741,26 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     // gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
     // gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
     // gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
+
+    ROS_INFO("List voxels analyzed");
+    Eigen::Vector3d* center; 
+    m_map.getVoxelCenter_ESDF( voxel, center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    m_map.getVoxelCenter_ESDF( voxel + shift_x , center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    m_map.getVoxelCenter_ESDF( voxel - shift_x , center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    m_map.getVoxelCenter_ESDF( voxel + shift_y , center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    m_map.getVoxelCenter_ESDF( voxel - shift_y , center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    m_map.getVoxelCenter_ESDF( voxel + shift_z , center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    m_map.getVoxelCenter_ESDF( voxel - shift_z , center );
+    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+    ROS_INFO("End list");
+
+
     
     
 
@@ -801,7 +821,7 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
 
 //Hardouin method 
 Eigen::Vector3d ViewGenerator::computeGradient_26(const Eigen::Vector3d& voxel){
-    // ROS_INFO("Gradient hardouin");
+    ROS_INFO("Gradient hardouin");
 
 
     Eigen::Vector3d grad_dir ; 
