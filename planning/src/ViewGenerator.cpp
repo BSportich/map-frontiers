@@ -743,21 +743,30 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     // gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
 
     ROS_INFO("List voxels analyzed");
-    Eigen::Vector3d* center; 
-    m_map.getVoxelCenter_ESDF( center, voxel );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( center , voxel + shift_x );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( center , voxel - shift_x );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( center , voxel + shift_y );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( center , voxel - shift_y );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( center , voxel + shift_z );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( center , voxel - shift_z );
-    ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
+
+    Eigen::Vector3d center;
+    if (m_map.getVoxelCenter_ESDF(&center, voxel)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    if (m_map.getVoxelCenter_ESDF(&center, voxel + shift_x)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    if (m_map.getVoxelCenter_ESDF(&center, voxel - shift_x)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    if (m_map.getVoxelCenter_ESDF(&center, voxel + shift_y)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    if (m_map.getVoxelCenter_ESDF(&center, voxel - shift_y)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    if (m_map.getVoxelCenter_ESDF(&center, voxel + shift_z)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    if (m_map.getVoxelCenter_ESDF(&center, voxel - shift_z)) {
+        ROS_INFO("%f %f %f", center.x(), center.y(), center.z());
+    }
+    
     ROS_INFO("End list");
 
 
