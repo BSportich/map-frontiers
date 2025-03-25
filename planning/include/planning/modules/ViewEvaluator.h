@@ -423,7 +423,8 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   }
   total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
-  return result;
+  return total_distance;
+  //return result;
 
 }
 
@@ -437,7 +438,7 @@ float ViewEvaluator::ponder_frontier_by_distance(float frontier_dist_to_vc){
   }
 
   if( frontier_dist_to_vc > m_dist_max){
-    return (0.5 - ( (frontier_dist_to_vc/ sensor_model_.p_ray_length_) * 0.5 ) );
+    return (0.5 - ( ( (frontier_dist_to_vc - m_dist_max) / (sensor_model_.p_ray_length_ - m_dist_max) )* 0.5 ) );
   }
 
 
