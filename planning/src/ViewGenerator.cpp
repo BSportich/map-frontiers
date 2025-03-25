@@ -744,19 +744,19 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
 
     ROS_INFO("List voxels analyzed");
     Eigen::Vector3d* center; 
-    m_map.getVoxelCenter_ESDF( voxel, center );
+    m_map.getVoxelCenter_ESDF( center, voxel );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( voxel + shift_x , center );
+    m_map.getVoxelCenter_ESDF( center , voxel + shift_x );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( voxel - shift_x , center );
+    m_map.getVoxelCenter_ESDF( center , voxel - shift_x );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( voxel + shift_y , center );
+    m_map.getVoxelCenter_ESDF( center , voxel + shift_y );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( voxel - shift_y , center );
+    m_map.getVoxelCenter_ESDF( center , voxel - shift_y );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( voxel + shift_z , center );
+    m_map.getVoxelCenter_ESDF( center , voxel + shift_z );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
-    m_map.getVoxelCenter_ESDF( voxel - shift_z , center );
+    m_map.getVoxelCenter_ESDF( center , voxel - shift_z );
     ROS_INFO("%f %f %f", center->x(), center->y(), center->z());
     ROS_INFO("End list");
 
