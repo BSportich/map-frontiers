@@ -36,6 +36,7 @@ struct system_parameters
     //////////////Planning parameters
     float alpha;
     float beta ;
+    bool gamma ; 
 
     //////////////View Generation parameters
     std::string method_view_generation ; 
@@ -86,6 +87,7 @@ private:
     //planning parameters
     float m_alpha ;
     float m_beta ; 
+    bool m_gamma ;
 
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
@@ -254,6 +256,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     m_alpha = sys_param.alpha ;
     m_beta = sys_param.beta ;
+    m_gamma = sys_param.gamma ;
 
 
     //frontiers
@@ -798,7 +801,23 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     // publish_test_voxels(); 
     // //ROS_INFO_COND(verbose_, "[ESDF callback] Published test voxels ! ");
 
+    int number_views = 0 ;
+    int number_resampling = 0 ; 
+
     generate_views() ; 
+    number_views = views.size();
+    
+    while( number_views = 0 ){
+      number_resampling = number_resampling +1 ; 
+      ROS_INFO_COND(verbose_, "[ESDF callback] Found no views... Resampling for the %d times ", number_resampling);
+      //sample frontiers
+      sample_subset_frontiers_shells();
+      generate_views() ; 
+      number_views = views.size();
+
+
+    }
+
     ROS_INFO_COND(verbose_, "Views generated !" );
     publish_views();
     ROS_INFO_COND(verbose_,"Views published !");
@@ -1019,7 +1038,7 @@ void NBV_Selector::publish_views(){
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
 
-    ROS_INFO_COND(verbose_, "View  %d %f %f %f %f", i, views[i].q_x, views[i].q_y, views[i].q_z, views[i].q_w);
+    // ROS_INFO_COND(verbose_, "View  %d %f %f %f %f", i, views[i].q_x, views[i].q_y, views[i].q_z, views[i].q_w);
 
   }
   views_set.header.frame_id = world_frame_;
@@ -1119,8 +1138,13 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
-    //dist_view = (view_vector - current_pos_vector ).norm() ;
-    //value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
+    
+    //IF DISTANCE IS TAKEN  INTO ACCOUNT
+    if ( m_gamma == true ){
+      dist_view = (view_vector - current_pos_vector ).norm() ;
+      value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
+    }
+
     ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
     // ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
@@ -1207,6 +1231,7 @@ int main(int argc, char** argv) {
     //////////////Planning parameters
     sys_params.alpha = 0.0 ;// image component weight
     sys_params.beta = 1.0 ;// angular/distance cost component weight 
+    sys_params.gamma = 1 ;  // BOOLEAN : 0 or 1 /// IF 0 distance is NOT taken into account in the angular/distance component 
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
