@@ -395,7 +395,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         }
 
         if(generated == false && angle_diff == 0 ){
-            // ROS_INFO(" FAILURE : Gradient failed  %d ",i);
+            ROS_INFO(" FAILURE : Gradient failed  %d ",i);
             rejected_frontiers.push_back( frontier ) ;
             continue ; 
 
