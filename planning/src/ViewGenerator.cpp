@@ -741,10 +741,12 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     // gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
     // gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
     // gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
+    
+    
 
-    gradient_vector.x() = m_map.getDistancePrecise_ESDF( voxel + shift_x) - m_map.getDistancePrecise_ESDF( voxel - shift_x);
-    gradient_vector.y() = m_map.getDistancePrecise_ESDF( voxel + shift_y) - m_map.getDistancePrecise_ESDF( voxel - shift_y);
-    gradient_vector.z() = m_map.getDistancePrecise_ESDF( voxel + shift_z) - m_map.getDistancePrecise_ESDF( voxel - shift_z);
+    gradient_vector.x() = m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel - shift_x);
+    gradient_vector.y() = m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel - shift_y);
+    gradient_vector.z() = m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel - shift_z);
 
     gradient_vector.x() = gradient_vector.x() / (2 *vs) ; 
     gradient_vector.y() = gradient_vector.y() / (2*vs) ;
@@ -753,9 +755,9 @@ Eigen::Vector3d ViewGenerator::computeGradient(const Eigen::Vector3d& voxel){
     if (gradient_vector.norm() == 0){
         //if gradient = 0 use forward difference
 
-        gradient_vector.x() = ( m_map.getDistancePrecise_ESDF( voxel + shift_x) - m_map.getDistancePrecise_ESDF( voxel ) ) / vs ;
-        gradient_vector.y() = ( m_map.getDistancePrecise_ESDF( voxel + shift_y) - m_map.getDistancePrecise_ESDF( voxel ) ) / vs ;
-        gradient_vector.z() = (m_map.getDistancePrecise_ESDF( voxel + shift_z) - m_map.getDistancePrecise_ESDF( voxel ) ) /vs ;
+        gradient_vector.x() = ( m_map.getVoxelDistance_ESDF( voxel + shift_x) - m_map.getVoxelDistance_ESDF( voxel ) ) / vs ;
+        gradient_vector.y() = ( m_map.getVoxelDistance_ESDF( voxel + shift_y) - m_map.getVoxelDistance_ESDF( voxel ) ) / vs ;
+        gradient_vector.z() = (m_map.getVoxelDistance_ESDF( voxel + shift_z) - m_map.getVoxelDistance_ESDF( voxel ) ) /vs ;
 
     }
 
