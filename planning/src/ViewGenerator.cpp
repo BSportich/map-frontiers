@@ -384,7 +384,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         ViewCandidate vc; 
         Eigen::Vector3d frontier = frontiers_set[i];
-        // ROS_INFO(" Generating view for frontier %d ",i);
+        ROS_INFO(" Generating view for frontier %d ",i);
         generated = generateview_normal(frontier, 0, angle_diff, vc);
 
         //if worked 
@@ -524,7 +524,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     ViewCandidate temp_view = { test_point.x() , test_point.y() , test_point.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
     findOrientation(temp_view) ; 
     verify_angle( frontier, temp_view, vertical_view_angle ) ; 
-    ROS_INFO(" Angle found is %f", vertical_view_angle);
+    ROS_INFO(" Original angle found is %f", vertical_view_angle);
 
 
     //TO DO : test the uncommented line
