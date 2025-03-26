@@ -135,6 +135,7 @@ private:
     ros::Publisher pub_views ; 
     ros::Publisher pub_rejected_views ; 
     ros::Publisher pub_views_marker ; 
+    ros::Publisher pub_views_rejected_marker ; 
     ros::Publisher pub_nbv ; 
 
 
@@ -304,6 +305,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
     pub_rejected_views = n.advertise<geometry_msgs::PoseArray>("rejected_views", 1, true);
     pub_views_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
+    pub_views_rejected_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
 
 
@@ -1006,6 +1008,7 @@ void NBV_Selector::publish_views(){
   // if (!extra_viz_)
   //   return;
   visualization_msgs::MarkerArray marker_array;
+  visualization_msgs::MarkerArray marker_array_rejects;
   float range_for_viz = 0.3;
 
   views_set.poses.clear();
@@ -1022,6 +1025,12 @@ void NBV_Selector::publish_views(){
     temp_frontier.y = rejected_views[i].o_y;
     temp_frontier.z = rejected_views[i].o_z;
     rejected_views_set.poses.push_back(temp_view);
+
+    // Create markers to represent the fov the view would have
+    marker_array_rejects.markers.push_back(map_frontiers::visualization::CreateHorizontalFOVMarker(temp_view, i, range_for_viz));
+    marker_array_rejects.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
+    marker_array_rejects.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
+
 
   }
 
@@ -1066,6 +1075,8 @@ void NBV_Selector::publish_views(){
   pub_views.publish(views_set);
   pub_rejected_views.publish( rejected_views_set);
   pub_views_marker.publish(marker_array);
+
+  pub_views_rejected_marker.publish( marker_array_rejects ) ;
 
 
 
