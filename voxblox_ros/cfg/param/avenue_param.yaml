@@ -16,6 +16,7 @@ reliable_band_ratio: 2.0
 reliable_normal_ratio_thre: 0.05
 
 # ESDF integration
+use_freespace_pointcloud: true
 local_range_offset_x: 20
 local_range_offset_y: 20
 local_range_offset_z: 5
