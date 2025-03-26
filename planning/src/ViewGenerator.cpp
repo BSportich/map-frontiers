@@ -402,7 +402,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         }
         
-
+        ROS_INFO(" FAILURE : Rotation required  %d ",i);
         // ROS_INFO(" ROTATION %d ",i);
         // // search for new view with a corrected vertical angle
         // generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
@@ -423,6 +423,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
     }
     total = (nb_rotation + nb_sucess) / frontiers_set.size() ; 
     ROS_INFO(" SUCCESS RATE VIEWS IS %f ",total);
+    ROS_INFO(" REJECTED VIEWS SIZE IS %d ", rejected_view_candidates.size());
 
 
 
@@ -591,7 +592,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if(mid){
         findOrientation(mid_view) ; 
         isAngleok = verify_angle( frontier, mid_view , angle_mid ) ; 
-        ROS_INFO(" Angle found is %f", angle_mid);
+        // ROS_INFO(" Angle found is %f", angle_mid);
         if( isAngleok ){
             // ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
             // ROS_INFO(" mid view found %f %f %f", mid_view.x, mid_view.y, mid_view.z);
@@ -604,7 +605,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if(minimum){
         findOrientation(min_view) ; 
         isAngleok = verify_angle( frontier, min_view , angle_min ) ; 
-        ROS_INFO(" Angle found is  %f", angle_min);
+        // ROS_INFO(" Angle found is  %f", angle_min);
         if( isAngleok ){
             // ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
             // ROS_INFO(" min view found %f %f %f", min_view.x, min_view.y, min_view.z);
@@ -616,7 +617,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if (max_bool){
         findOrientation(max_view) ; 
         isAngleok = verify_angle( frontier, max_view , angle_max ) ; 
-        ROS_INFO(" Angle found is  %f", angle_max);
+        // ROS_INFO(" Angle found is  %f", angle_max);
         if( isAngleok ){
             // ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
             // ROS_INFO(" max view found %f %f %f", max_view.x, max_view.y, max_view.z);
