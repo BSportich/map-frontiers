@@ -435,6 +435,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     ViewCandidate min_view ; 
     ViewCandidate mid_view;
     ViewCandidate max_view ;
+    ViewCandidate rejected_view;
     
     Eigen::Vector3d close_point;
     Eigen::Vector3d mid_point;
