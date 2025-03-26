@@ -1003,8 +1003,8 @@ void NBV_Selector::generate_views(){
 }
 
 void NBV_Selector::publish_views(){
-  if (!extra_viz_)
-    return;
+  // if (!extra_viz_)
+  //   return;
   visualization_msgs::MarkerArray marker_array;
   float range_for_viz = 0.3;
 
