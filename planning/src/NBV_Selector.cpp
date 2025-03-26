@@ -235,6 +235,19 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     nh_private.param("sub_sample_size", sys_param.subsampling_views, sys_param.subsampling_views);
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
 
+    nh_private.param("alpha", sys_param.alpha, sys_param.alpha);
+    ROS_INFO("Received sub_sample_size: %f", sys_param.alpha);
+
+    nh_private.param("beta", sys_param.beta, sys_param.beta);
+    ROS_INFO("Received sub_sample_size: %f", sys_param.beta);
+
+    nh_private.param("gamma", sys_param.gamma, sys_param.gamma);
+    if (sys_param.gamma) {
+      ROS_INFO("Using angular and linear distances to compute the cost weight of each view.");
+    } else {
+      ROS_INFO("Using angular distance only to compute the cost weight of each view.");
+    }
+
     nh_private.param("timer", timer_, timer_);
     ROS_INFO("Enabling timer: %s", timer_ ? "true" : "false");
 

@@ -18,6 +18,10 @@
         <param name="timer" command="rosparam get /NBV_selector/timer" />
         <param name="verbose" command="rosparam get /NBV_selector/verbose" />
         <param name="extra_viz" command="rosparam get /NBV_selector/extra_viz" />
+
+        <param name="alpha" command="rosparam get /NBV_selector/image_component_weight" />
+        <param name="beta" command="rosparam get /NBV_selector/metrics_component_weight" />
+        <param name="gamma" command="rosparam get /NBV_selector/use_distance_in_metrics_component" />
     </node>
   </group>
 </launch>
