@@ -526,6 +526,23 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     verify_angle( frontier, temp_view, vertical_view_angle ) ; 
     ROS_INFO(" Original angle found is %f", vertical_view_angle);
 
+    if( vertical_view_angle > m_angle_high ){
+        angle_diff = m_angle_high - angle_mid ;
+        rejected_view_candidates.push_back(temp_view);
+        ROS_INFO(" Angle rejected :  %f ! Too high ! ", vertical_view_angle);
+        return false;
+    }
+    else if( vertical_view_angle < m_angle_low ){
+        angle_diff = m_angle_low - angle_mid ;
+        rejected_view_candidates.push_back(temp_view);
+        ROS_INFO(" Angle rejected :  %f ! Too low ! ", vertical_view_angle);
+        return false;
+    }
+    else {
+        angle_diff = 0;
+        ROS_INFO(" Angle accepted :  %f ! ", vertical_view_angle);
+    }
+
 
     //TO DO : test the uncommented line
     //current_pos = current_pos + ( (m_distance_min / m_map.getVoxelSize() ) -1 ) * vector_director ; 
@@ -611,20 +628,22 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     }
 
     // ROS_INFO("No position found : angle mid is  %f", angle_mid);
-    if( angle_mid > m_angle_high ){
-        angle_diff = m_angle_high - angle_mid ;
-    }
-    else if( angle_mid < m_angle_low ){
-        angle_diff = m_angle_low - angle_mid ;
-    }
-    else {
-        angle_diff = angle_mid;
+    // if( angle_mid > m_angle_high ){
+    //     angle_diff = m_angle_high - angle_mid ;
+    // }
+    // else if( angle_mid < m_angle_low ){
+    //     angle_diff = m_angle_low - angle_mid ;
+    // }
+    // else {
+    //     angle_diff = angle_mid;
 
-    }
+    // }
 
     if( angle_diff == 0 ){
         rejected_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
         rejected_view_candidates.push_back(rejected_view);
+        ROS_INFO(" Angle correct but could not find any view ");
+
     }
 
     return false;
