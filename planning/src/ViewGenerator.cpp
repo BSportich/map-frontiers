@@ -517,7 +517,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
 
     //ANGLE VERIFICATION
-    ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
+    // ROS_INFO(" Angle should be between %f and %f", m_angle_low, m_angle_high);
 
     float vertical_view_angle = 0 ; 
     Eigen::Vector3d test_point = current_pos + 10 * vector_director; 
@@ -529,18 +529,18 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if( vertical_view_angle > m_angle_high ){
         angle_diff = m_angle_high - angle_mid ;
         rejected_view_candidates.push_back(temp_view);
-        ROS_INFO(" Angle rejected :  %f ! Too high ! ", vertical_view_angle);
+        // ROS_INFO(" Angle rejected :  %f ! Too high ! ", vertical_view_angle);
         return false;
     }
     else if( vertical_view_angle < m_angle_low ){
         angle_diff = m_angle_low - angle_mid ;
         rejected_view_candidates.push_back(temp_view);
-        ROS_INFO(" Angle rejected :  %f ! Too low ! ", vertical_view_angle);
+        // ROS_INFO(" Angle rejected :  %f ! Too low ! ", vertical_view_angle);
         return false;
     }
     else {
         angle_diff = 0;
-        ROS_INFO(" Angle accepted :  %f ! ", vertical_view_angle);
+        // ROS_INFO(" Angle accepted :  %f ! ", vertical_view_angle);
     }
 
 
