@@ -305,7 +305,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     pub_views = n.advertise<geometry_msgs::PoseArray>("views", 1, true);
     pub_rejected_views = n.advertise<geometry_msgs::PoseArray>("rejected_views", 1, true);
     pub_views_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
-    pub_views_rejected_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker", 1, true);
+    pub_views_rejected_marker = n.advertise<visualization_msgs::MarkerArray>("views_marker_rejected", 1, true);
     pub_nbv = n.advertise<geometry_msgs::Pose>("the_next_best_view", 1, true);
 
 
