@@ -17,14 +17,14 @@
     <rosparam file="$(find voxblox_ros)/cfg/param/avenue_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/avenue_calib.yaml"/>
     <!-- Have to set the following parameters manually but should be improved in ros 2 -->
-    <param name="voxel_size" command="rosparam get /voxel_size" />
-    <param name="occ_voxel_size" command="rosparam get /voxel_size" />
-    <param name="tsdf_voxel_size" command="rosparam get /voxel_size" />
-    <param name="esdf_voxel_size" command="rosparam get /voxel_size" />
-    <param name="voxels_per_side_in_block" command="rosparam get /voxels_per_side" />
-    <param name="occ_voxels_per_side" command="rosparam get /voxels_per_side" />
-    <param name="tsdf_voxels_per_side" command="rosparam get /voxels_per_side" />
-    <param name="esdf_voxels_per_side" command="rosparam get /voxels_per_side" />
+    <param name="voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="occ_voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="tsdf_voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="esdf_voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="voxels_per_side_in_block" type="int" command="rosparam get /voxels_per_side" />
+    <param name="occ_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
+    <param name="tsdf_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
+    <param name="esdf_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
     <param name="robot_model_file" value="$(arg robot_model_file)"/>
   </node>
 
