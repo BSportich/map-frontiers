@@ -8,7 +8,7 @@ class NodeLauncher:
     def __init__(self):
         # Initialize the ROS node
         rospy.init_node('node_launcher', anonymous=True)
-        self._rate = 0.1
+        self._rate = rospy.Rate(0.1)
         self._has_called_services = False
 
         # Get parameters
@@ -28,20 +28,21 @@ class NodeLauncher:
         # Add voxblox to the service client list
         # voxblox_service_name = "/voxblox_node/activate_node"
         # rospy.wait_for_service(voxblox_service_name)
-        # self._service_clients(rospy.ServiceProxy(voxblox_service_name, Empty))
+        # self._service_clients.append(rospy.ServiceProxy(voxblox_service_name, Empty))
 
         # Should work for N number of service
         for drone_id in range(self._number_of_drones):
             full_service_name = self._topic_namespace + str(drone_id) + '/' + self._service_name
             # Wait for the service to be available
             rospy.wait_for_service(full_service_name)
-            self.loginfo("Added service %s to the list of services to call", full_service_name)
-            self._service_clients(rospy.ServiceProxy(full_service_name, Empty))
+            rospy.loginfo("[node_launcher] Added service %s to the list of services to call", full_service_name)
+            self._service_clients.append(rospy.ServiceProxy(full_service_name, Empty))
             
 
     def _LaunchVoxbloxNodeCallback(self, req):
         self._CallServiceClients()
-        return True
+        rospy.loginfo("[node_launcher] Done calling services")
+        return []
     
     def _CallServiceClients(self):
         for client in self._service_clients:
