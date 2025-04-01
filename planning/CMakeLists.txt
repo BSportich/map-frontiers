@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
+catkin_python_setup()
+
 add_definitions(-std=c++14 -Wall -Wextra)
 
 

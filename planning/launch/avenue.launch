@@ -2,8 +2,11 @@
   <!-- Loading map_frontiers's parameters -->
   <rosparam command="load" file="/root/params/map_frontiers_params.yml" />
 
+  <!-- Create a node that will launch all voxblox related node-->
+  <node pkg="map_frontiers" type="voxblox_node_launcher.py" name="voxblox_node_launcher" output="screen" args="" />
+
   <!-- Assigning one nbv selector per existing drone-->
-  <node pkg="voxblox_ros" type="nbv_selector.sh" name="nbv_selector_assigner" output="screen" args="" />
+  <node pkg="map_frontiers" type="nbv_selector.sh" name="nbv_selector_assigner" output="screen" args="" />
 
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
 
