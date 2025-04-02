@@ -476,7 +476,7 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
 void NpTsdfServer::insertPointcloud(
     const sensor_msgs::PointCloud2::Ptr& pointcloud_msg_in) {
   if (!is_activated_) {
-    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    ROS_INFO_THROTTLE(60.0, "[insertPointcloud] Exiting function because voxfield has not been activated.");
     return;
   }
   if (pointcloud_msg_in->header.stamp - last_msg_time_ptcloud_ >=
@@ -596,7 +596,7 @@ void NpTsdfServer::publishSlices() {
 
 void NpTsdfServer::publishMap(bool reset_remote_map) {
   if (!is_activated_) {
-    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    ROS_INFO_THROTTLE(60.0, "[publishMap] Exiting function because voxfield has not been activated.");
     return;
   }
   if (!publish_tsdf_map_) {
@@ -637,7 +637,7 @@ void NpTsdfServer::publishPointclouds() {
 
 void NpTsdfServer::updateMesh() {
   if (!is_activated_) {
-    ROS_INFO_THROTTLE(60.0, "Exiting function because voxfield has not been activated.");
+    ROS_INFO_THROTTLE(60.0, "[updateMesh] Exiting function because voxfield has not been activated.");
     return;
   }
   if (verbose_) {
@@ -795,7 +795,7 @@ void NpTsdfServer::clear() {
 
 void NpTsdfServer::tsdfMapCallback(const voxblox_msgs::Layer& layer_msg) {
   if (!is_activated_) {
-    ROS_INFO_THROTTLE(60.0, "Exiting callback because voxfield has not been activated.");
+    ROS_INFO_THROTTLE(60.0, "[tsdfMapCallback] Exiting callback because voxfield has not been activated.");
     return;
   }
   timing::Timer receive_map_timer("map/receive_tsdf");
