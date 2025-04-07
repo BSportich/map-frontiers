@@ -3,8 +3,12 @@ project(map_frontiers)
 
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(catkin_simple REQUIRED)
+find_package(catkin_simple REQUIRED COMPONENTS rospy)
 catkin_simple(ALL_DEPS_REQUIRED)
+
+catkin_python_setup()
+
+catkin_package()
 
 add_definitions(-std=c++14 -Wall -Wextra)
 

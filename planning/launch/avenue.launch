@@ -2,13 +2,16 @@
   <!-- Loading map_frontiers's parameters -->
   <rosparam command="load" file="/root/params/map_frontiers_params.yml" />
 
+  <!-- Create a node that will launch all voxblox related node-->
+  <node pkg="map_frontiers" type="voxblox_node_launcher.py" name="voxblox_node_launcher" output="screen" args="" />
+
   <!-- Assigning one nbv selector per existing drone-->
-  <node pkg="voxblox_ros" type="nbv_selector.sh" name="nbv_selector_assigner" output="screen" args="" />
+  <node pkg="map_frontiers" type="nbv_selector.sh" name="nbv_selector_assigner" output="screen" args="" />
 
   <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/camera.dae"/>
 
   <!-- Run voxblox_node-->
-  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxblox_server" output="screen" args="-alsologtostderr" clear_params="true">
     <remap from="pointcloud" to="/all_pointclouds"/>
     <!-- If sensor_frame is not set, the tf us -->
     <param name="~sensor_frame"           value=""/>
@@ -17,14 +20,14 @@
     <rosparam file="$(find voxblox_ros)/cfg/param/avenue_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/avenue_calib.yaml"/>
     <!-- Have to set the following parameters manually but should be improved in ros 2 -->
-    <param name="voxel_size" command="rosparam get /voxel_size" />
-    <param name="occ_voxel_size" command="rosparam get /voxel_size" />
-    <param name="tsdf_voxel_size" command="rosparam get /voxel_size" />
-    <param name="esdf_voxel_size" command="rosparam get /voxel_size" />
-    <param name="voxels_per_side_in_block" command="rosparam get /voxels_per_side" />
-    <param name="occ_voxels_per_side" command="rosparam get /voxels_per_side" />
-    <param name="tsdf_voxels_per_side" command="rosparam get /voxels_per_side" />
-    <param name="esdf_voxels_per_side" command="rosparam get /voxels_per_side" />
+    <param name="voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="occ_voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="tsdf_voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="esdf_voxel_size" type="double" command="rosparam get /voxel_size" />
+    <param name="voxels_per_side_in_block" type="int" command="rosparam get /voxels_per_side" />
+    <param name="occ_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
+    <param name="tsdf_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
+    <param name="esdf_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
     <param name="robot_model_file" value="$(arg robot_model_file)"/>
   </node>
 
