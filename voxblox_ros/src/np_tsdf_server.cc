@@ -738,6 +738,7 @@ bool NpTsdfServer::activateNodeCallback(
     std_srvs::Empty::Request& /*request*/, std_srvs::Empty::Response&
     /*response*/) {  // NOLINT
   is_activated_ = true;
+  LOG(INFO) << "Voxfield node has been activated.";
   return is_activated_;
 }
 

@@ -49,9 +49,9 @@ class NodeLauncher:
         for client in self._service_clients:
             try:
                 client() # Call the service
-                self._has_called_services = True
             except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s" % e)
+        self._has_called_services = True
 
     def Spin(self):
         while not rospy.is_shutdown():
