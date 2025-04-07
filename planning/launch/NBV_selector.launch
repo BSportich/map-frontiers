@@ -10,6 +10,8 @@
         <remap from="groundtruth/odom" to="/$(arg namespace)/groundtruth/odom" />
         <remap from="is_idle" to="/$(arg namespace)/mav_local_planner/is_idle" />
 
+        <param name="p_ray_length" type="double" command="rosparam get /lidar_max_range" />
+
         <param name="voxel_size" type="double" command="rosparam get /voxel_size" />
         <param name="voxels_per_side" type="double" command="rosparam get /voxels_per_side" />
 
