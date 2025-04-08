@@ -1,5 +1,5 @@
 <launch>
-  <!-- Loading map_frontiers's parameters and generic params (for lidar_max_range)-->
+  <!-- Loading map_frontiers's parameters and generic params (for lidar_max_range and drone_name)-->
   <rosparam command="load" file="/root/params/map_frontiers_params.yml" />
   <rosparam command="load" file="/root/params/project_avenue_params.yml" />
 
@@ -33,7 +33,7 @@
     <param name="max_ray_length_m" type="double" command="rosparam get /lidar_max_range" />
   </node>
 
-  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/mai_25cm.rviz" />
+  <node pkg="map_frontiers" type="start_rviz.sh" name="rvizvisualisation" output="screen" args="" />
   <!-- To avoid being spammed with rviz warnings -->
   <node pkg="rosservice" type="rosservice" name="rvizvisualisationlogservicecall" args="call --wait /rvizvisualisation/set_logger_level 'ros' 'error'" />
 </launch>
