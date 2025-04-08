@@ -1002,6 +1002,7 @@ void NBV_Selector::publish_goal(){
 
   next_goal.header.stamp = ros::Time::now();  // Set timestamp
   next_goal.header.frame_id = world_frame_;
+
   map_frontiers::conversions::ViewCandidateToGeometryPose(m_current_goal, next_goal.pose);
   pub_goal.publish(next_goal);
 
@@ -1225,7 +1226,15 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(verbose_, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
 
     views_history.push_back( views[index_of_nbv]) ;
-    m_current_goal = views[index_of_nbv];
+
+    //Correct orientation of the goal
+    ViewCandidate goal_corrected = views[index_of_nbv];
+    goal_corrected.z = goal_corrected.o_z ; 
+    m_view_generator.findOrientation(goal_corrected);
+
+    //m_current_goal = views[index_of_nbv];
+    m_current_goal = goal_corrected;
+    
   }
 
 
