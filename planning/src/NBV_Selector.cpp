@@ -232,6 +232,9 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
     ROS_INFO("Received voxels_per_side: %i found", voxels_per_side);
 
+    nh_private.param("p_ray_length", sys_param.p_ray_length, sys_param.p_ray_length);
+    ROS_INFO("Received p_ray_length: %f", sys_param.p_ray_length);
+
     nh_private.param("sub_sample_size", sys_param.subsampling_views, sys_param.subsampling_views);
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
 
