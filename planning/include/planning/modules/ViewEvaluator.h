@@ -244,7 +244,7 @@ float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen:
 
 float ViewEvaluator::evaluate_distance_angle_cost( float value_angular, float dist_min_frontiers, float dist_view ){
   //return value_angular * (dist_min_frontiers / dist_view ) ;
-  return value_angular * exp( - ( dist_view ) )
+  return value_angular * exp( - ( dist_view ) ) ; 
 }
 
 
