@@ -239,10 +239,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
 
     nh_private.param("alpha", sys_param.alpha, sys_param.alpha);
-    ROS_INFO("Received sub_sample_size: %f", sys_param.alpha);
+    ROS_INFO("Received image component coefficient: %f", sys_param.alpha);
 
     nh_private.param("beta", sys_param.beta, sys_param.beta);
-    ROS_INFO("Received sub_sample_size: %f", sys_param.beta);
+    ROS_INFO("Received navigation component coefficient: %f", sys_param.beta);
 
     nh_private.param("gamma", sys_param.gamma, sys_param.gamma);
     if (sys_param.gamma) {
@@ -1154,6 +1154,7 @@ void NBV_Selector::select_next_best_view(){
   m_current_goal = m_current_pos;
 
   ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  ROS_INFO_COND(verbose_, "ALPHA %f BETA %f GAMMA %f", m_alpha, m_beta, m_gamma);
   ros::Time total_view_evaluation_start = ros::Time::now();
 
   for(int i=0;i< views.size();i++){
@@ -1197,7 +1198,7 @@ void NBV_Selector::select_next_best_view(){
 
     ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
-    // ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    //ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
 
     total_value = m_alpha * image_value + m_beta * value_angular ; 
     ROS_INFO_COND(verbose_, "TOTAL VALUE OF  %d is %f", i, total_value);
@@ -1290,7 +1291,7 @@ int main(int argc, char** argv) {
     
     //////////////Planning parameters
     sys_params.alpha = 1.0 ;// image component weight
-    sys_params.beta = 0.0 ;// angular/distance cost component weight 
+    sys_params.beta = 1.0 ;// angular/distance cost component weight 
     sys_params.gamma = 1 ;  // BOOLEAN : 0 or 1 /// IF 0 distance is NOT taken into account in the angular/distance component 
 
     //////////////View Generation parameters
