@@ -1232,8 +1232,10 @@ void NBV_Selector::select_next_best_view(){
 
     //Correct orientation of the goal
     ViewCandidate goal_corrected = views[index_of_nbv];
+    float temp_number = goal_corrected.z ; 
     goal_corrected.z = goal_corrected.o_z ; 
     findOrientation(goal_corrected);
+    goal_corrected.z = temp_number ; 
 
     //m_current_goal = views[index_of_nbv];
     m_current_goal = goal_corrected;
