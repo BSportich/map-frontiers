@@ -23,6 +23,7 @@ private:
     std::string m_method_type;
     voxblox_map::VoxbloxMap m_map;
     SensorModel sensor_model_ ; 
+    bool m_occlusion ; 
 
     float m_dist_min;
     float m_dist_max;
@@ -53,7 +54,7 @@ private:
     bool m_frontier6;
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion) ;
     ViewEvaluator(){};
     ~ViewEvaluator();
 
@@ -68,7 +69,7 @@ public:
     float evaluate_voxel_image(const Eigen::Vector3d point);
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
-    bool lineOfSightCheck(const ViewCandidate& vc);
+    bool lineOfSightCheck(const ViewCandidate& vc,  float& nb_unknown_voxels );
     float inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set );
     float ponder_frontier_by_distance(float frontier_dist_to_vc);
 
@@ -84,13 +85,14 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion) 
 {
   m_map = map ;
   m_method_type = method_name ;
   p_ray_step_ = m_map.getVoxelSize() ;
   m_dist_max = dist_max;
   m_dist_min = dist_min ;
+  m_occlusion = occlusion ;
 
   p_downsampling_factor_ = 1.0 ;
   sensor_model_ = sensor_lidar ; 
@@ -391,9 +393,11 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
   ViewCandidate vc_2 ;
   float temp_distance = -1 ;
+  float voxel_distance = -10000;
   float total_distance = 0 ; 
+  float nb_unknown_vox = -1;
 
-  if ( !lineOfSightCheck(vc) ){
+  if ( !lineOfSightCheck(vc, nb_unknown_vox) ){
     return -2;
   }
 
@@ -409,10 +413,20 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
       vc_2.o_y = frontier.y();
       vc_2.o_z = frontier.z(); 
 
-      if( lineOfSightCheck(vc_2) ){
+      if( lineOfSightCheck(vc_2, nb_unknown_vox) ){
         result = result +1 ;
         temp_distance = (frontier - pos).norm() ;
-        total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) ; 
+        voxel_distance = temp_distance / m_map.getVoxelSize() ;
+
+        if ( m_occlusion ){
+          total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) * pow(2, -( nb_unknown_vox/ voxel_distance) ); 
+        }
+        else{
+          total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) ; 
+
+        }
+
+
 
       }
 
@@ -445,7 +459,7 @@ float ViewEvaluator::ponder_frontier_by_distance(float frontier_dist_to_vc){
 
 }
 
-bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
+bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_voxels ){
   Eigen::Vector3d frontier(vc.o_x, vc.o_y, vc.o_z);
   Eigen::Vector3d view( vc.x, vc.y, vc.z);
   Eigen::Vector3d direction = (view - frontier).normalized() ; 
@@ -453,7 +467,7 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
   Eigen::Vector3d new_pos = frontier ; 
   Eigen::Vector3d old_pos = frontier ; // deepcopy ? yes. 
   char state ;
-
+  float unknown_vox = 0;
   for(int i=0; i< ( 2* distance) ; i++  ){ // while ?
 
     new_pos = new_pos + direction ; 
@@ -467,6 +481,10 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
 
       old_pos = new_pos;
       state = m_map.getVoxelState_TSDF(new_pos, m_threshold_known ); 
+
+      if(  state == voxblox_map::VoxbloxMap::UNKNOWN){
+        unknown_vox = unknown_vox +1;
+      } 
       if( state == voxblox_map::VoxbloxMap::OCCUPIED ){
         return false;
       }
@@ -475,7 +493,7 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc){
 
 
   }
-
+  nb_unknown_voxels = unknown_vox;
   return true;
 }
 
