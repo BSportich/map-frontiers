@@ -396,6 +396,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   float voxel_distance = -10000;
   float total_distance = 0 ; 
   float nb_unknown_vox = -1;
+  float average_dist_frontier = 0 ;
 
   if ( !lineOfSightCheck(vc, nb_unknown_vox) ){
     return -2;
@@ -417,6 +418,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
         result = result +1 ;
         temp_distance = (frontier - pos).norm() ;
         voxel_distance = temp_distance / m_map.getVoxelSize() ;
+        average_dist_frontier = average_dist_frontier + temp_distance ; 
 
         if ( m_occlusion ){
           total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) * pow(2, -( nb_unknown_vox/ voxel_distance) ); 
@@ -436,6 +438,8 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
 
 
   }
+  average_dist_frontier= average_dist_frontier/result;
+  ROS_INFO(verbose_, "AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
   total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
   return total_distance;
