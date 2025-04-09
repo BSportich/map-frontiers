@@ -439,7 +439,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
 
   }
   average_dist_frontier= average_dist_frontier/result;
-  ROS_INFO(verbose_, "AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
+  ROS_INFO("AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
   total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
   return total_distance;
