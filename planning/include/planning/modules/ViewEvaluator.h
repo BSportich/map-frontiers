@@ -417,7 +417,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
       if( lineOfSightCheck(vc_2, nb_unknown_vox) ){
         result = result +1 ;
         temp_distance = (frontier - pos).norm() ;
-        voxel_distance = temp_distance / m_map.getVoxelSize() ;
+        voxel_distance = temp_distance * m_map.getVoxelSize() ;
         average_dist_frontier = average_dist_frontier + temp_distance ; 
 
         if ( m_occlusion ){
