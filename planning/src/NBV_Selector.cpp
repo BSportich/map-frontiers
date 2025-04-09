@@ -37,6 +37,7 @@ struct system_parameters
     float alpha;
     float beta ;
     bool gamma ; 
+    bool occlusion;
 
     //////////////View Generation parameters
     std::string method_view_generation ; 
@@ -269,7 +270,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     std::string method = sys_param.method_view_generation ;
     m_view_generator = ViewGenerator(method, sys_param.distance_min, sys_param.distance_max, m_map, sys_param.robot_radius, sys_param.angle_low, sys_param.angle_high);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
-    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max, sys_param.distance_min, sys_param.distance_max );
+    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max, sys_param.distance_min, sys_param.distance_max, sys_param.occlusion );
     m_sub_sample_size_ = sys_param.subsampling_views ; 
     m_tolerance_distance_ = sys_param.tolerance_distance ; 
     m_threshold_known = sys_param.threshold_known ; 
@@ -1154,7 +1155,7 @@ void NBV_Selector::select_next_best_view(){
   m_current_goal = m_current_pos;
 
   ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
-  ROS_INFO_COND(verbose_, "ALPHA %f BETA %f GAMMA %f", m_alpha, m_beta, m_gamma);
+  ROS_INFO_COND(verbose_, "ALPHA %f BETA %f GAMMA %d", m_alpha, m_beta, m_gamma);
   ros::Time total_view_evaluation_start = ros::Time::now();
 
   for(int i=0;i< views.size();i++){
@@ -1293,6 +1294,7 @@ int main(int argc, char** argv) {
     sys_params.alpha = 1.0 ;// image component weight
     sys_params.beta = 1.0 ;// angular/distance cost component weight 
     sys_params.gamma = 1 ;  // BOOLEAN : 0 or 1 /// IF 0 distance is NOT taken into account in the angular/distance component 
+    sys_params.occlusion = true; 
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
