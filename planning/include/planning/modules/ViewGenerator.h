@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdlib>
 #include <voxblox_map/voxblox_map.h>
-#include <utils.h>
+#include <planning/modules/utils.h>
 
 
 struct ViewCandidate
