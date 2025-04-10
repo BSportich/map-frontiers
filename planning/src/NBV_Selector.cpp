@@ -1299,8 +1299,8 @@ int main(int argc, char** argv) {
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
-    sys_params.distance_min = 1;
-    sys_params.distance_max = 2;
+    sys_params.distance_min = 3;
+    sys_params.distance_max = 4;
     sys_params.subsampling_views = 100 ;
     sys_params.robot_radius = 8; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
     sys_params.angle_low = -25 ; // vertical angle below the drone 
