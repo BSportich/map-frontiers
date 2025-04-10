@@ -555,6 +555,7 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
   unsigned char current_state;
   bool is_surface = false;
   bool close_unknown = false;
+  bool close_empty = false;
 
   if( voxel.z() <= 0){   //TO CHECK
     return false;
@@ -576,13 +577,21 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
       close_unknown = true;
       unknown_vox = voxel + c_neighbor_voxels_[i] ;
       // ROS_INFO( "FOUND UNKNOWN %f %f %f", unknown_vox.x(), unknown_vox.y(), unknown_vox.z());
-      return true;
+      //return true;
     }
+
+    if (voxel_state == voxblox_map::VoxbloxMap::FREE) {
+      close_empty = true;
+      //return true;
+    }
+
+
 
 
   }
 
-  if( is_surface && close_unknown ){
+  //if( is_surface && close_unknown ){
+  if( is_surface && close_unknown && close_empty ){
     return true;
   }
   return false;
