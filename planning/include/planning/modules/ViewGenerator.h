@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdlib>
 #include <voxblox_map/voxblox_map.h>
-
+#include <modules/utils.h>
 
 
 struct ViewCandidate
@@ -64,7 +64,6 @@ public:
     void generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set);
 
 
-    bool verify_angle(const Eigen::Vector3d& frontier,const ViewCandidate& vc, float& angle);
     Eigen::Vector3d computeGradient(const Eigen::Vector3d& voxel);
     Eigen::Vector3d computeGradient_26(const Eigen::Vector3d& voxel);
     Eigen::Vector3d computeGradient_Sobel(const Eigen::Vector3d& voxel);

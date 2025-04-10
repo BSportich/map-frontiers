@@ -1,0 +1,42 @@
+// utils.h
+#pragma once  // or use include guards
+
+#include <math.h>
+#include <Eigen/Eigen>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
+// Function declarations
+
+bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high);
+
+bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high){
+
+    //if find orientation failed to find a direction
+    if( vc.q_x == 0 &&  vc.q_y == 0 && vc.q_z == 0 && vc.q_w == 0 ){
+        return false;
+    }
+
+    double vertical_angle_rad = 0 ;
+    double vertical_angle_deg = 0 ;
+    Eigen::Vector3d next_voxel( vc.x, vc.y, vc.z );
+
+    //Compute direction with frontier
+    Eigen::Vector3d direction_original = (next_voxel - frontier).normalized() ; // from view candidate, towards frontier
+    Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
+    direction_proj.normalize() ;
+    
+    //Compute signed vertical angle
+    //vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
+    vertical_angle_rad = std::atan2(direction_original.z(), direction_proj.norm()); //same as last line
+    vertical_angle_deg = vertical_angle_rad * (180.0 / M_PI);
+
+    // ROS_INFO("Angle found is function is  %f", vertical_angle_deg);
+    angle = vertical_angle_deg;
+    if( (vertical_angle_deg < angle_high ) && (vertical_angle_deg > angle_low) ){
+        angle = vertical_angle_deg;
+        return true;
+    }
+
+    return false;
+
+}

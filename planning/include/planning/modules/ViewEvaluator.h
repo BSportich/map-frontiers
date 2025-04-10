@@ -6,6 +6,7 @@
 #include <string>
 #include <planning/modules/SensorModel.h>
 #include "ros/ros.h"
+#include <modules/utils.h>
 
 
 
@@ -24,6 +25,9 @@ private:
     voxblox_map::VoxbloxMap m_map;
     SensorModel sensor_model_ ; 
     bool m_occlusion ; 
+
+    double m_angle_high;
+    double m_angle_low; 
 
     float m_dist_min;
     float m_dist_max;
@@ -54,7 +58,7 @@ private:
     bool m_frontier6;
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion, float angle_low, float angle_high) ;
     ViewEvaluator(){};
     ~ViewEvaluator();
 
@@ -85,7 +89,7 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion, float angle_low, float angle_high) 
 {
   m_map = map ;
   m_method_type = method_name ;
@@ -94,6 +98,8 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   m_dist_min = dist_min ;
   m_occlusion = occlusion ;
 
+  m_angle_high = angle_high ; 
+  m_angle_low = angle_low ;
   p_downsampling_factor_ = 1.0 ;
   sensor_model_ = sensor_lidar ; 
   m_threshold_known = threshold ; 
@@ -472,6 +478,16 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_
   Eigen::Vector3d old_pos = frontier ; // deepcopy ? yes. 
   char state ;
   float unknown_vox = 0;
+  float angle = 0;
+  bool isAngleOk = false;
+
+  //check angle
+  isAngleOk = verify_Angle(frontier, vc, angle, m_angle_low, m_angle_high ); 
+  if ( isAngleOk == false ){
+    return false;
+  }
+
+
   for(int i=0; i< ( 2* distance) ; i++  ){ // while ?
 
     new_pos = new_pos + direction ; 
