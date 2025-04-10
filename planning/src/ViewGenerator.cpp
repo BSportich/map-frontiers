@@ -600,7 +600,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
             // ROS_INFO(" mid view found %f %f %f", mid_view.x, mid_view.y, mid_view.z);
 
             Eigen::Vector3d mid_view_vec( mid_view.x, mid_view.y, mid_view.z);
-            ROS_INFO(" View generated with distance of  %f", (mid_view_vec - frontier).norm() );
+            ROS_INFO(" Mid view generated with distance of  %f", (mid_view_vec - frontier).norm() );
             
             vc= mid_view ; 
             return true;
@@ -617,7 +617,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
             // ROS_INFO(" min view found %f %f %f", min_view.x, min_view.y, min_view.z);
 
             Eigen::Vector3d min_view_vec( min_view.x, min_view.y, min_view.z);
-            ROS_INFO(" View generated with distance of  %f", (min_view_vec - frontier).norm() );
+            ROS_INFO(" Min view generated with distance of  %f", (min_view_vec - frontier).norm() );
 
             vc = min_view ;
             return true;
@@ -633,7 +633,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
             // ROS_INFO(" max view found %f %f %f", max_view.x, max_view.y, max_view.z);
 
             Eigen::Vector3d max_view_vec( max_view.x, max_view.y, max_view.z);
-            ROS_INFO(" View generated with distance of  %f", (max_view_vec - frontier).norm() );
+            ROS_INFO(" Max view generated with distance of  %f", (max_view_vec - frontier).norm() );
 
             vc = max_view  ; 
             return true;
