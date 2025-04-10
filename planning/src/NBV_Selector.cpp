@@ -1294,7 +1294,7 @@ int main(int argc, char** argv) {
     sys_params.alpha = 1.0 ;// image component weight
     sys_params.beta = 1.0 ;// angular/distance cost component weight 
     sys_params.gamma = 1 ;  // BOOLEAN : 0 or 1 /// IF 0 distance is NOT taken into account in the angular/distance component 
-    sys_params.occlusion = true; 
+    sys_params.occlusion = false; 
 
     //////////////View Generation parameters
     sys_params.method_view_generation = "gradient" ; 
