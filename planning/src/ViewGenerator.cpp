@@ -550,7 +550,8 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     //current_pos = current_pos + ( (m_distance_min / m_map.getVoxelSize() ) -1 ) * vector_director ; 
 
     //int number_it = (m_distance_max + 0.2 - m_distance_min) / ( m_map.getVoxelSize()) ; //UNSURE! !!!!!!!!!!!!
-    int number_it = (m_distance_max + 0.2) / (vector_director.norm() * m_map.getVoxelSize()) ; 
+    //int number_it = (m_distance_max + 0.2) / (vector_director.norm() * m_map.getVoxelSize()) ; 
+    int number_it = (m_distance_max + 0.2) / (vector_director.norm() ) ; 
     //go along the gradient direction
     for(int k =0 ; k< number_it; k++){
     //while( distance < m_distance_max){
