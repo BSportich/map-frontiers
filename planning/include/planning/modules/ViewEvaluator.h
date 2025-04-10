@@ -482,7 +482,7 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_
   bool isAngleOk = false;
 
   //check angle
-  isAngleOk = verify_Angle(frontier, vc, angle, m_angle_low, m_angle_high ); 
+  isAngleOk = verify_angle(frontier, vc, angle, m_angle_low, m_angle_high ); 
   if ( isAngleOk == false ){
     return false;
   }
