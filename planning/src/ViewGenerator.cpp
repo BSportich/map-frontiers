@@ -696,6 +696,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 
 
 bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
+    float vox_size = m_map.getVoxelSize();
 
     if( isCorrectPos(voxel) == false ){
         return false;
@@ -715,7 +716,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
         for(int j= min_radius ; j <= max_radius ; j++){
             for(int k= min_radius ; k <= max_radius ; k++){
 
-                Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
+                Eigen::Vector3d shift = Eigen::Vector3d(i * vox_size ,j * vox_size ,k * vox_size );
                 state = m_map.getVoxelState_ESDF(voxel + shift) ;
                 distance = m_map.getVoxelDistance_ESDF(voxel + shift) ;
                 //state = m_map.getVoxelState_TSDF(voxel + shift, 0);
