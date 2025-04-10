@@ -514,6 +514,9 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     }
     else{
         vector_director = gradient ; 
+
+        //UNSURE
+        vector_director = vector_director * m_map.getVoxelSize();
     }
 
 
