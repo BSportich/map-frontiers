@@ -743,9 +743,9 @@ bool ViewGenerator::isCorrectPos(const Eigen::Vector3d& pos){
     // float x = pos.x();
     // float y = pos.y();
     // float z = pos z.();
-    if(pos.z() < 3 ){
-        return false; 
-    }
+    // if(pos.z() < 3 ){
+    //     return false; 
+    // }
 
     if( pos.z() < 0 ){
         return false;
