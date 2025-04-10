@@ -2,6 +2,7 @@
 #include <iostream>
 #include "planning/modules/ViewGenerator.h"
 #include "planning/modules/ViewEvaluator.h"
+#include <planning/modules/utils.h>
 #include "planning/data/type_conversions.h"
 #include "planning/data/visualization_marker.h"
 #include <string>

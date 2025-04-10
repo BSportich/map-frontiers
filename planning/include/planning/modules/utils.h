@@ -7,6 +7,29 @@
 #include <Eigen/Geometry>
 // Function declarations
 
+struct ViewCandidate
+{
+    //position
+    float x;
+    float y;
+    float z;
+
+    //orientation
+    double q_x ;
+    double q_y;
+    double q_z;
+    double q_w;
+
+    //origin of the generation
+    float o_x;
+    float o_y;
+    float o_z;
+
+    // ViewCandidate(int x, int y, int z, float qx, float qy, float qz, float qw, int ox, int oy, int oz)
+    //     : x(x), y(y), z(z), q_x(qx), q_y(qy), q_z(qz), q_w(qw), o_x(ox), o_y(oy), o_z(oz) {}
+
+};
+
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high);
 
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high){
