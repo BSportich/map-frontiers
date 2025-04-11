@@ -405,6 +405,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   float total_distance = 0 ; 
   float nb_unknown_vox = -1;
   float average_dist_frontier = 0 ;
+  int nb_frontiers_examined = 0 ;
 
   if ( !lineOfSightCheck(vc, nb_unknown_vox) ){
     return -2;
@@ -416,6 +417,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
     frontier = frontiers_set[i];
 
     if( (frontier - pos).norm() < range ){
+      nb_frontiers_examined = nb_frontiers_examined +1;
 
       vc_2 = vc ; //deep copy only for simple types
       vc_2.o_x = frontier.x();
@@ -448,6 +450,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   }
   average_dist_frontier= average_dist_frontier/result;
   ROS_INFO("AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
+  ROS_INFO(" Frontiers blocked/bad angle are  %d on %d",result, nb_frontiers_examined );
   total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
   return total_distance;
@@ -489,7 +492,7 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_
     ROS_INFO(" Angle is %f : refused ", angle);
     return false;
   }
-  ROS_INFO(" Angle is %f : accepted ", angle);
+  // ROS_INFO(" Angle is %f : accepted ", angle);
 
   for(int i=0; i< ( 2* distance) ; i++  ){ // while ?
 
