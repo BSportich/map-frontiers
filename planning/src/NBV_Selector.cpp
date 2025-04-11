@@ -270,7 +270,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     world_frame_ = "world";
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
-    m_bb = BoundingBox( sys_param.x_max, sys_param.x_min, sys_param.y_max, sys_param.y_min, sys_param.z_max, sys_param.z_min );
+    m_bb = { sys_param.x_max, sys_param.x_min, sys_param.y_max, sys_param.y_min, sys_param.z_max, sys_param.z_min };
 
     //modules
     //m_view_generator.set_map(m_map);
