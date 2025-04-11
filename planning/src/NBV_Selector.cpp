@@ -612,7 +612,7 @@ void NBV_Selector::updateFrontiers(){
 
 void NBV_Selector::sample_subset_frontiers_shells(){
   int sample_value = m_sub_sample_size_; 
-  std::vector<int> history_table();
+  std::vector<int> history_table;
   ROS_INFO("[Sampling] sampling value is %d out of %d", sample_value, frontiers_set.size());
   if( m_sub_sample_size_ > frontiers_set.size()){
     sample_value = frontiers_set.size();
