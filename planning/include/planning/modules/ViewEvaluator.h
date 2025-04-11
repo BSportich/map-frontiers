@@ -489,7 +489,7 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_
   //check angle
   isAngleOk = verify_angle(frontier, vc, angle, m_angle_low, m_angle_high ); 
   if ( isAngleOk == false ){
-    ROS_INFO(" Angle is %f : refused ", angle);
+    // ROS_INFO(" Angle is %f : refused ", angle);
     return false;
   }
   // ROS_INFO(" Angle is %f : accepted ", angle);
