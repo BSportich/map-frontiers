@@ -612,7 +612,7 @@ void NBV_Selector::updateFrontiers(){
 
 void NBV_Selector::sample_subset_frontiers_shells(){
   int sample_value = m_sub_sample_size_; 
-  std::vector<int> history_table(sample_value);
+  std::vector<int> history_table();
   ROS_INFO("[Sampling] sampling value is %d out of %d", sample_value, frontiers_set.size());
   if( m_sub_sample_size_ > frontiers_set.size()){
     sample_value = frontiers_set.size();
@@ -627,7 +627,7 @@ void NBV_Selector::sample_subset_frontiers_shells(){
 
   for(int i =0 ; i < sample_value; i++ ){
 
-    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * (sample_value -1) ; 
+    value_tirage = (static_cast<float>(rand()) / RAND_MAX) * (frontiers_set.size() -1) ; 
     index_id = static_cast<int>(value_tirage) ;
     history_table.push_back(index_id);
     frontiers_subset.push_back( frontiers_set[index_id] ) ; 
