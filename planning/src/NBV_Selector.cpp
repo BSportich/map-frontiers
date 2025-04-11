@@ -174,7 +174,7 @@ public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param);
     void updateFrontiers();
-    void sample_subset_frontiers();
+    // void sample_subset_frontiers();
     void sample_subset_frontiers_discrete();
     void sample_subset_frontiers_shells();
 
@@ -536,88 +536,88 @@ void NBV_Selector::updateFrontiers(){
 
 
 
-void NBV_Selector::sample_subset_frontiers(){
-  ros::Time start_sample_subset_frontiers = ros::Time::now();
-  frontiers_sub_pointcloud.clear();
-  frontiers_subset.clear();
+// void NBV_Selector::sample_subset_frontiers(){
+//   ros::Time start_sample_subset_frontiers = ros::Time::now();
+//   frontiers_sub_pointcloud.clear();
+//   frontiers_subset.clear();
 
-  std::vector<float> distances_table(frontiers_set.size());
+//   std::vector<float> distances_table(frontiers_set.size());
 
-  if( frontiers_set.size() > m_sub_sample_size_ ){
+//   if( frontiers_set.size() > m_sub_sample_size_ ){
 
-    double min_value_distance = std::numeric_limits<double>::max() ; 
-    double max_value_distance = std::numeric_limits<double>::min() ; 
-    double total_distance = 0 ;
+//     double min_value_distance = std::numeric_limits<double>::max() ; 
+//     double max_value_distance = std::numeric_limits<double>::min() ; 
+//     double total_distance = 0 ;
 
-    for(int i=0; i< frontiers_set.size(); i++){
+//     for(int i=0; i< frontiers_set.size(); i++){
       
-      Eigen::Vector3d current_pos = Eigen::Vector3d( m_current_pos.x, m_current_pos.y, m_current_pos.z );
-      double distance_frontier = (frontiers_set[i] - current_pos).norm();
-      distances_table[i] = distance_frontier ; 
+//       Eigen::Vector3d current_pos = Eigen::Vector3d( m_current_pos.x, m_current_pos.y, m_current_pos.z );
+//       double distance_frontier = (frontiers_set[i] - current_pos).norm();
+//       distances_table[i] = distance_frontier ; 
 
-      if(distance_frontier > max_value_distance){
-        max_value_distance = distance_frontier;
-      }
-      if(distance_frontier < min_value_distance){
-        min_value_distance = distance_frontier;
-      }
+//       if(distance_frontier > max_value_distance){
+//         max_value_distance = distance_frontier;
+//       }
+//       if(distance_frontier < min_value_distance){
+//         min_value_distance = distance_frontier;
+//       }
 
-    }
+//     }
 
-    float threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
-    float value_tirage = -1 ; 
-    int i = 0 ; 
-    std::vector<int> history_table(m_sub_sample_size_);
-    int history_count = 0;
-    while((frontiers_subset.size() < m_sub_sample_size_) && (i < frontiers_set.size() )){
+//     float threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
+//     float value_tirage = -1 ; 
+//     int i = 0 ; 
+//     std::vector<int> history_table(m_sub_sample_size_);
+//     int history_count = 0;
+//     while((frontiers_subset.size() < m_sub_sample_size_) && (i < frontiers_set.size() )){
 
-        value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
-        threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
-        threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
+//         value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
+//         threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
+//         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
         
-        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
-        ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
-        if(value_tirage > threshold_tirage){
+//         ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
+//         ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
+//         if(value_tirage > threshold_tirage){
 
-          frontiers_subset.push_back(frontiers_set[i]);
-          history_table.push_back( i );
-          pcl::PointXYZRGB point;
-          point.x = frontiers_set[i].x();
-          point.y = frontiers_set[i].y();
-          point.z = frontiers_set[i].z();
-          point.r = 0;
-          point.g = 0;
-          point.b = 0;
-          frontiers_sub_pointcloud.push_back(point);
+//           frontiers_subset.push_back(frontiers_set[i]);
+//           history_table.push_back( i );
+//           pcl::PointXYZRGB point;
+//           point.x = frontiers_set[i].x();
+//           point.y = frontiers_set[i].y();
+//           point.z = frontiers_set[i].z();
+//           point.r = 0;
+//           point.g = 0;
+//           point.b = 0;
+//           frontiers_sub_pointcloud.push_back(point);
           
 
-        }
-        i=i+1;
-        ROS_INFO_COND(verbose_, "[Sampling] End while loop");
-        printVectorOneLine(history_table);
+//         }
+//         i=i+1;
+//         ROS_INFO_COND(verbose_, "[Sampling] End while loop");
 
-    }
+//     }
     
 
 
-  }
-  else {
+//   }
+//   else {
 
-    frontiers_subset = frontiers_set ; //careful ! Seems like a deep copy but not sure
-  }
+//     frontiers_subset = frontiers_set ; //careful ! Seems like a deep copy but not sure
+//   }
 
-  ros::Time end_sample_subset_frontiers = ros::Time::now();
-  ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
-  ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers] %.4f s", duration.toSec());
-}
+//   ros::Time end_sample_subset_frontiers = ros::Time::now();
+//   ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
+//   ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers] %.4f s", duration.toSec());
+// }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
   int sample_value = m_sub_sample_size_; 
-  ROS_INFO("[Sampling] sampling value is %d", sample_value);
+  std::vector<int> history_table(sample_value);
+  ROS_INFO("[Sampling] sampling value is %d out of %d", sample_value, frontiers_set.size());
   if( m_sub_sample_size_ > frontiers_set.size()){
     sample_value = frontiers_set.size();
   }
-  ROS_INFO("[Sampling] sampling value is %d", sample_value);
+  // ROS_INFO("[Sampling] sampling value is %d", sample_value);
 
   ROS_INFO_COND(verbose_, "[Sampling] shells start");
   float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
@@ -629,13 +629,14 @@ void NBV_Selector::sample_subset_frontiers_shells(){
 
     value_tirage = (static_cast<float>(rand()) / RAND_MAX) * (sample_value -1) ; 
     index_id = static_cast<int>(value_tirage) ;
+    history_table.push_back(index_id);
     frontiers_subset.push_back( frontiers_set[index_id] ) ; 
     frontiers_sub_pointcloud.push_back( frontiers_pointcloud.points[index_id] );
 
   }
 
   ROS_INFO_COND(verbose_, "[Sampling] shells end");
-
+  printVectorOneLine(history_table);
 }
 
 void NBV_Selector::sample_subset_frontiers_discrete(){
