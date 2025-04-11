@@ -5,6 +5,9 @@
 #include <Eigen/Eigen>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <ros/ros.h>
+#include <vector>
+#include <sstream>
 // Function declarations
 
 struct ViewCandidate
@@ -47,6 +50,7 @@ struct BoundingBox
 
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high);
 bool isCorrectPos(const Eigen::Vector3d& pos,  const BoundingBox& bb);
+void printVectorOneLine(const std::vector<double>& vec);
 
 
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high){
@@ -98,4 +102,16 @@ bool isCorrectPos(const Eigen::Vector3d& pos, const BoundingBox& bb){
     return true ; 
 
   
+}
+
+
+
+void printVectorOneLine(const std::vector<int>& vec) {
+    std::stringstream ss;
+    ss << "[ ";
+    for (int val : vec) {
+        ss << val << " ";
+    }
+    ss << "]";
+    ROS_INFO_STREAM("Vector: " << ss.str());
 }

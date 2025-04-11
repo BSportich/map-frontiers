@@ -567,6 +567,8 @@ void NBV_Selector::sample_subset_frontiers(){
     float threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
     float value_tirage = -1 ; 
     int i = 0 ; 
+    std::vector<int> history_table(m_sub_sample_size_);
+    int history_count = 0;
     while((frontiers_subset.size() < m_sub_sample_size_) && (i < frontiers_set.size() )){
 
         value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
@@ -578,7 +580,7 @@ void NBV_Selector::sample_subset_frontiers(){
         if(value_tirage > threshold_tirage){
 
           frontiers_subset.push_back(frontiers_set[i]);
-
+          history_table.push_back( i );
           pcl::PointXYZRGB point;
           point.x = frontiers_set[i].x();
           point.y = frontiers_set[i].y();
@@ -592,6 +594,8 @@ void NBV_Selector::sample_subset_frontiers(){
         }
         i=i+1;
         ROS_INFO_COND(verbose_, "[Sampling] End while loop");
+        printTableOneLine(history_table);
+
     }
     
 
