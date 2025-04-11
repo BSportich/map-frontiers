@@ -66,6 +66,18 @@ struct system_parameters
     int p_resolution_x ;
     int p_resolution_y ; // high number attendu
     double p_sampling_time;
+
+
+    //////////////Bounding Box
+
+    float x_max;
+    float x_min;
+
+    float y_max;
+    float y_min;
+
+    float z_max;
+    float z_min;
 };
 
 
@@ -82,6 +94,8 @@ private:
     std::vector<ViewCandidate> rejected_views;
     std::vector<Eigen::Vector3d> frontiers_set ;
     std::vector<Eigen::Vector3d> frontiers_subset ;
+
+    BoundingBox m_bb;
 
     ViewEvaluator m_view_evaluator;
     SensorModel m_sensor_model;
@@ -139,15 +153,6 @@ private:
     ros::Publisher pub_views_marker ; 
     ros::Publisher pub_views_rejected_marker ; 
     ros::Publisher pub_nbv ; 
-
-
-    //MAP PARAMETERS
-    float z_max;
-    float z_min;
-    float y_max;
-    float y_min;
-    float x_max;
-    float x_min;
 
     //TEAM AND COORDINATIONS ANALYSIS
     int m_team_size;
@@ -265,13 +270,14 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     world_frame_ = "world";
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
+    m_bb = BoundingBox( sys_params.x_max, sys_params.x_min, sys_params.y_max, sys_params.y_min, sys_params.z_max, sys_params.z_min );
 
     //modules
     //m_view_generator.set_map(m_map);
     std::string method = sys_param.method_view_generation ;
-    m_view_generator = ViewGenerator(method, sys_param.distance_min, sys_param.distance_max, m_map, sys_param.robot_radius, sys_param.angle_low, sys_param.angle_high);
+    m_view_generator = ViewGenerator(method, sys_param.distance_min, sys_param.distance_max, m_map, sys_param.robot_radius, sys_param.angle_low, sys_param.angle_high, m_bb);
     m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
-    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max, sys_param.distance_min, sys_param.distance_max, sys_param.occlusion, sys_param.angle_low, sys_param.angle_high );
+    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max, sys_param.distance_min, sys_param.distance_max, sys_param.occlusion, sys_param.angle_low, sys_param.angle_high, m_bb );
     m_sub_sample_size_ = sys_param.subsampling_views ; 
     m_tolerance_distance_ = sys_param.tolerance_distance ; 
     m_threshold_known = sys_param.threshold_known ; 
@@ -1290,6 +1296,17 @@ int main(int argc, char** argv) {
     sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
 
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
+
+    //////////////Bounding Box
+    sys_params.x_max = 100;
+    sys_params.x_min = -100  ;
+
+    sys_params.y_max = 100;
+    sys_params.y_min = -100;
+
+    sys_params.z_max = 100;
+    sys_params.z_min = 0;
+
     
     //////////////Planning parameters
     sys_params.alpha = 1.0 ;// image component weight

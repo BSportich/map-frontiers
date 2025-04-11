@@ -25,6 +25,7 @@ private:
     voxblox_map::VoxbloxMap m_map;
     SensorModel sensor_model_ ; 
     bool m_occlusion ; 
+    BoundingBox m_bb;
 
     double m_angle_high;
     double m_angle_low; 
@@ -58,7 +59,7 @@ private:
     bool m_frontier6;
 
 public:
-    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion, float angle_low, float angle_high) ;
+    ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion, float angle_low, float angle_high, const BoundingBox& bb) ;
     ViewEvaluator(){};
     ~ViewEvaluator();
 
@@ -89,7 +90,7 @@ public:
 
 };
 
-ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion, float angle_low, float angle_high) 
+ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::string& method_name, const SensorModel& sensor_lidar, double threshold, int radius_max_surface, float dist_min, float dist_max, bool occlusion, float angle_low, float angle_high, const BoundingBox& bb) 
 {
   m_map = map ;
   m_method_type = method_name ;
@@ -97,6 +98,7 @@ ViewEvaluator::ViewEvaluator(const voxblox_map::VoxbloxMap& map, const std::stri
   m_dist_max = dist_max;
   m_dist_min = dist_min ;
   m_occlusion = occlusion ;
+  m_bb = bb;
 
   m_angle_high = angle_high ; 
   m_angle_low = angle_low ;
@@ -484,9 +486,10 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_
   //check angle
   isAngleOk = verify_angle(frontier, vc, angle, m_angle_low, m_angle_high ); 
   if ( isAngleOk == false ){
+    ROS_INFO(" Angle is %f : refused ", angle);
     return false;
   }
-
+  ROS_INFO(" Angle is %f : accepted ", angle);
 
   for(int i=0; i< ( 2* distance) ; i++  ){ // while ?
 
@@ -523,6 +526,10 @@ bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double th
   bool is_empty = false;
   bool close_unknown = false;
   bool close_occupied = false; 
+
+  if ( isCorrectPos(voxel, m_bb) == false ){
+    return false;
+  }
 
   current_state = m_map.getVoxelState_TSDF(voxel, threshold_known);
     if( current_state == voxblox_map::VoxbloxMap::FREE){

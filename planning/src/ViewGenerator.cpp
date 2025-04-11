@@ -5,7 +5,7 @@
 #include <algorithm>
 
 
-ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high){
+ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high, const BoundingBox& bb){
     m_method_type = method_name;
     m_distance_max = distance_max;
     m_distance_min = distance_min;
@@ -13,6 +13,7 @@ ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min,
     robot_radius_ = robot_radius ; 
     m_angle_low = angle_low ;
     m_angle_high = angle_high ; 
+    m_bb = bb;
 
     rejected_frontiers = std::vector<Eigen::Vector3d>();
     max_sampling = 1;
@@ -702,7 +703,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
 bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
     float vox_size = m_map.getVoxelSize();
 
-    if( isCorrectPos(voxel) == false ){
+    if( isCorrectPos(voxel, m_bb) == false ){
         return false;
     }
 
@@ -739,21 +740,7 @@ bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){
 
 }
 
-bool ViewGenerator::isCorrectPos(const Eigen::Vector3d& pos){
-    // float x = pos.x();
-    // float y = pos.y();
-    // float z = pos z.();
-    // if(pos.z() < 3 ){
-    //     return false; 
-    // }
 
-    if( pos.z() < 0 ){
-        return false;
-    }
-    return true ; 
-
-  
-}
 
 
 // bool ViewGenerator::isSafeView(const Eigen::Vector3d& voxel){

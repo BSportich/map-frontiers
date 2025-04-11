@@ -30,7 +30,24 @@ struct ViewCandidate
 
 };
 
+struct BoundingBox
+{
+    //MAP PARAMETERS
+    float x_max;
+    float x_min;
+
+    float y_max;
+    float y_min;
+
+    float z_max;
+    float z_min;
+    
+};
+
+
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high);
+bool isCorrectPos(const Eigen::Vector3d& pos,  const BoundingBox& bb);
+
 
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high){
 
@@ -62,4 +79,23 @@ bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, floa
 
     return false;
 
+}
+
+bool isCorrectPos(const Eigen::Vector3d& pos, const BoundingBox& bb){
+
+    if ( pos.z() >= bb.z_max || pos.z() <= bb.z_min ){
+        return false;
+    }
+
+    if ( pos.y() >= bb.y_max || pos.y() <= bb.y_min ){
+        return false;
+    }
+
+    if ( pos.x() >= bb.x_max || pos.x() <= bb.x_min ){
+        return false;
+    }
+
+    return true ; 
+
+  
 }

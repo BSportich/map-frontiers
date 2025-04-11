@@ -26,9 +26,10 @@ private:
 
     int max_sampling;
     float robot_radius_ ; 
+    BoundingBox m_bb; 
 
 public:
-    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high);
+    ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high, const BoundingBox& bb);
     ViewGenerator(){};
     ~ViewGenerator(){};
 
@@ -53,7 +54,6 @@ public:
     
     std::string getMethod_type(){ return m_method_type; } ;
     bool isSafeView(const Eigen::Vector3d& voxel);
-    bool isCorrectPos(const Eigen::Vector3d& pos);
 
 
 
