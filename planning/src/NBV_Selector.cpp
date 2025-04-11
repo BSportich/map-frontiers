@@ -594,7 +594,7 @@ void NBV_Selector::sample_subset_frontiers(){
         }
         i=i+1;
         ROS_INFO_COND(verbose_, "[Sampling] End while loop");
-        printTableOneLine(history_table);
+        printVectorOneLine(history_table);
 
     }
     
