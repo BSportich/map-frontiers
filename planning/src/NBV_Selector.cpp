@@ -270,7 +270,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     world_frame_ = "world";
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
-    m_bb = BoundingBox( sys_params.x_max, sys_params.x_min, sys_params.y_max, sys_params.y_min, sys_params.z_max, sys_params.z_min );
+    m_bb = BoundingBox( sys_param.x_max, sys_param.x_min, sys_param.y_max, sys_param.y_min, sys_param.z_max, sys_param.z_min );
 
     //modules
     //m_view_generator.set_map(m_map);
@@ -1297,12 +1297,12 @@ int main(int argc, char** argv) {
 
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
 
-    //////////////Bounding Box
-    sys_params.x_max = 100;
-    sys_params.x_min = -100  ;
+    //////////////Bounding Box #current value is for HOUSE env. 
+    sys_params.x_max = 10;
+    sys_params.x_min = -20  ;
 
-    sys_params.y_max = 100;
-    sys_params.y_min = -100;
+    sys_params.y_max = 11;
+    sys_params.y_min = -11;
 
     sys_params.z_max = 100;
     sys_params.z_min = 0;
