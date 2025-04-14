@@ -401,7 +401,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
   ViewCandidate vc_2 ;
   float temp_distance = -1 ;
-  float voxel_distance = -10000;
+  float nb_voxel_distance = -10000;
   float total_distance = 0 ; 
   float nb_unknown_vox = -1;
   float average_dist_frontier = 0 ;
@@ -427,11 +427,11 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
       if( lineOfSightCheck(vc_2, nb_unknown_vox) ){
         result = result +1 ;
         temp_distance = (frontier - pos).norm() ;
-        //voxel_distance = temp_distance * m_map.getVoxelSize() ;
+        nb_voxel_distance = temp_distance * m_map.getVoxelSize() ;
         average_dist_frontier = average_dist_frontier + temp_distance ; 
 
         if ( m_occlusion ){
-          total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) * pow(2, -( nb_unknown_vox/ voxel_distance) ); 
+          total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) * pow(2, -( nb_unknown_vox/ nb_voxel_distance) ); 
         }
         else{
           total_distance = total_distance + ponder_frontier_by_distance( temp_distance ) ; 
@@ -450,7 +450,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   }
   average_dist_frontier= average_dist_frontier/result;
   ROS_INFO("AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
-  ROS_INFO(" Frontiers blocked/bad angle are  %d on %d",result, nb_frontiers_examined );
+  ROS_INFO(" Frontiers blocked/bad angle are  %f on %d",result, nb_frontiers_examined );
   total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
   return total_distance;
