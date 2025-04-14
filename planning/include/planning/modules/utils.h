@@ -55,6 +55,7 @@ void printVectorOneLine(const std::vector<double>& vec);
 
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high){
 
+    float reduction_angle = 3 
     //if find orientation failed to find a direction
     if( vc.q_x == 0 &&  vc.q_y == 0 && vc.q_z == 0 && vc.q_w == 0 ){
         return false;
@@ -76,7 +77,7 @@ bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, floa
 
     // ROS_INFO("Angle found is function is  %f", vertical_angle_deg);
     angle = vertical_angle_deg;
-    if( (vertical_angle_deg < angle_high ) && (vertical_angle_deg > angle_low) ){
+    if( (vertical_angle_deg < angle_high - reduction_angle ) && (vertical_angle_deg > angle_low + reduction_angle) ){
         angle = vertical_angle_deg;
         return true;
     }

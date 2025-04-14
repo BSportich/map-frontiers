@@ -530,7 +530,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     ViewCandidate temp_view = { test_point.x() , test_point.y() , test_point.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
     findOrientation(temp_view) ; 
     verify_angle( frontier, temp_view, vertical_view_angle, m_angle_low, m_angle_high ) ; 
-    ROS_INFO(" Original angle found is %f", vertical_view_angle);
+    // ROS_INFO(" Original angle found is %f", vertical_view_angle);
 
     if( vertical_view_angle > m_angle_high ){
         angle_diff = m_angle_high - angle_mid ;
@@ -599,13 +599,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if(mid){
         findOrientation(mid_view) ; 
         isAngleok = verify_angle( frontier, mid_view , angle_mid, m_angle_low, m_angle_high ) ; 
-        ROS_INFO(" Angle found is %f", angle_mid);
+        // ROS_INFO(" Angle found is %f", angle_mid);
         if( isAngleok ){
             // ROS_INFO(" Angle of mid candidate accepted  %f", angle_mid);
             // ROS_INFO(" mid view found %f %f %f", mid_view.x, mid_view.y, mid_view.z);
 
             Eigen::Vector3d mid_view_vec( mid_view.x, mid_view.y, mid_view.z);
-            ROS_INFO(" Mid view generated with distance of  %f", (mid_view_vec - frontier).norm() );
+            // ROS_INFO(" Mid view generated with distance of  %f", (mid_view_vec - frontier).norm() );
             
             vc= mid_view ; 
             return true;
@@ -616,13 +616,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if(minimum){
         findOrientation(min_view) ; 
         isAngleok = verify_angle( frontier, min_view , angle_min, m_angle_low, m_angle_high ) ; 
-        ROS_INFO(" Angle found is  %f", angle_min);
+        // ROS_INFO(" Angle found is  %f", angle_min);
         if( isAngleok ){
             // ROS_INFO(" Angle of min candidate accepted  %f", angle_min);
             // ROS_INFO(" min view found %f %f %f", min_view.x, min_view.y, min_view.z);
 
             Eigen::Vector3d min_view_vec( min_view.x, min_view.y, min_view.z);
-            ROS_INFO(" Min view generated with distance of  %f", (min_view_vec - frontier).norm() );
+            // ROS_INFO(" Min view generated with distance of  %f", (min_view_vec - frontier).norm() );
 
             vc = min_view ;
             return true;
@@ -632,13 +632,13 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     if (max_bool){
         findOrientation(max_view) ; 
         isAngleok = verify_angle( frontier, max_view , angle_max, m_angle_low, m_angle_high ) ; 
-        ROS_INFO(" Angle found is  %f", angle_max);
+        // ROS_INFO(" Angle found is  %f", angle_max);
         if( isAngleok ){
             // ROS_INFO(" Angle of max candidate accepted  %f", angle_max);
             // ROS_INFO(" max view found %f %f %f", max_view.x, max_view.y, max_view.z);
 
             Eigen::Vector3d max_view_vec( max_view.x, max_view.y, max_view.z);
-            ROS_INFO(" Max view generated with distance of  %f", (max_view_vec - frontier).norm() );
+            // ROS_INFO(" Max view generated with distance of  %f", (max_view_vec - frontier).norm() );
 
             vc = max_view  ; 
             return true;
