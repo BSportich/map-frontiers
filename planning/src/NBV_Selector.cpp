@@ -32,6 +32,7 @@ struct system_parameters
 
     ///////////////NAVIGATION
     float tolerance_distance ; 
+    float angular_tolerance ; 
     double threshold_known ;
 
     //////////////Planning parameters
@@ -118,6 +119,7 @@ private:
     geometry_msgs::PoseArray rejected_views_set; 
     int m_sub_sample_size_ ;
     float m_tolerance_distance_ ; 
+    float m_angular_tolerance_ ;
     double m_threshold_known ; 
 
     bool m_surface_frontiers;
@@ -280,6 +282,7 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max, sys_param.distance_min, sys_param.distance_max, sys_param.occlusion, sys_param.angle_low, sys_param.angle_high, m_bb );
     m_sub_sample_size_ = sys_param.subsampling_views ; 
     m_tolerance_distance_ = sys_param.tolerance_distance ; 
+    m_angular_tolerance_ = sys_param.angular_tolerance ; 
     m_threshold_known = sys_param.threshold_known ; 
 
     m_alpha = sys_param.alpha ;
@@ -947,23 +950,21 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   // ROS_INFO_COND(verbose_, "[First] OR VALUES ARE %f %f %f %f", m_current_pos.q_x,  m_current_pos.q_y ,  m_current_pos.q_z, m_current_pos.q_w );
   
 
-  if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
-    //Position
-    float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
-   
-    //Orientation
-    // Eigen::Quaterniond& orient(m_current_pos.q_x, m_current_pos.q_y, m_current_pos.q_z, m_current_pos.q_w ); 
-    // Eigen::Quaterniond& orient_goal(m_current_goal.q_x, m_current_goal.q_y, m_current_goal.q_z, m_current_goal.q_w ); 
-    // bool isOrientationCorrect = (orient.isApprox(orien_goal, tol) || orient.isApprox( -orien_goal, tol));
+    if( m_availability == BUSY){
+      //Position
+      float distance_difference = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ), 2) + pow((m_current_pos.z - m_current_goal.z ), 2) ; 
+      bool isPositionCorrect = distance_difference < m_tolerance_distance_;
 
-    // if( pos_test < m_tolerance_distance_  && isOrientationCorrect){
-    if(pos_test < m_tolerance_distance_ ){
-      m_availability = AVAILABLE ; 
-      ROS_INFO_COND(verbose_, "ROBOT IS NOW AVAILABLE");
+      // Orientation
+      Eigen::Quaterniond current_orientation(m_current_pos.q_x, m_current_pos.q_y, m_current_pos.q_z, m_current_pos.q_w ); 
+      Eigen::Quaterniond goal_orientation(m_current_goal.q_x, m_current_goal.q_y, m_current_goal.q_z, m_current_goal.q_w ); 
+      bool isOrientationCorrect = (current_orientation.isApprox(goal_orientation, m_angular_tolerance_) || current_orientation.coeffs().isApprox( -goal_orientation.coeffs(), m_angular_tolerance_));
 
+      if( isPositionCorrect && isOrientationCorrect){
+        m_availability = AVAILABLE ; 
+        ROS_INFO_COND(verbose_, "ROBOT IS NOW AVAILABLE");
+      }
     }
-
-  }
 
 
   ros::Duration duration = ros::Time::now() - last_nbv_ ; 
@@ -1310,6 +1311,7 @@ int main(int argc, char** argv) {
     system_parameters sys_params ; 
     /////////////// NAVIGATION
     sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
+    sys_params.angular_tolerance = 0.2 ; // In radian
 
     sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
 
