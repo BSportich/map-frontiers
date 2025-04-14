@@ -55,7 +55,7 @@ void printVectorOneLine(const std::vector<double>& vec);
 
 bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, float& angle, float angle_low, float angle_high){
 
-    float reduction_angle = 3 ;
+    float reduction_angle = 15 ;
     //if find orientation failed to find a direction
     if( vc.q_x == 0 &&  vc.q_y == 0 && vc.q_z == 0 && vc.q_w == 0 ){
         return false;
