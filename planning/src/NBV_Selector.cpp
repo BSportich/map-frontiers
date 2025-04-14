@@ -3,6 +3,7 @@
 #include "planning/modules/ViewGenerator.h"
 #include "planning/modules/ViewEvaluator.h"
 #include <planning/modules/utils.h>
+#include <planning/modules/NBVSelectorParameters.h>
 #include "planning/data/type_conversions.h"
 #include "planning/data/visualization_marker.h"
 #include <string>
@@ -27,61 +28,6 @@
 #include <geometry_msgs/Point.h>
 
 
-struct system_parameters
-{
-
-    ///////////////NAVIGATION
-    float tolerance_distance ; 
-    float angular_tolerance ; 
-    double threshold_known ;
-
-    //////////////Planning parameters
-    float alpha;
-    float beta ;
-    bool gamma ; 
-    bool occlusion;
-
-    //////////////View Generation parameters
-    std::string method_view_generation ; 
-    float distance_min ;
-    float distance_max ;
-    int subsampling_views ;
-    float robot_radius ; 
-    int radius_surface_max ; 
-    float angle_low ;
-    float angle_high ;
-    ///////////////
-
-    //////////////View Evaluator parameters
-    float value_frontier ;
-    ///////////////
-
-    //////////////LIDAR Parameters
-    Eigen::Vector3d mounting_translation_;  // x,y,z [m]
-    Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
-    //sensor parameters
-    double p_ray_length ;  // params for camera model
-    double p_fov_x ;  // Total fields of view [deg], expected symmetric w.r.t.
-    // sensor facing direction
-    double p_fov_y ;
-    int p_resolution_x ;
-    int p_resolution_y ; // high number attendu
-    double p_sampling_time;
-
-
-    //////////////Bounding Box
-
-    float x_max;
-    float x_min;
-
-    float y_max;
-    float y_min;
-
-    float z_max;
-    float z_min;
-};
-
-
 class NBV_Selector
 {
 private:
@@ -96,16 +42,12 @@ private:
     std::vector<Eigen::Vector3d> frontiers_set ;
     std::vector<Eigen::Vector3d> frontiers_subset ;
 
-    BoundingBox m_bb;
-
     ViewEvaluator m_view_evaluator;
     SensorModel m_sensor_model;
     ros::Time last_nbv_ ;
 
-    //planning parameters
-    float m_alpha ;
-    float m_beta ; 
-    bool m_gamma ;
+    // System parameters
+    NBVSelectorParameters _sys_params;
 
     //frontiers pointclouds
     pcl::PointCloud<pcl::PointXYZRGB> frontiers_pointcloud ;
@@ -117,12 +59,7 @@ private:
     //views generated poses
     geometry_msgs::PoseArray views_set; 
     geometry_msgs::PoseArray rejected_views_set; 
-    int m_sub_sample_size_ ;
-    float m_tolerance_distance_ ; 
-    float m_angular_tolerance_ ;
-    double m_threshold_known ; 
 
-    bool m_surface_frontiers;
     ViewCandidate m_current_goal;
     ViewCandidate m_current_pos;
     //Velocity angular or directional ?? 
@@ -167,14 +104,11 @@ private:
     const static unsigned char BUSY = 1;      // NOLINT
 
     // GENERAL BEHAVIOUR
-    bool timer_ = false;
-    bool verbose_ = false;
-    bool extra_viz_ = false;
     bool is_started_ = false;
 
 public:
     NBV_Selector();
-    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param);
+    NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team);
     void updateFrontiers();
     // void sample_subset_frontiers();
     void sample_subset_frontiers_discrete();
@@ -218,7 +152,7 @@ public:
     ~NBV_Selector();
 };
 
-NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team, system_parameters sys_param)
+NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team)
 {
     n = nh;
     //initialization
@@ -241,54 +175,18 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     nh_private.param("voxels_per_side", voxels_per_side, voxels_per_side);
     ROS_INFO("Received voxels_per_side: %i found", voxels_per_side);
 
-    nh_private.param("p_ray_length", sys_param.p_ray_length, sys_param.p_ray_length);
-    ROS_INFO("Received p_ray_length: %f", sys_param.p_ray_length);
-
-    nh_private.param("sub_sample_size", sys_param.subsampling_views, sys_param.subsampling_views);
-    ROS_INFO("Received sub_sample_size: %i", sys_param.subsampling_views);
-
-    nh_private.param("alpha", sys_param.alpha, sys_param.alpha);
-    ROS_INFO("Received image component coefficient: %f", sys_param.alpha);
-
-    nh_private.param("beta", sys_param.beta, sys_param.beta);
-    ROS_INFO("Received navigation component coefficient: %f", sys_param.beta);
-
-    nh_private.param("gamma", sys_param.gamma, sys_param.gamma);
-    if (sys_param.gamma) {
-      ROS_INFO("Using angular and linear distances to compute the cost weight of each view.");
-    } else {
-      ROS_INFO("Using angular distance only to compute the cost weight of each view.");
-    }
-
-    nh_private.param("timer", timer_, timer_);
-    ROS_INFO("Enabling timer: %s", timer_ ? "true" : "false");
-
-    nh_private.param("verbose", verbose_, verbose_);
-    ROS_INFO("Enabling verbose: %s", verbose_ ? "true" : "false");
-
-    nh_private.param("extra_viz", extra_viz_, extra_viz_);
-    ROS_INFO("Enabling extra_viz: %s", extra_viz_ ? "true" : "false");
+    _sys_params.LoadFromRos(nh_private);
 
     world_frame_ = "world";
     //map
     m_map = voxblox_map::VoxbloxMap(voxel_size, voxels_per_side);
-    m_bb = { sys_param.x_max, sys_param.x_min, sys_param.y_max, sys_param.y_min, sys_param.z_max, sys_param.z_min };
 
     //modules
     //m_view_generator.set_map(m_map);
-    std::string method = sys_param.method_view_generation ;
-    m_view_generator = ViewGenerator(method, sys_param.distance_min, sys_param.distance_max, m_map, sys_param.robot_radius, sys_param.angle_low, sys_param.angle_high, m_bb);
-    m_sensor_model = SensorModel( sys_param.p_ray_length, sys_param.p_fov_x, sys_param.p_fov_y, sys_param.p_resolution_x, sys_param.p_resolution_y, sys_param.p_sampling_time);
-    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, sys_param.threshold_known, sys_param.radius_surface_max, sys_param.distance_min, sys_param.distance_max, sys_param.occlusion, sys_param.angle_low, sys_param.angle_high, m_bb );
-    m_sub_sample_size_ = sys_param.subsampling_views ; 
-    m_tolerance_distance_ = sys_param.tolerance_distance ; 
-    m_angular_tolerance_ = sys_param.angular_tolerance ; 
-    m_threshold_known = sys_param.threshold_known ; 
-
-    m_alpha = sys_param.alpha ;
-    m_beta = sys_param.beta ;
-    m_gamma = sys_param.gamma ;
-
+    std::string method = _sys_params.views_generation_method;
+    m_view_generator = ViewGenerator(method, _sys_params.distance_min, _sys_params.distance_max, m_map, _sys_params.robot_radius, _sys_params.angle_low, _sys_params.angle_high, _sys_params.bounding_box);
+    m_sensor_model = SensorModel( _sys_params.p_ray_length, _sys_params.p_fov_x, _sys_params.p_fov_y, _sys_params.p_resolution_x, _sys_params.p_resolution_y, _sys_params.p_sampling_time);
+    m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, _sys_params.threshold_known, _sys_params.radius_surface_max, _sys_params.distance_min, _sys_params.distance_max, _sys_params.do_occlusions_check, _sys_params.angle_low, _sys_params.angle_high, _sys_params.bounding_box ); 
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -380,7 +278,7 @@ void NBV_Selector::updateFrontiers(){
     ros::Time start_update_frontiers = ros::Time::now();
 
     unsigned char current_state;
-    ROS_INFO_COND(verbose_, "Updated frontiers: %lu found", frontiers_set.size());
+    ROS_INFO_COND(_sys_params.verbose, "Updated frontiers: %lu found", frontiers_set.size());
 
     voxblox::BlockIndexList blocks;
     m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
@@ -405,14 +303,14 @@ void NBV_Selector::updateFrontiers(){
         const voxblox::TsdfVoxel& voxel = block.getVoxelByLinearIndex(linear_index);
         Eigen::Vector3d coord_3d = Eigen::Vector3d(coord.x(), coord.y(), coord.z());
 
-        // ROS_INFO_COND(verbose_, "TESTING COORDINATES %f %f %f", coord.x(), coord.y(), coord.z());
+        // ROS_INFO_COND(_sys_params.verbose, "TESTING COORDINATES %f %f %f", coord.x(), coord.y(), coord.z());
 
 
         Eigen::Vector3d unknown_vox_frontier;
         if ( m_view_evaluator.isSurfaceFrontier_TSDF(coord_3d, unknown_vox_frontier ) ){
           frontiers_set.push_back( coord_3d );
 
-          // ROS_INFO_COND(verbose_, "Frontier found distance %f", m_map.getVoxelDistance_TSDF( coord_3d ));
+          // ROS_INFO_COND(_sys_params.verbose, "Frontier found distance %f", m_map.getVoxelDistance_TSDF( coord_3d ));
 
           pcl::PointXYZRGB point;
           point.x = coord.x();
@@ -436,7 +334,7 @@ void NBV_Selector::updateFrontiers(){
         }
 
         ///empty pointcloud
-        // current_state = m_map.getVoxelState_TSDF(coord_3d, m_threshold_known);
+        // current_state = m_map.getVoxelState_TSDF(coord_3d, _sys_params.threshold_known);
         // if ( current_state == voxblox_map::VoxbloxMap::FREE ){
 
         //   pcl::PointXYZRGB point;
@@ -469,7 +367,7 @@ void NBV_Selector::updateFrontiers(){
     ROS_INFO_ONCE("Frontiers updated!");
     ros::Time end_update_frontiers = ros::Time::now();
     ros::Duration duration = end_update_frontiers - start_update_frontiers;
-    ROS_INFO_COND(timer_, "[NBV_Selector][updateFrontiers] %.4f s", duration.toSec());
+    ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][updateFrontiers] %.4f s", duration.toSec());
     
 
  }
@@ -479,7 +377,7 @@ void NBV_Selector::updateFrontiers(){
   ros::Time start_update_frontiers = ros::Time::now();
 
   unsigned char current_state;
-  ROS_INFO_COND(verbose_, "Updated frontiers: %lu found", frontiers_set.size());
+  ROS_INFO_COND(_sys_params.verbose, "Updated frontiers: %lu found", frontiers_set.size());
 
   voxblox::BlockIndexList blocks;
   m_map.get_esdf_map_pointer()->getEsdfLayerPtr()->getAllAllocatedBlocks(&blocks);
@@ -545,7 +443,7 @@ void NBV_Selector::updateFrontiers(){
 
 //   std::vector<float> distances_table(frontiers_set.size());
 
-//   if( frontiers_set.size() > m_sub_sample_size_ ){
+//   if( frontiers_set.size() > _sys_params.subsampling_views ){
 
 //     double min_value_distance = std::numeric_limits<double>::max() ; 
 //     double max_value_distance = std::numeric_limits<double>::min() ; 
@@ -566,19 +464,19 @@ void NBV_Selector::updateFrontiers(){
 
 //     }
 
-//     float threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
+//     float threshold_tirage = _sys_params.subsampling_views / frontiers_set.size() ;
 //     float value_tirage = -1 ; 
 //     int i = 0 ; 
-//     std::vector<int> history_table(m_sub_sample_size_);
+//     std::vector<int> history_table(_sys_params.subsampling_views);
 //     int history_count = 0;
-//     while((frontiers_subset.size() < m_sub_sample_size_) && (i < frontiers_set.size() )){
+//     while((frontiers_subset.size() < _sys_params.subsampling_views) && (i < frontiers_set.size() )){
 
 //         value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
-//         threshold_tirage = m_sub_sample_size_ / frontiers_set.size() ;
+//         threshold_tirage = _sys_params.subsampling_views / frontiers_set.size() ;
 //         threshold_tirage = threshold_tirage *  ( (max_value_distance - distances_table[i] ) / (max_value_distance - min_value_distance )); 
         
-//         ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", i);
-//         ROS_INFO_COND(verbose_, "[Sampling] in the while loop ... %d", frontiers_subset.size());
+//         ROS_INFO_COND(_sys_params.verbose, "[Sampling] in the while loop ... %d", i);
+//         ROS_INFO_COND(_sys_params.verbose, "[Sampling] in the while loop ... %d", frontiers_subset.size());
 //         if(value_tirage > threshold_tirage){
 
 //           frontiers_subset.push_back(frontiers_set[i]);
@@ -595,7 +493,7 @@ void NBV_Selector::updateFrontiers(){
 
 //         }
 //         i=i+1;
-//         ROS_INFO_COND(verbose_, "[Sampling] End while loop");
+//         ROS_INFO_COND(_sys_params.verbose, "[Sampling] End while loop");
 
 //     }
     
@@ -609,19 +507,19 @@ void NBV_Selector::updateFrontiers(){
 
 //   ros::Time end_sample_subset_frontiers = ros::Time::now();
 //   ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
-//   ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers] %.4f s", duration.toSec());
+//   ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][sample_subset_frontiers] %.4f s", duration.toSec());
 // }
 
 void NBV_Selector::sample_subset_frontiers_shells(){
-  int sample_value = m_sub_sample_size_; 
+  int sample_value = _sys_params.subsampling_views; 
   std::vector<int> history_table;
   ROS_INFO("[Sampling] sampling value is %d out of %d", sample_value, frontiers_set.size());
-  if( m_sub_sample_size_ > frontiers_set.size()){
+  if( _sys_params.subsampling_views > frontiers_set.size()){
     sample_value = frontiers_set.size();
   }
   // ROS_INFO("[Sampling] sampling value is %d", sample_value);
 
-  ROS_INFO_COND(verbose_, "[Sampling] shells start");
+  ROS_INFO_COND(_sys_params.verbose, "[Sampling] shells start");
   float value_tirage = (static_cast<float>(rand()) / RAND_MAX) ; 
   int index_id = -1 ; 
   frontiers_sub_pointcloud.clear();
@@ -637,7 +535,7 @@ void NBV_Selector::sample_subset_frontiers_shells(){
 
   }
 
-  ROS_INFO_COND(verbose_, "[Sampling] shells end");
+  ROS_INFO_COND(_sys_params.verbose, "[Sampling] shells end");
   printVectorOneLine(history_table);
 }
 
@@ -650,7 +548,7 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
   std::vector<float> distances_table(frontiers_set.size());
   std::vector<float> weight_table(frontiers_set.size());
 
-  if( frontiers_set.size() > m_sub_sample_size_ ){
+  if( frontiers_set.size() > _sys_params.subsampling_views ){
 
     double min_value_distance = std::numeric_limits<double>::max() ; 
     double max_value_distance = std::numeric_limits<double>::min() ; 
@@ -671,7 +569,7 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
       }
 
     }
-    ROS_INFO_COND(verbose_, "[Sampling][Before generating distribution] ");
+    ROS_INFO_COND(_sys_params.verbose, "[Sampling][Before generating distribution] ");
 
     float sum_weight = std::accumulate( weight_table.begin(), weight_table.end(), 0); // sum of weights
     for(auto& w : weight_table){ w = w / sum_weight; } //normalize weights
@@ -680,9 +578,9 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
     std::mt19937 gen(rd());
     std::discrete_distribution<> dist(weight_table.begin(), weight_table.end());
 
-    ROS_INFO_COND(verbose_, "[Sampling][After generating distribution] ");
+    ROS_INFO_COND(_sys_params.verbose, "[Sampling][After generating distribution] ");
 
-    for(int i =0; i < m_sub_sample_size_ ; i++){
+    for(int i =0; i < _sys_params.subsampling_views ; i++){
 
           int idx = dist(gen);
 
@@ -713,7 +611,7 @@ void NBV_Selector::sample_subset_frontiers_discrete(){
 
   ros::Time end_sample_subset_frontiers = ros::Time::now();
   ros::Duration duration = end_sample_subset_frontiers - start_sample_subset_frontiers;
-  ROS_INFO_COND(timer_, "[NBV_Selector][sample_subset_frontiers_discrete] %.4f s", duration.toSec());
+  ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][sample_subset_frontiers_discrete] %.4f s", duration.toSec());
 
 
 }
@@ -767,10 +665,10 @@ void NBV_Selector::publish_sub_frontiers(){
 // }
 
 void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
-  ROS_INFO_COND(verbose_, "[TSDF callback] Entering TSDF callback");
+  ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] Entering TSDF callback");
   if (!is_started_)
     return;
-  ROS_INFO_COND(verbose_, "[TSDF callback] Activated "); 
+  ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] Activated "); 
 
   voxblox::timing::Timer receive_map_timer("map/receive_tsdf");
 
@@ -782,33 +680,33 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
     LOG(ERROR) << "layer_msg voxel size = " << layer_msg.voxel_size << " map layer voxel size = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxel_size();
     LOG(ERROR) << "layer_msg voxel per side = " << layer_msg.voxels_per_side << " map layer voxel per side = " << m_map.get_tsdf_map_pointer()->getTsdfLayerPtr()->voxels_per_side();
   } else {
-    ROS_INFO_COND(verbose_, "[TSDF callback] Got an TSDF map from ROS topic!");
+    ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] Got an TSDF map from ROS topic!");
     // publishAllUpdatedTsdfVoxels();
-    // ROS_INFO_COND(verbose_, "[TSDF callback] Published pointclouds");
+    // ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] Published pointclouds");
 
     updateFrontiers();
-    ROS_INFO_COND(verbose_, "[TSDF callback] Updated frontiers ! ");
+    ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] Updated frontiers ! ");
 
-    if (extra_viz_){
+    if (_sys_params.extra_viz){
       publish_all_frontiers();
-      ROS_INFO_COND(verbose_, "Frontiers published !");
+      ROS_INFO_COND(_sys_params.verbose, "Frontiers published !");
     }
 
-    ROS_INFO_COND(verbose_, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
+    ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] THERE ARE %d FRONTIERS", frontiers_set.size() );
 
     // publish_test_voxels(); 
-    ROS_INFO_COND(verbose_, "[TSDF callback] Published test voxels ! ");
+    ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] Published test voxels ! ");
     
     //sample frontiers
     sample_subset_frontiers_shells();
 
 
-    ROS_INFO_COND(verbose_, "[TSDF callback] SAMPLING");
+    ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] SAMPLING");
   
     
     
     publish_sub_frontiers();
-    ROS_INFO_COND(verbose_, "[TSDF callback] PUBLISHING SUB FRONTIERS");
+    ROS_INFO_COND(_sys_params.verbose, "[TSDF callback] PUBLISHING SUB FRONTIERS");
   }
     //SEND PROCEDURE
     //voxblox_msgs::Layer layer_msg;
@@ -818,26 +716,26 @@ void NBV_Selector::tSDFCallback(const voxblox_msgs::Layer& layer_msg){
 }
 
 void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
-  ROS_INFO_COND(verbose_, "[ESDF callback] Entering ESDF callback");
+  ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Entering ESDF callback");
   if (!is_started_)
     return;
-  ROS_INFO_COND(verbose_, "[ESDF callback] Activated");
+  ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Activated");
   voxblox::timing::Timer receive_map_timer("map/receive_esdf");
 
   bool success =
       voxblox::deserializeMsgToLayer<voxblox::EsdfVoxel>(layer_msg, m_map.get_esdf_map_pointer()->getEsdfLayerPtr());
-  ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized done ! ");
+  ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Deserialized done ! ");
 
   if (!success) {
     ROS_ERROR_THROTTLE(10, "MAP FRONTIERS : Got an invalid ESDF map message!");
-    ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized failed ! ");
+    ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Deserialized failed ! ");
   } else {
-    ROS_INFO_COND(verbose_, "[ESDF callback] Deserialized sucess ! ");
+    ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Deserialized sucess ! ");
 
     // visualize_voxels_ESDF();
-    // //ROS_INFO_COND(verbose_, "[ESDF callback] Sorted ESDF voxels ! ");
+    // //ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Sorted ESDF voxels ! ");
     // publish_test_voxels(); 
-    // //ROS_INFO_COND(verbose_, "[ESDF callback] Published test voxels ! ");
+    // //ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Published test voxels ! ");
 
     int number_views = 0 ;
     int number_resampling = 0 ; 
@@ -847,7 +745,7 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
     
     while( number_views == 0 && frontiers_set.size() > 0 ){
       number_resampling = number_resampling +1 ; 
-      ROS_INFO_COND(verbose_, "[ESDF callback] Found no views... Resampling for the %d times ", number_resampling);
+      ROS_INFO_COND(_sys_params.verbose, "[ESDF callback] Found no views... Resampling for the %d times ", number_resampling);
       //sample frontiers
       sample_subset_frontiers_shells();
       generate_views() ; 
@@ -856,9 +754,9 @@ void NBV_Selector::eSDFCallback(const voxblox_msgs::Layer& layer_msg){
 
     }
 
-    ROS_INFO_COND(verbose_, "Views generated !" );
+    ROS_INFO_COND(_sys_params.verbose, "Views generated !" );
     publish_views();
-    ROS_INFO_COND(verbose_,"Views published !");
+    ROS_INFO_COND(_sys_params.verbose,"Views published !");
 
     }
   
@@ -927,11 +825,11 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 /////////////////////////////////////////////////////////////////
 
 
-  ROS_INFO_COND(verbose_, "POS CALLBACK");
+  ROS_INFO_COND(_sys_params.verbose, "POS CALLBACK");
   m_current_pos.o_x = m_current_pos.x ; 
   m_current_pos.o_y = m_current_pos.y;
   m_current_pos.o_z = m_current_pos.z;
-  // ROS_INFO_COND(verbose_, "CHECK 2 ");
+  // ROS_INFO_COND(_sys_params.verbose, "CHECK 2 ");
   m_current_pos.x = msg_odom.pose.pose.position.x ;
   m_current_pos.y = msg_odom.pose.pose.position.y ;
   m_current_pos.z = msg_odom.pose.pose.position.z ;
@@ -940,29 +838,29 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   m_current_pos.q_z = msg_odom.pose.pose.orientation.z ;
   m_current_pos.q_w = msg_odom.pose.pose.orientation.w ;
   
-  // ROS_INFO_COND(verbose_, "CHECK 3 ");
+  // ROS_INFO_COND(_sys_params.verbose, "CHECK 3 ");
   //linear speed : should be angular ? 
   m_vel_x = msg_odom.twist.twist.linear.x ;
   m_vel_y = msg_odom.twist.twist.linear.y ;
   m_vel_z = msg_odom.twist.twist.linear.z ;
-  // ROS_INFO_COND(verbose_, "[First] VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
-  // ROS_INFO_COND(verbose_, "[First] POS VALUES ARE %f %f %f", m_current_pos.x,  m_current_pos.y ,  m_current_pos.z);
-  // ROS_INFO_COND(verbose_, "[First] OR VALUES ARE %f %f %f %f", m_current_pos.q_x,  m_current_pos.q_y ,  m_current_pos.q_z, m_current_pos.q_w );
+  // ROS_INFO_COND(_sys_params.verbose, "[First] VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
+  // ROS_INFO_COND(_sys_params.verbose, "[First] POS VALUES ARE %f %f %f", m_current_pos.x,  m_current_pos.y ,  m_current_pos.z);
+  // ROS_INFO_COND(_sys_params.verbose, "[First] OR VALUES ARE %f %f %f %f", m_current_pos.q_x,  m_current_pos.q_y ,  m_current_pos.q_z, m_current_pos.q_w );
   
 
     if( m_availability == BUSY){
       //Position
       float distance_difference = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ), 2) + pow((m_current_pos.z - m_current_goal.z ), 2) ; 
-      bool isPositionCorrect = distance_difference < m_tolerance_distance_;
+      bool isPositionCorrect = distance_difference < _sys_params.tolerance_distance;
 
       // Orientation
       Eigen::Quaterniond current_orientation(m_current_pos.q_x, m_current_pos.q_y, m_current_pos.q_z, m_current_pos.q_w ); 
       Eigen::Quaterniond goal_orientation(m_current_goal.q_x, m_current_goal.q_y, m_current_goal.q_z, m_current_goal.q_w ); 
-      bool isOrientationCorrect = (current_orientation.isApprox(goal_orientation, m_angular_tolerance_) || current_orientation.coeffs().isApprox( -goal_orientation.coeffs(), m_angular_tolerance_));
+      bool isOrientationCorrect = (current_orientation.isApprox(goal_orientation, _sys_params.angular_tolerance) || current_orientation.coeffs().isApprox( -goal_orientation.coeffs(), _sys_params.angular_tolerance));
 
       if( isPositionCorrect && isOrientationCorrect){
         m_availability = AVAILABLE ; 
-        ROS_INFO_COND(verbose_, "ROBOT IS NOW AVAILABLE");
+        ROS_INFO_COND(_sys_params.verbose, "ROBOT IS NOW AVAILABLE");
       }
     }
 
@@ -975,27 +873,27 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
 
   //if the robot hasn't had a new goal in the last second and is available, find nbv
   if( (m_availability == AVAILABLE) && ( duration.toSec() > 1.0 ) ) {
-    ROS_INFO_COND(verbose_, " Going into selection");
+    ROS_INFO_COND(_sys_params.verbose, " Going into selection");
 
     select_next_best_view();
     last_nbv_ = ros::Time::now();
 
     publish_goal();
     m_availability = BUSY ; 
-    ROS_INFO_COND(verbose_, "ROBOT IS NOW BUSY");
+    ROS_INFO_COND(_sys_params.verbose, "ROBOT IS NOW BUSY");
 
 
     
   }
   else {
-    ROS_INFO_COND(verbose_, "ROBOT IS NOT AVAILABLE %f ", duration.toSec()  );
+    ROS_INFO_COND(_sys_params.verbose, "ROBOT IS NOT AVAILABLE %f ", duration.toSec()  );
   }
 
 
 }
 
 void NBV_Selector::isIdleCallback(const std_msgs::Bool& msg_is_idle) {
-  if (verbose_ && m_is_idle != msg_is_idle.data) {
+  if (_sys_params.verbose && m_is_idle != msg_is_idle.data) {
     if (m_is_idle)
       ROS_INFO("drone went from %s to %s", "idle", "moving");
     else
@@ -1039,12 +937,12 @@ void NBV_Selector::generate_views(){
   views = m_view_generator.getViewCandidates();
   ros::Time end_generate_views = ros::Time::now();
   ros::Duration duration = end_generate_views - start_generate_views;
-  ROS_INFO_COND(timer_, "[NBV_Selector][generate_views] %.4f s", duration.toSec());
+  ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][generate_views] %.4f s", duration.toSec());
 }
 
 void NBV_Selector::publish_views(){
-  // if (!extra_viz_)
-  //   return;
+  if (!_sys_params.extra_viz)
+    return;
   visualization_msgs::MarkerArray marker_array;
   visualization_msgs::MarkerArray marker_array_rejects;
   float range_for_viz = 0.3;
@@ -1087,7 +985,7 @@ void NBV_Selector::publish_views(){
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
 
-    ROS_INFO_COND(verbose_, "View history %d %f %f %f %f", i, views_history[i].q_x, views_history[i].q_y, views_history[i].q_z, views_history[i].q_w);
+    ROS_INFO_COND(_sys_params.verbose, "View history %d %f %f %f %f", i, views_history[i].q_x, views_history[i].q_y, views_history[i].q_z, views_history[i].q_w);
 
   }
   
@@ -1105,7 +1003,7 @@ void NBV_Selector::publish_views(){
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
 
-    // ROS_INFO_COND(verbose_, "View  %d %f %f %f %f", i, views[i].q_x, views[i].q_y, views[i].q_z, views[i].q_w);
+    // ROS_INFO_COND(_sys_params.verbose, "View  %d %f %f %f %f", i, views[i].q_x, views[i].q_y, views[i].q_z, views[i].q_w);
 
   }
   views_set.header.frame_id = world_frame_;
@@ -1145,9 +1043,9 @@ void NBV_Selector::publish_views(){
 //Called in poscallback after pose updated
 void NBV_Selector::select_next_best_view(){
   
-  ROS_INFO_COND(verbose_, "SELECTING VIEWS NOW");
+  ROS_INFO_COND(_sys_params.verbose, "SELECTING VIEWS NOW");
   
-  // ROS_INFO_COND(verbose_, "EMPTY SPACE");
+  // ROS_INFO_COND(_sys_params.verbose, "EMPTY SPACE");
 
   //evaluate views
   std::vector<float> values_views;
@@ -1162,28 +1060,28 @@ void NBV_Selector::select_next_best_view(){
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
-  // ROS_INFO_COND(verbose_, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
+  // ROS_INFO_COND(_sys_params.verbose, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
 
   if (views.size() > 0){
     dist_min_views = m_view_evaluator.getMinMaxViewDistance(views, current_pos_vector, dist_max_views) ;
   }
   else{
-    ROS_INFO_COND(verbose_, "NO VIEWS TO CHECK FOR DISTANCE VIEWS ");
+    ROS_INFO_COND(_sys_params.verbose, "NO VIEWS TO CHECK FOR DISTANCE VIEWS ");
   }
-  ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_views);
-  ROS_INFO_COND(verbose_, "MAX DISTANCE FRONTIERS IS %f", dist_max_views);
+  ROS_INFO_COND(_sys_params.verbose, "MIN DISTANCE FRONTIERS IS %f", dist_min_views);
+  ROS_INFO_COND(_sys_params.verbose, "MAX DISTANCE FRONTIERS IS %f", dist_max_views);
 
 
 
   m_current_goal = m_current_pos;
 
-  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
-  ROS_INFO_COND(verbose_, "ALPHA %f BETA %f GAMMA %d", m_alpha, m_beta, m_gamma);
+  ROS_INFO_COND(_sys_params.verbose, "EXAMINING %d", views.size());
+  ROS_INFO_COND(_sys_params.verbose, "image_component_weight %f metrics_component_weight %f use_distance_in_metrics_component %d", _sys_params.image_component_weight, _sys_params.metrics_component_weight, _sys_params.use_distance_in_metrics_component);
   ros::Time total_view_evaluation_start = ros::Time::now();
 
   for(int i=0;i< views.size();i++){
 
-    ROS_INFO_COND(verbose_, "GET VOXELS VIEW %d", i);
+    ROS_INFO_COND(_sys_params.verbose, "GET VOXELS VIEW %d", i);
 
 
     ViewCandidate view = views[i] ; 
@@ -1197,35 +1095,35 @@ void NBV_Selector::select_next_best_view(){
     // &visible_voxels, pos, orient) ;
     // ros::Time end_get_visible_voxels_lidar = ros::Time::now();
     // ros::Duration duration = end_get_visible_voxels_lidar - start_get_visible_voxels_lidar;
-    // ROS_INFO_COND(timer_, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
+    // ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][getVisibleVoxels_LIDAR] %.4f s", duration.toSec());
 
-    ROS_INFO_COND(verbose_, "COUNTING FRONTIERS VIEW %d", i);
+    ROS_INFO_COND(_sys_params.verbose, "COUNTING FRONTIERS VIEW %d", i);
     
     ros::Time start_view_evaluation = ros::Time::now();
     //temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
     //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
     image_value = m_view_evaluator.inverseRayCast(view, frontiers_set ); 
-    ROS_INFO_COND(verbose_, "IMAGE VALUE of  %d is %f", i, image_value);
+    ROS_INFO_COND(_sys_params.verbose, "IMAGE VALUE of  %d is %f", i, image_value);
 
 
     ros::Time end_view_evaluation = ros::Time::now();
     ros::Duration duration = end_view_evaluation - start_view_evaluation;
-    ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
+    ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
     
     //IF DISTANCE IS TAKEN  INTO ACCOUNT
-    if ( m_gamma == true ){
+    if ( _sys_params.use_distance_in_metrics_component == true ){
       dist_view = (view_vector - current_pos_vector ).norm() ;
       value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
     }
 
-    ROS_INFO_COND(verbose_, "ANGLE COST VALUE of  %d is %f", i, value_angular);
+    ROS_INFO_COND(_sys_params.verbose, "ANGLE COST VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
-    //ROS_INFO_COND(verbose_, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    //ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
 
-    total_value = m_alpha * image_value + m_beta * value_angular ; 
-    ROS_INFO_COND(verbose_, "TOTAL VALUE OF  %d is %f", i, total_value);
+    total_value = _sys_params.image_component_weight * image_value + _sys_params.metrics_component_weight * value_angular ; 
+    ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
     
     values_views.push_back(total_value);
     if( total_value > max_value_nbv){
@@ -1243,15 +1141,15 @@ void NBV_Selector::select_next_best_view(){
   //select views
   ros::Time total_view_evaluation_end = ros::Time::now();
   ros::Duration duration_total = total_view_evaluation_start - total_view_evaluation_end ; 
-  ROS_INFO_COND(timer_, "[NBV_Selector][Evaluate View] Total %.4f s", duration_total.toSec());
+  ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][Evaluate View] Total %.4f s", duration_total.toSec());
 
 
 
   if (views.size() > 0){
-    ROS_INFO_COND(verbose_, "UPDATING CURRENT GOAL ");
-    ROS_INFO_COND(verbose_, "NEW GOAL IS VIEW %d", index_of_nbv);
-    ROS_INFO_COND(verbose_, " %f %f %f ", views[index_of_nbv].x , views[index_of_nbv].y , views[index_of_nbv].z );
-    ROS_INFO_COND(verbose_, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
+    ROS_INFO_COND(_sys_params.verbose, "UPDATING CURRENT GOAL ");
+    ROS_INFO_COND(_sys_params.verbose, "NEW GOAL IS VIEW %d", index_of_nbv);
+    ROS_INFO_COND(_sys_params.verbose, " %f %f %f ", views[index_of_nbv].x , views[index_of_nbv].y , views[index_of_nbv].z );
+    ROS_INFO_COND(_sys_params.verbose, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
 
     views_history.push_back( views[index_of_nbv]) ;
 
@@ -1273,9 +1171,9 @@ void NBV_Selector::select_next_best_view(){
 }
 
 void NBV_Selector::next_best_view_closest_frontier(){
-  ROS_INFO_COND(verbose_, "CLOSEST FRONTIER MODE");
+  ROS_INFO_COND(_sys_params.verbose, "CLOSEST FRONTIER MODE");
   
-  // ROS_INFO_COND(verbose_, "EMPTY SPACE");
+  // ROS_INFO_COND(_sys_params.verbose, "EMPTY SPACE");
 
   //evaluate views
   std::vector<float> values_views;
@@ -1285,7 +1183,7 @@ void NBV_Selector::next_best_view_closest_frontier(){
   m_current_goal = m_current_pos;
   float temp_value_angular = 0 ;
   float max_value_angular = 0 ; 
-  ROS_INFO_COND(verbose_, "EXAMINING %d", views.size());
+  ROS_INFO_COND(_sys_params.verbose, "EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
     ViewCandidate view = views[i] ; 
@@ -1307,69 +1205,13 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");  
 
-    system_parameters sys_params ; 
-    /////////////// NAVIGATION
-    sys_params.tolerance_distance = 0.2 ; //TO DO : CHECK UNITE
-    sys_params.angular_tolerance = 0.2 ; // In radian
-
-    sys_params.threshold_known = 0.0 ; //from Hardouin 0.3
-
-    //////////////Bounding Box #current value is for HOUSE env. 
-    sys_params.x_max = 10;
-    sys_params.x_min = -20  ;
-
-    sys_params.y_max = 11;
-    sys_params.y_min = -11;
-
-    sys_params.z_max = 100;
-    sys_params.z_min = 0;
-
-    
-    //////////////Planning parameters
-    sys_params.alpha = 1.0 ;// image component weight
-    sys_params.beta = 1.0 ;// angular/distance cost component weight 
-    sys_params.gamma = 1 ;  // BOOLEAN : 0 or 1 /// IF 0 distance is NOT taken into account in the angular/distance component 
-    sys_params.occlusion = false; 
-
-    //////////////View Generation parameters
-    sys_params.method_view_generation = "gradient" ; 
-    sys_params.distance_min = 3;
-    sys_params.distance_max = 4;
-    sys_params.subsampling_views = 100 ;
-    sys_params.robot_radius = 8; // max number of voxels occupied by the robots in one direction : if 5, robot is contained in a 5*5*5 voxel cube
-    sys_params.angle_low = -25 ; // vertical angle below the drone 
-    sys_params.angle_high = 57; // vertical angle above the drone 
-    ///////////////
-
-    //////////////View Evaluator parameters
-    sys_params.value_frontier = 1 ;
-    sys_params.radius_surface_max = 3 ; // zone around the frontier to search for surface voxels
-    ///////////////
-
-    //////////////LIDAR Parameters
-    Eigen::Vector3d mounting_translation_;  // x,y,z [m]
-    Eigen::Quaterniond mounting_rotation_;  // x,y,z,w quaternion
-    //sensor parameters
-    sys_params.p_ray_length = 10;  // params for camera model
-    sys_params.p_fov_y = 360;  // Total fields of view [deg], expected symmetric w.r.t.
-    // sensor facing direction
-    sys_params.p_fov_x = 63.05;
-    sys_params.p_resolution_x = 1000 ;
-    sys_params.p_resolution_y = 1000; // high number attendu
-    sys_params.p_sampling_time =1; 
-
-    sys_params.p_fov_x *= M_PI / 180.0;
-    sys_params.p_fov_y *= M_PI / 180.0;
-    ///////////////
-
-
     ///////////////Robot team initialization
     int team_id = 1;
     std::vector<int> robot_team ; 
     robot_team.push_back(team_id);
     ///////////////
 
-    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, team_id,  robot_team, sys_params);
+    NBV_Selector nbv_selector = NBV_Selector(nh, nh_private, team_id,  robot_team);
     ros::spin();
     return 0;
 }
