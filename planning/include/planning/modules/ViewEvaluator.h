@@ -336,8 +336,9 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
   for(int i=0; i< voxels_set.size(); i++) {
 
     Eigen::Vector3d voxel_test = voxels_set[i];
+    Eigen::Vector3d voxel_unknown;
 
-    if( isSurfaceFrontier_TSDF(voxel_test, m_threshold_known) ){ // replaced by hashmap 
+    if( isSurfaceFrontier_TSDF(voxel_test, voxel_unknown) ){ // replaced by hashmap 
 
           evaluation = evaluation + value_frontier_ ; 
         }
@@ -359,8 +360,9 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
   for(int i=0; i< voxels_set.size(); i++) {
 
     Eigen::Vector3d voxel_test = voxels_set[i];
+    Eigen::Vector3d voxel_unknown;
 
-    if( isSurfaceFrontier_TSDF(voxel_test, m_threshold_known) ){
+    if( isSurfaceFrontier_TSDF(voxel_test, voxel_unknown) ){
 
           evaluation = evaluation + value_frontier_ ; 
         }
