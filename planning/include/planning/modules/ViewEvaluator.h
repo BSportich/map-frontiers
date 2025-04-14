@@ -251,8 +251,8 @@ float ViewEvaluator::evaluate_view_angular(const ViewCandidate& vc, const Eigen:
 }
 
 float ViewEvaluator::evaluate_distance_angle_cost( float value_angular, float dist_min_frontiers, float dist_view ){
-  //return value_angular * (dist_min_frontiers / dist_view ) ;
-  return value_angular * exp( - ( dist_view ) ) ; 
+  return value_angular * (dist_min_frontiers / dist_view ) ;
+  //return value_angular * exp( - ( dist_view ) ) ; 
 }
 
 
@@ -450,7 +450,7 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   }
   average_dist_frontier= average_dist_frontier/result;
   ROS_INFO("AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
-  ROS_INFO(" Frontiers blocked/bad angle are  %f on %d",result, nb_frontiers_examined );
+  ROS_INFO(" Frontiers visible/good angle are  %f on %d",result, nb_frontiers_examined );
   total_distance = ( total_distance / frontiers_set.size() ) ;
   result = (result / frontiers_set.size()); 
   return total_distance;
