@@ -15,15 +15,9 @@
         <param name="voxel_size" type="double" command="rosparam get /voxel_size" />
         <param name="voxels_per_side" type="double" command="rosparam get /voxels_per_side" />
 
-        <param name="sub_sample_size" type="int" command="rosparam get /NBV_selector/nb_of_subsampled_views" />
+        <!-- Load all the parameters for NBV_Selector -->
+        <rosparam file="/root/params/map_frontiers_params.yml"/>
 
-        <param name="timer" type="bool" command="rosparam get /NBV_selector/timer" />
-        <param name="verbose" type="bool" command="rosparam get /NBV_selector/verbose" />
-        <param name="extra_viz" type="bool" command="rosparam get /NBV_selector/extra_viz" />
-
-        <param name="alpha" type="double" command="rosparam get /NBV_selector/image_component_weight" />
-        <param name="beta" type="double" command="rosparam get /NBV_selector/metrics_component_weight" />
-        <param name="gamma" type="bool" command="rosparam get /NBV_selector/use_distance_in_metrics_component" />
     </node>
   </group>
 </launch>
