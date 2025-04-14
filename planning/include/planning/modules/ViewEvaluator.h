@@ -63,10 +63,8 @@ public:
     ViewEvaluator(){};
     ~ViewEvaluator();
 
-    // float evaluate_view_image(const ViewCandidate& vc); 
     // float evaluate_view_pos(const ViewCandidate& vc, const ViewCandidate& current_pos);
 
-    bool isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known);
     //bool isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel);
     bool isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::Vector3d& unknown_vox);
 
@@ -81,7 +79,7 @@ public:
 
     float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos, const Eigen::Vector3d& vel);
     float evaluate_distance_angle_cost( float value_angular, float dist_min_frontiers, float dist_view );
-    float getMinViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector);
+    float getMinMaxViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
@@ -339,7 +337,7 @@ float ViewEvaluator::count_frontiers_view(const std::vector<Eigen::Vector3d>& vo
 
     Eigen::Vector3d voxel_test = voxels_set[i];
 
-    if( isFrontierVoxel_TSDF(voxel_test, m_threshold_known) ){ // replaced by hashmap 
+    if( isSurfaceFrontier_TSDF(voxel_test, m_threshold_known) ){ // replaced by hashmap 
 
           evaluation = evaluation + value_frontier_ ; 
         }
@@ -362,7 +360,7 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 
     Eigen::Vector3d voxel_test = voxels_set[i];
 
-    if( isFrontierVoxel_TSDF(voxel_test, m_threshold_known) ){
+    if( isSurfaceFrontier_TSDF(voxel_test, m_threshold_known) ){
 
           evaluation = evaluation + value_frontier_ ; 
         }
@@ -523,56 +521,6 @@ bool ViewEvaluator::lineOfSightCheck(const ViewCandidate& vc, float& nb_unknown_
   return true;
 }
 
-bool ViewEvaluator::isFrontierVoxel_TSDF(const Eigen::Vector3d& voxel, double threshold_known){
-  unsigned char voxel_state;
-  unsigned char current_state;
-  bool is_empty = false;
-  bool close_unknown = false;
-  bool close_occupied = false; 
-
-  if ( isCorrectPos(voxel, m_bb) == false ){
-    return false;
-  }
-
-  current_state = m_map.getVoxelState_TSDF(voxel, threshold_known);
-    if( current_state == voxblox_map::VoxbloxMap::FREE){
-      is_empty = true;
-    } 
-    else{
-      return false;
-    }
-
-
-    for (int i = 0; i < 6; ++i) {
-
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], threshold_known);
-      if (voxel_state == voxblox_map::VoxbloxMap::UNKNOWN) {
-        close_unknown = true;
-      }
-
-
-    }
-
-
-    for (int i = 0; i < 6; ++i) {
-
-
-      voxel_state = m_map.getVoxelState_TSDF(voxel + c_neighbor_voxels_[i], threshold_known);
-      if (voxel_state == voxblox_map::VoxbloxMap::OCCUPIED) {
-        close_occupied = true;
-
-      } 
-
-    }
-
-
-    if(is_empty && close_unknown && close_occupied){
-    //if(is_empty){
-      return true;
-    }
-    return false;
-  }
-
 
 
 bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::Vector3d& unknown_vox){
@@ -583,7 +531,7 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
   bool close_unknown = false;
   bool close_empty = false;
 
-  if( voxel.z() <= 0){   //TO CHECK
+  if ( isCorrectPos(voxel, m_bb) == false ){
     return false;
   }
 
@@ -626,10 +574,12 @@ bool ViewEvaluator::isSurfaceFrontier_TSDF(const Eigen::Vector3d& voxel, Eigen::
 }
 
 
-float ViewEvaluator::getMinViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector){
+float ViewEvaluator::getMinMaxViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector, float& max_dist){
 
   float temp_distance = -1;
-  float min_distance = MAXFLOAT;
+  float temp_max_distance = -1;
+  float max_distance = std::numeric_limits<float>::min() ;
+  float min_distance = std::numeric_limits<float>::max();
   for(int i=0;i< views.size();i++){
 
     ViewCandidate view = views[i] ;
@@ -639,11 +589,15 @@ float ViewEvaluator::getMinViewDistance(std::vector<ViewCandidate> views, const 
     if ( temp_distance < min_distance ){
       min_distance = temp_distance ; 
     }
+
+    if ( temp_distance > max_distance){
+      max_distance = temp_distance;
+    }
     
     
     
   }
-
+  max_dist = max_distance;
   return min_distance;
 
 }

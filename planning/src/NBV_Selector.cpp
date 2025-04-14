@@ -405,7 +405,6 @@ void NBV_Selector::updateFrontiers(){
         // ROS_INFO_COND(verbose_, "TESTING COORDINATES %f %f %f", coord.x(), coord.y(), coord.z());
 
 
-        //if ( m_view_evaluator.isFrontierVoxel_TSDF(coord_3d, m_threshold_known)){
         Eigen::Vector3d unknown_vox_frontier;
         if ( m_view_evaluator.isSurfaceFrontier_TSDF(coord_3d, unknown_vox_frontier ) ){
           frontiers_set.push_back( coord_3d );
@@ -949,7 +948,15 @@ void NBV_Selector::posCallback(const nav_msgs::Odometry& msg_odom){ // TO FIX : 
   
 
   if( m_availability == BUSY){ //TO DO : ADD ORIENTATION
+    //Position
     float pos_test = pow((m_current_pos.x - m_current_goal.x ), 2)   + pow((m_current_pos.y - m_current_goal.y ),2) + pow((m_current_pos.z - m_current_goal.z ),2) ; 
+   
+    //Orientation
+    // Eigen::Quaterniond& orient(m_current_pos.q_x, m_current_pos.q_y, m_current_pos.q_z, m_current_pos.q_w ); 
+    // Eigen::Quaterniond& orient_goal(m_current_goal.q_x, m_current_goal.q_y, m_current_goal.q_z, m_current_goal.q_w ); 
+    // bool isOrientationCorrect = (orient.isApprox(orien_goal, tol) || orient.isApprox( -orien_goal, tol));
+
+    // if( pos_test < m_tolerance_distance_  && isOrientationCorrect){
     if(pos_test < m_tolerance_distance_ ){
       m_availability = AVAILABLE ; 
       ROS_INFO_COND(verbose_, "ROBOT IS NOW AVAILABLE");
@@ -1150,18 +1157,21 @@ void NBV_Selector::select_next_best_view(){
   float value_angular = 0 ;
   float dist_view = 0 ;
   float dist_min_views = -1 ;
+  float dist_max_views = -1;
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
   // ROS_INFO_COND(verbose_, "VEL VALUES ARE %f %f %f", m_vel_x, m_vel_y, m_vel_z);
 
   if (views.size() > 0){
-    dist_min_views = m_view_evaluator.getMinViewDistance(views, current_pos_vector) ;
+    dist_min_views = m_view_evaluator.getMinMaxViewDistance(views, current_pos_vector, dist_max_views) ;
   }
   else{
     ROS_INFO_COND(verbose_, "NO VIEWS TO CHECK FOR DISTANCE VIEWS ");
   }
   ROS_INFO_COND(verbose_, "MIN DISTANCE FRONTIERS IS %f", dist_min_views);
+  ROS_INFO_COND(verbose_, "MAX DISTANCE FRONTIERS IS %f", dist_max_views);
+
 
 
   m_current_goal = m_current_pos;
