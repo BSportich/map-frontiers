@@ -1087,7 +1087,7 @@ void NBV_Selector::publish_views(){
     marker_array.markers.push_back(map_frontiers::visualization::CreateVerticalFOVMarker(temp_view, i, range_for_viz));
     marker_array.markers.push_back(map_frontiers::visualization::CreateViewToFrontiersLine(temp_view, temp_frontier, i));
 
-    ROS_INFO_COND(verbose_, "View history %d %f %f %f %f", i, views_history[i].q_x, views_history[i].q_y, views_history[i].q_z, views_history[i].q_w);
+    // ROS_INFO_COND(verbose_, "View history %d %f %f %f %f", i, views_history[i].q_x, views_history[i].q_y, views_history[i].q_z, views_history[i].q_w);
 
   }
   
