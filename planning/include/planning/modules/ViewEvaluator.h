@@ -79,7 +79,7 @@ public:
 
     float evaluate_view_angular(const ViewCandidate& vc, const Eigen::Vector3d& robot_pos, const Eigen::Vector3d& vel);
     float evaluate_distance_angle_cost( float value_angular, float dist_min_frontiers, float dist_view );
-    float getMinMaxViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector);
+    float getMinMaxViewDistance(std::vector<ViewCandidate> views, const Eigen::Vector3d& current_pos_vector,  float& max_dist);
 
     void getVisibleVoxels_camera(const ViewCandidate& vc);
     void getVisibleVoxels_LIDAR(std::vector<Eigen::Vector3d>* result, const Eigen::Vector3d& position, const Eigen::Quaterniond& orientation);
