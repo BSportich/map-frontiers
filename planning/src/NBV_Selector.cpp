@@ -1083,12 +1083,14 @@ void NBV_Selector::select_next_best_view(){
   ROS_INFO_COND(_sys_params.verbose, "image_component_weight %f metrics_component_weight %f use_distance_in_metrics_component %d", _sys_params.image_component_weight, _sys_params.metrics_component_weight, _sys_params.use_distance_in_metrics_component);
   ros::Time total_view_evaluation_start = ros::Time::now();
 
+  ViewCandidate view ;
+
   for(int i=0;i< views.size();i++){
 
     ROS_INFO_COND(_sys_params.verbose, "GET VOXELS VIEW %d", i);
 
 
-    ViewCandidate view = views[i] ; 
+    view = views[i] ; 
     // std::vector<Eigen::Vector3d> visible_voxels; 
 
     ros::Time start_get_visible_voxels_lidar = ros::Time::now();
