@@ -1057,6 +1057,10 @@ void NBV_Selector::select_next_best_view(){
   float dist_view = 0 ;
   float dist_min_views = -1 ;
   float dist_max_views = -1;
+  std::vector<float> image_values ; 
+  int max_nb_frontiers_visible = -1;
+  int temp_nb_frontiers_visible = -1;
+  int index_max_frontiers = -1;
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
@@ -1102,16 +1106,30 @@ void NBV_Selector::select_next_best_view(){
     ros::Time start_view_evaluation = ros::Time::now();
     //temp_value = m_view_evaluator.count_frontiers_view(visible_voxels);
     //temp_value = m_view_evaluator.evaluate_view_image(visible_voxels);
-    image_value = m_view_evaluator.inverseRayCast(view, frontiers_set ); 
-    ROS_INFO_COND(_sys_params.verbose, "IMAGE VALUE of  %d is %f", i, image_value);
-
+    image_value = m_view_evaluator.inverseRayCast(view, frontiers_set, temp_nb_frontiers_visible ); 
 
     ros::Time end_view_evaluation = ros::Time::now();
     ros::Duration duration = end_view_evaluation - start_view_evaluation;
     ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][Evaluate View] %.4f s", duration.toSec());
 
+
+    if ( temp_nb_frontiers_visible > max_nb_frontiers_visible){
+      max_nb_frontiers_visible = temp_nb_frontiers_visible ; 
+      index_max_frontiers = i;
+    }
+    image_values.push_back(image_value);
+
+
+
+
+
+  for(int i=0;i< views.size();i++){
+
+    image_values[i] = image_values[i] / max_nb_frontiers_visible ; 
+    ROS_INFO_COND(_sys_params.verbose, "IMAGE VALUE of  %d is %f", i, image_values[i]);
+
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
-    ROS_INFO_COND(_sys_params.verbose, "ANGLE COST of  %d is %f", i, value_angular);
+    // ROS_INFO_COND(_sys_params.verbose, "ANGLE COST of  %d is %f", i, value_angular);
 
     //IF DISTANCE IS TAKEN  INTO ACCOUNT
     if ( _sys_params.use_distance_in_metrics_component == true ){
@@ -1119,12 +1137,12 @@ void NBV_Selector::select_next_best_view(){
       value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
     }
 
-    ROS_INFO_COND(_sys_params.verbose, "ANGLE/DISTANCE VALUE of  %d is %f", i, value_angular);
+    // ROS_INFO_COND(_sys_params.verbose, "ANGLE/DISTANCE VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
     //ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
 
-    total_value = _sys_params.image_component_weight * image_value + _sys_params.metrics_component_weight * value_angular ; 
-    ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
+    total_value = _sys_params.image_component_weight * image_values[i] + _sys_params.metrics_component_weight * value_angular ; 
+    // ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
     
     values_views.push_back(total_value);
     if( total_value > max_value_nbv){

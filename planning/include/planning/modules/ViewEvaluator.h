@@ -395,8 +395,8 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 
 }
 
-float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set ){
-  float result = 0 ; 
+float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set, float& nb_frontiers_visible, float& nb_frontiers_visible ){
+  int result = 0 ; 
   Eigen::Vector3d frontier ;
   Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
   ViewCandidate vc_2 ;
@@ -450,8 +450,10 @@ float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Ei
   }
   average_dist_frontier= average_dist_frontier/result;
   ROS_INFO("AVERAGE DISTANCE OF GOAL IS %f", average_dist_frontier);
-  ROS_INFO(" Frontiers visible/good angle are  %f on %d",result, nb_frontiers_examined );
-  total_distance = ( total_distance / frontiers_set.size() ) ;
+  ROS_INFO(" Frontiers visible/good angle are  %d on %d",result, nb_frontiers_examined );
+  //TO UNCOMMENT IF REVERTED TO NON NORMALIZED : 
+  //total_distance = ( total_distance / frontiers_set.size() ) ;
+  nb_frontiers_visible = result;
   result = (result / frontiers_set.size()); 
   return total_distance;
   //return result;
