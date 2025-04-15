@@ -31,6 +31,8 @@
     <param name="esdf_voxels_per_side" type="int" command="rosparam get /voxels_per_side" />
     <param name="robot_model_file" value="$(arg robot_model_file)"/>
     <param name="max_ray_length_m" type="double" command="rosparam get /lidar_max_range" />
+    <param name="fov_up" type="double" command="rosparam get /vertical_min_angle" />
+    <param name="fov_down" type="double" command="rosparam get /vertical_max_angle" />
   </node>
 
   <node pkg="map_frontiers" type="start_rviz.sh" name="rvizvisualisation" output="screen" args="" />

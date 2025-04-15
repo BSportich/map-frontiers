@@ -122,6 +122,12 @@ void NBVSelectorParameters::LoadFromRos(const ros::NodeHandle& nh){
     nh.param("NBV_selector/sub_sample_size", subsampling_views, subsampling_views);
     ROS_INFO("Received sub_sample_size: %i", subsampling_views);
 
+    nh.param("NBV_selector/angle_low", angle_low, angle_low);
+    ROS_INFO("Received angle_low: %f", angle_low);
+
+    nh.param("NBV_selector/angle_high", angle_high, angle_high);
+    ROS_INFO("Received angle_high: %f", angle_high);
+
     nh.param("NBV_selector/p_ray_length", p_ray_length, p_ray_length);
     ROS_INFO("Received p_ray_length: %f", p_ray_length);
 
