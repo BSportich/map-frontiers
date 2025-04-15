@@ -1118,6 +1118,7 @@ void NBV_Selector::select_next_best_view(){
       index_max_frontiers = i;
     }
     image_values.push_back(image_value);
+  }
 
 
 
