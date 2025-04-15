@@ -395,7 +395,7 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 
 }
 
-float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set, float& nb_frontiers_visible ){
+float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set, int& nb_frontiers_visible ){
   int result = 0 ; 
   Eigen::Vector3d frontier ;
   Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
