@@ -385,7 +385,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
         ViewCandidate vc; 
         Eigen::Vector3d frontier = frontiers_set[i];
-        // ROS_INFO(" Generating view for frontier %d ",i);
+        ROS_INFO(" Generating view for frontier %d ",i);
         generated = generateview_normal(frontier, 0, angle_diff, vc);
 
         //if worked 
