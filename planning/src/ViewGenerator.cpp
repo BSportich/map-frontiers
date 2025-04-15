@@ -404,18 +404,20 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         }
         
         ROS_INFO(" FAILURE : Rotation required  %d ",i);
-        // ROS_INFO(" ROTATION %d ",i);
-        // // search for new view with a corrected vertical angle
-        // generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
-        // //if worked
-        // if(generated){
-        //     view_candidates.push_back( vc );
-        //     nb_rotation = nb_rotation +1 ;
-        //     continue;
-        // }
+        ROS_INFO(" ROTATION %d ",i);
+        // search for new view with a corrected vertical angle
+        generated = generateview_normal(frontier, (2* angle_diff) , angle_diff, vc);
+        //if worked
+        if(generated){
+            view_candidates.push_back( vc );
+            nb_rotation = nb_rotation +1 ;
+            continue;
+        }
+        else{
+            ROS_INFO(" Rotation failed  %d ",i);
+        }
 
         //search for new view with a different horizontal angle
-
         //if didn't manage to find a solution
         rejected_frontiers.push_back( frontier ) ; 
 
@@ -509,6 +511,14 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         
 
         vector_director = mat_rot * gradient ; 
+        ROS_INFO(" Rotated goal was %f", rotation);
+        float achieved_rotation = 0;
+        bool isNewAngleOk = false;
+        // ROS_INFO(" Rotated achieved was %f", );
+
+        
+
+
         // ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
 
 
@@ -530,7 +540,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     ViewCandidate temp_view = { test_point.x() , test_point.y() , test_point.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
     findOrientation(temp_view) ; 
     verify_angle( frontier, temp_view, vertical_view_angle, m_angle_low, m_angle_high ) ; 
-    // ROS_INFO(" Original angle found is %f", vertical_view_angle);
+    ROS_INFO(" Original angle found is %f", vertical_view_angle);
 
     if( vertical_view_angle > m_angle_high ){
         angle_diff = m_angle_high - angle_mid ;

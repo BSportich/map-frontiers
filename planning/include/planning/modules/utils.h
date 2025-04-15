@@ -69,6 +69,7 @@ bool verify_angle(const Eigen::Vector3d& frontier, const ViewCandidate& vc, floa
     Eigen::Vector3d direction_original = (frontier - next_voxel).normalized() ; // from view candidate, towards frontier
     Eigen::Vector3d direction_proj( direction_original.x(), direction_original.y(), 0) ;
     direction_proj.normalize() ;
+
     
     //Compute signed vertical angle
     //vertical_angle_rad = std::atan2(direction_original.z(), direction_original.head<2>().norm());
