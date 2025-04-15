@@ -73,7 +73,7 @@ public:
     float evaluate_view_image(const std::vector<Eigen::Vector3d>& voxels_set);
 
     bool lineOfSightCheck(const ViewCandidate& vc,  float& nb_unknown_voxels );
-    float inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set );
+    float inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set,  int& nb_frontiers_visible);
     float ponder_frontier_by_distance(float frontier_dist_to_vc);
 
 
@@ -395,7 +395,7 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
 
 }
 
-float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set, float& nb_frontiers_visible, float& nb_frontiers_visible ){
+float ViewEvaluator::inverseRayCast(const ViewCandidate& vc,const std::vector<Eigen::Vector3d>& frontiers_set, float& nb_frontiers_visible ){
   int result = 0 ; 
   Eigen::Vector3d frontier ;
   Eigen::Vector3d pos( vc.x, vc.y, vc.z); 
