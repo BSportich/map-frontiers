@@ -516,10 +516,8 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         bool isNewAngleOk = false;
         // ROS_INFO(" Rotated achieved was %f", );
 
-        
-
-
-        // ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
+        ROS_INFO(" Original gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
+        ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
 
 
     }
