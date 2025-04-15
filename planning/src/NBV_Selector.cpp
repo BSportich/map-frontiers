@@ -1089,9 +1089,7 @@ void NBV_Selector::select_next_best_view(){
 
 
     ViewCandidate view = views[i] ; 
-    std::vector<Eigen::Vector3d> visible_voxels; 
-    Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
-    Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
+    // std::vector<Eigen::Vector3d> visible_voxels; 
 
     ros::Time start_get_visible_voxels_lidar = ros::Time::now();
 
@@ -1125,6 +1123,10 @@ void NBV_Selector::select_next_best_view(){
 
 
   for(int i=0;i< views.size();i++){
+
+    view = views[i] ; 
+    Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
+    Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
 
     image_values[i] = image_values[i] / max_nb_frontiers_visible ; 
     ROS_INFO_COND(_sys_params.verbose, "IMAGE VALUE of  %d is %f", i, image_values[i]);
