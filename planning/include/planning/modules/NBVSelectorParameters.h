@@ -70,6 +70,7 @@ public:
 
     // Constructor
     NBVSelectorParameters();
+    NBVSelectorParameters(const std::string& profile);
 
     void SetDefaultValues();
 
