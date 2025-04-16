@@ -83,6 +83,39 @@ NBVSelectorParameters::NBVSelectorParameters(){
     SetDefaultValues();
 }
 
+NBVSelectorParameters::NBVSelectorParameters(const std::String& profile){
+    SetDefaultValues();
+
+    if(profile=="closest_frontier"){
+
+        views_generation_method="sphere";
+        views_selection_method = "closest";
+
+    }
+
+
+    if(profile=="highest_frontier"){
+
+        views_generation_method="sphere";
+        views_selection_method = "count_frontiers";
+
+    }
+
+    if(profile=="speed"){
+
+        views_generation_method="sphere";
+        image_component_weight = 0.0;
+        metrics_component_weight = 1.0;
+        use_distance_in_metrics_component = false; 
+
+    }
+
+
+
+
+
+}
+
 void NBVSelectorParameters::SetDefaultValues(){
     quality_objective = 1.0;
     use_freespace = false;
@@ -97,6 +130,7 @@ void NBVSelectorParameters::SetDefaultValues(){
     do_occlusions_check = false;
 
     views_generation_method = "gradient";
+    views_selection_method = "ours";
     distance_min = 3.0;
     distance_max = 4.0;
     subsampling_views = 100;

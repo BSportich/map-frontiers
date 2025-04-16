@@ -109,12 +109,12 @@ void ViewGenerator::generateViews_sphere(const std::vector<Eigen::Vector3d>& fro
 
                 Eigen::Vector3d voxel  = Eigen::Vector3d( o_x, o_y, o_z);
                 unsigned char current_state = m_map.getVoxelState_ESDF(voxel);
-                isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
-                //isFree = isSafeView(voxel); // never converges
-                if (current_state == voxblox_map::VoxbloxMap::OCCUPIED)
-                    numberOfOccupiedVoxels++;
-                if (current_state == voxblox_map::VoxbloxMap::UNKNOWN)
-                    numberOfUnknownVoxels++;
+                //isFree = (current_state == voxblox_map::VoxbloxMap::FREE);
+                isFree = isSafeView(voxel); // never converges
+                // if (current_state == voxblox_map::VoxbloxMap::OCCUPIED)
+                //     numberOfOccupiedVoxels++;
+                // if (current_state == voxblox_map::VoxbloxMap::UNKNOWN)
+                //     numberOfUnknownVoxels++;
                 //ROS_INFO("Generating views %f %f %f ", o_x, o_y, o_z );
 
 
@@ -404,18 +404,18 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         }
         
         ROS_INFO(" FAILURE : Rotation required  %d ",i);
-        ROS_INFO(" ROTATION %d ",i);
-        // search for new view with a corrected vertical angle
-        generated = generateview_normal(frontier, (1.1* angle_diff) , angle_diff, vc);
-        //if worked
-        if(generated){
-            view_candidates.push_back( vc );
-            nb_rotation = nb_rotation +1 ;
-            continue;
-        }
-        else{
-            ROS_INFO(" Rotation failed  %d ",i);
-        }
+        // ROS_INFO(" ROTATION %d ",i);
+        // // search for new view with a corrected vertical angle
+        // generated = generateview_normal(frontier, (1.1* angle_diff) , angle_diff, vc);
+        // //if worked
+        // if(generated){
+        //     view_candidates.push_back( vc );
+        //     nb_rotation = nb_rotation +1 ;
+        //     continue;
+        // }
+        // else{
+        //     ROS_INFO(" Rotation failed  %d ",i);
+        // }
 
         //search for new view with a different horizontal angle
         //if didn't manage to find a solution
