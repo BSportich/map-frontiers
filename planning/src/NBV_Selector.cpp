@@ -1126,6 +1126,8 @@ void NBV_Selector::select_next_best_view(){
 
   for(int i=0;i< views.size();i++){
 
+    ROS_INFO_COND(_sys_params.verbose, "Max frontiers visible is %f",max_nb_frontiers_visible);
+
     view = views[i] ; 
     Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
     Eigen::Quaterniond orient = Eigen::Quaterniond( view.q_x, view.q_y, view.q_z, view.q_w);
