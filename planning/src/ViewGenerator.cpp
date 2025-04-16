@@ -373,7 +373,6 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
     double vertical_angle_rad = 0 ;
     double vertical_angle_deg = 0 ;
     bool generated = false;
-    float angle_diff; 
     ViewAngle view_angle ; 
     float nb_rotation = 0 ; 
     float nb_sucess = 0 ; 
@@ -409,7 +408,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         ROS_INFO(" FAILURE : Rotation required  %d ",i);
         ROS_INFO(" ROTATION %d ",i);
         // search for new view with a corrected vertical angle
-        view_angle.goal_vert_rotation = (1.1* angle_diff); 
+        view_angle.goal_vert_rotation = (1.1* view_angle.vert_angle_diff); 
 
         generated = generateview_normal(frontier, view_angle, vc);
         //if worked
@@ -479,7 +478,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, ViewAng
     // ROS_INFO(" Position is %f %f %f ",frontier.x(), frontier.y(), frontier.z());
     if( (gradient.x() == 0) && (gradient.y() == 0) && (gradient.z() ==0) ){
         ROS_INFO(" Gradient is 0 : view can not be found");
-        angle_diff = 0 ;
+        view_angle.vert_angle_diff = 0 ;
         return false; 
     }
 
@@ -545,22 +544,22 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, ViewAng
 
     view_angle.current_vert_angle = vertical_view_angle ; 
     if( vertical_view_angle > m_angle_high ){
-        angle_diff = m_angle_high - angle_mid ;
+        view_angle.vert_angle_diff  = m_angle_high - angle_mid ;
         rejected_view_candidates.push_back(temp_view);
         // ROS_INFO(" Angle rejected :  %f ! Too high ! ", vertical_view_angle);
         return false;
     }
     else if( vertical_view_angle < m_angle_low ){
-        angle_diff = m_angle_low - angle_mid ;
+        view_angle.vert_angle_diff  = m_angle_low - angle_mid ;
         rejected_view_candidates.push_back(temp_view);
         // ROS_INFO(" Angle rejected :  %f ! Too low ! ", vertical_view_angle);
         return false;
     }
     else {
-        angle_diff = 0;
+        view_angle.vert_angle_diff  = 0;
         // ROS_INFO(" Angle accepted :  %f ! ", vertical_view_angle);
     }
-    view_angle.vert_angle_diff = angle_diff ; 
+    
 
 
     //TO DO : test the uncommented line
@@ -672,7 +671,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, ViewAng
 
     // }
 
-    if( angle_diff == 0 ){
+    if( view_angle.vert_angle_diff == 0 ){
         rejected_view = { current_pos.x() , current_pos.y() , current_pos.z() , 0,0,0,0, frontier.x() , frontier.y(), frontier.z()};
         rejected_view_candidates.push_back(rejected_view);
         ROS_INFO(" Angle correct but could not find any view ");
