@@ -1126,7 +1126,7 @@ void NBV_Selector::select_next_best_view(){
 
   for(int i=0;i< views.size();i++){
 
-    ROS_INFO_COND(_sys_params.verbose, "Max frontiers visible is %f",max_nb_frontiers_visible);
+    ROS_INFO_COND(_sys_params.verbose, "Max frontiers visible is %d",max_nb_frontiers_visible);
 
     view = views[i] ; 
     Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
@@ -1144,12 +1144,12 @@ void NBV_Selector::select_next_best_view(){
       value_angular = m_view_evaluator.evaluate_distance_angle_cost( value_angular, dist_min_views, dist_view ) ; 
     }
 
-    // ROS_INFO_COND(_sys_params.verbose, "ANGLE/DISTANCE VALUE of  %d is %f", i, value_angular);
+    ROS_INFO_COND(_sys_params.verbose, "ANGLE/DISTANCE VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
-    //ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
 
     total_value = _sys_params.image_component_weight * image_values[i] + _sys_params.metrics_component_weight * value_angular ; 
-    // ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
+    ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
     
     values_views.push_back(total_value);
     if( total_value > max_value_nbv){
