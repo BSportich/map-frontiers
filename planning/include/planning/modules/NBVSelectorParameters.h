@@ -83,7 +83,7 @@ NBVSelectorParameters::NBVSelectorParameters(){
     SetDefaultValues();
 }
 
-NBVSelectorParameters::NBVSelectorParameters(const std::String& profile){
+NBVSelectorParameters::NBVSelectorParameters(const std::string& profile){
     SetDefaultValues();
 
     if(profile=="closest_frontier"){
