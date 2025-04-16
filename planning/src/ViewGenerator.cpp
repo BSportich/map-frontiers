@@ -505,8 +505,8 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, ViewAng
         float current_angle_radian = view_angle.current_vert_angle *  (M_PI / 180.0); 
         ROS_INFO(" Angle gradient is %f", view_angle.current_vert_angle);
         ROS_INFO(" Angle gradient is %f", current_angle_radian);
-        current_angle_radian = current_angle_radian + M_PI ;
-        float new_height = tan(current_angle_radian + rotation_angle_radian) * sqrt( gradient.x() * gradient.x() + gradient.y() * gradient.y()) ;
+        // current_angle_radian = current_angle_radian + M_PI ;
+        float new_height = -tan(current_angle_radian + rotation_angle_radian) * sqrt( gradient.x() * gradient.x() + gradient.y() * gradient.y()) ;
         //float new_height = tan(current_angle_radian ) * sqrt( gradient.x() * gradient.x() + gradient.y() * gradient.y()) ;
 
         vector_director = Eigen::Vector3d( gradient.x(), gradient.y(), new_height);
