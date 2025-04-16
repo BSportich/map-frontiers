@@ -8,6 +8,14 @@
 #include <voxblox_map/voxblox_map.h>
 #include <planning/modules/utils.h>
 
+struct ViewAngle
+{
+    float current_vert_angle ;
+    float vert_angle_diff ; 
+    float goal_vert_rotation; 
+    float goal_vert_angle ; 
+};
+
 
 class ViewGenerator
 {

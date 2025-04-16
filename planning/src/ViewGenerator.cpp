@@ -4,14 +4,6 @@
 #include "ros/ros.h"
 #include <algorithm>
 
-struct ViewAngle
-{
-    float current_vert_angle ;
-    float vert_angle_diff ; 
-    float goal_vert_rotation; 
-    float goal_vert_angle ; 
-};
-
 
 
 ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high, const BoundingBox& bb){
