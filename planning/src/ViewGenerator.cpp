@@ -406,20 +406,20 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         }
         
         ROS_INFO(" FAILURE : Rotation required  %d ",i);
-        ROS_INFO(" ROTATION %d ",i);
-        // search for new view with a corrected vertical angle
-        view_angle.goal_vert_rotation = (1.1* view_angle.vert_angle_diff); 
+        // ROS_INFO(" ROTATION %d ",i);
+        // // search for new view with a corrected vertical angle
+        // view_angle.goal_vert_rotation = (1.1* view_angle.vert_angle_diff); 
 
-        generated = generateview_normal(frontier, view_angle, vc);
-        //if worked
-        if(generated){
-            view_candidates.push_back( vc );
-            nb_rotation = nb_rotation +1 ;
-            continue;
-        }
-        else{
-            ROS_INFO(" Rotation failed  %d ",i);
-        }
+        // generated = generateview_normal(frontier, view_angle, vc);
+        // //if worked
+        // if(generated){
+        //     view_candidates.push_back( vc );
+        //     nb_rotation = nb_rotation +1 ;
+        //     continue;
+        // }
+        // else{
+        //     ROS_INFO(" Rotation failed  %d ",i);
+        // }
 
         //search for new view with a different horizontal angle
         //if didn't manage to find a solution
