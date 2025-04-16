@@ -1136,7 +1136,7 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(_sys_params.verbose, "IMAGE VALUE of  %d is %f", i, image_values[i]);
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
-    // ROS_INFO_COND(_sys_params.verbose, "ANGLE COST of  %d is %f", i, value_angular);
+    ROS_INFO_COND(_sys_params.verbose, "ANGLE COST of  %d is %f", i, value_angular);
 
     //IF DISTANCE IS TAKEN  INTO ACCOUNT
     if ( _sys_params.use_distance_in_metrics_component == true ){
@@ -1146,7 +1146,7 @@ void NBV_Selector::select_next_best_view(){
 
     ROS_INFO_COND(_sys_params.verbose, "ANGLE/DISTANCE VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
-    ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    // ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
 
     total_value = _sys_params.image_component_weight * image_values[i] + _sys_params.metrics_component_weight * value_angular ; 
     ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
