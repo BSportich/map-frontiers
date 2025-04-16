@@ -37,7 +37,7 @@ public:
     void generateViews_sphere(const std::vector<Eigen::Vector3d>& frontiers_set);
     // void generateViews_echo(std::vector<Eigen::Vector3d> frontiers_set);
     void generateViews_normals(const std::vector<Eigen::Vector3d>& frontiers_set);
-    bool generateview_normal(const Eigen::Vector3d& frontier, float rotation, float& angle_diff, ViewCandidate& vc);
+    bool generateview_normal(const Eigen::Vector3d& frontier, ViewAngle& view_angle, ViewCandidate& vc);
 
     void generateViews_gradients_ESDF(const std::vector<Eigen::Vector3d>& frontiers_set);
 

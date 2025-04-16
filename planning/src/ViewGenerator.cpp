@@ -4,6 +4,15 @@
 #include "ros/ros.h"
 #include <algorithm>
 
+struct ViewAngle
+{
+    float current_vert_angle ;
+    float vert_angle_diff ; 
+    float goal_vert_rotation; 
+    float goal_vert_angle ; 
+};
+
+
 
 ViewGenerator::ViewGenerator(const std::string& method_name, float distance_min, float distance_max, const voxblox_map::VoxbloxMap& map, float robot_radius, float angle_low, float angle_high, const BoundingBox& bb){
     m_method_type = method_name;
@@ -373,6 +382,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
     double vertical_angle_deg = 0 ;
     bool generated = false;
     float angle_diff; 
+    ViewAngle view_angle ; 
     float nb_rotation = 0 ; 
     float nb_sucess = 0 ; 
     float total = 0 ;
@@ -386,7 +396,8 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         ViewCandidate vc; 
         Eigen::Vector3d frontier = frontiers_set[i];
         ROS_INFO(" Generating view for frontier %d ",i);
-        generated = generateview_normal(frontier, 0, angle_diff, vc);
+        view_angle.goal_vert_rotation = 0; 
+        generated = generateview_normal(frontier, view_angle, vc);
 
         //if worked 
         if(generated){
@@ -396,7 +407,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
             continue;
         }
 
-        if(generated == false && angle_diff == 0 ){
+        if(generated == false && view_angle.vert_angle_diff == 0 ){
             ROS_INFO(" FAILURE : Gradient failed  %d ",i);
             rejected_frontiers.push_back( frontier ) ;
             continue ; 
@@ -406,7 +417,9 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
         ROS_INFO(" FAILURE : Rotation required  %d ",i);
         ROS_INFO(" ROTATION %d ",i);
         // search for new view with a corrected vertical angle
-        generated = generateview_normal(frontier, (1.1* angle_diff) , angle_diff, vc);
+        view_angle.goal_vert_rotation = (1.1* angle_diff); 
+
+        generated = generateview_normal(frontier, view_angle, vc);
         //if worked
         if(generated){
             view_candidates.push_back( vc );
@@ -435,7 +448,7 @@ void ViewGenerator::generateViews_normals(const std::vector<Eigen::Vector3d>& fr
 
 }
 
-bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float rotation, float& angle_diff, ViewCandidate& vc){
+bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, ViewAngle& view_angle, ViewCandidate& vc){
     ViewCandidate min_view ; 
     ViewCandidate mid_view;
     ViewCandidate max_view ;
@@ -456,6 +469,8 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     float angle = -180 ; 
     bool isSafeView_bool = false; 
     bool isAngleok = true;
+
+    float rotation = view_angle.goal_vert_rotation ;
 
     float rotation_angle_radian =  rotation * (M_PI / 180.0);  
     float rotation_cosinus = cos( rotation_angle_radian) ;
@@ -482,46 +497,32 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
     //change of angle if necessary 
     if( rotation != 0){
 
-        //gradient.normalize() ;
 
-        //Eigen::Matrix3d mat_rot = Eigen::Matrix3d::Zero();
-        //mat(row, col) = value
-        // mat_rot(0,0) = ( gradient.x() * gradient.x() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
-        // mat_rot(0,1) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) - ( gradient.z() * rotation_sinus ) ;
-        // mat_rot(0,2) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.y() * rotation_sinus ) ;
-        
-        // mat_rot(1,0) = ( gradient.x() * gradient.y() ) * ( 1 - rotation_cosinus ) + ( gradient.z() * rotation_sinus ) ;
-        // mat_rot(1,1) = ( gradient.y() * gradient.y() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
-        // mat_rot(1,2) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.x() * rotation_sinus ) ;
-
-        // mat_rot(2,0) = ( gradient.x() * gradient.z() ) * ( 1 - rotation_cosinus ) - ( gradient.y() * rotation_sinus ) ;
-        // mat_rot(2,1) = ( gradient.y() * gradient.z() ) * ( 1 - rotation_cosinus ) + ( gradient.x() * rotation_sinus ) ;
-        // mat_rot(2,2) = ( gradient.z() * gradient.z() ) * ( 1 - rotation_cosinus ) + rotation_cosinus ;
-        
-        // ROS_INFO(" Rotation goal is %f ", rotation);
-        // ROS_INFO(" Rotation goal gradient is  %f ", rotation_angle_radian);
-
-        //Eigen::Vector3d temp_vect_calc( gradient.x(), gradient.y(), gradient.z() + 1) ; 
-
+        //VECTOR BASED ROTATION
         //Eigen::Vector3d temp_vect_calc( gradient.x(), gradient.y(), 0) ; 
-        Eigen::Vector3d temp_vect_calc( gradient.x(), gradient.y(), -gradient.z() ) ; 
-        temp_vect_calc.normalize();
+        // Eigen::Vector3d temp_vect_calc( gradient.x(), gradient.y(), -gradient.z() ) ; 
+        // temp_vect_calc.normalize();
 
-        Eigen::Vector3d axis_rotation = gradient.cross( temp_vect_calc);
-        axis_rotation.normalize();
+        // Eigen::Vector3d axis_rotation = gradient.cross( temp_vect_calc);
+        // axis_rotation.normalize();
 
-        Eigen::Matrix3d mat_rot = Eigen::AngleAxisd(rotation_angle_radian, axis_rotation).toRotationMatrix();
+        // Eigen::Matrix3d mat_rot = Eigen::AngleAxisd(rotation_angle_radian, axis_rotation).toRotationMatrix();
 
-        
+        // vector_director = mat_rot * gradient ; 
 
-        vector_director = mat_rot * gradient ; 
+        //TRIGONOMETRY BASED ROTATION
+        float current_angle_radian = view_angle.current_vert_angle *  (M_PI / 180.0); 
+        float new_height = tan(current_angle_radian + rotation_angle_radian) * sqrt( gradient.x() * gradient.x() + gradient.y() * gradient.y()) ;
+        vector_director = Eigen::Vector3d( gradient.x(), gradient.y(), new_height);
+
+
         ROS_INFO(" Rotated goal was %f", rotation);
         // ROS_INFO(" Rotated achieved was %f", );
 
         ROS_INFO(" Original gradient is %f %f %f ",gradient.x(), gradient.y(), gradient.z());
         ROS_INFO(" Rotated gradient is %f %f %f ",vector_director.x(), vector_director.y(), vector_director.z());
 
-        vector_direction = vector_director * m_map.getVoxelSize();
+        vector_director = vector_director * m_map.getVoxelSize();
 
 
     }
@@ -550,6 +551,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         ROS_INFO(" Original angle found is %f", vertical_view_angle);
     }
 
+    view_angle.current_vert_angle = vertical_view_angle ; 
     if( vertical_view_angle > m_angle_high ){
         angle_diff = m_angle_high - angle_mid ;
         rejected_view_candidates.push_back(temp_view);
@@ -566,6 +568,7 @@ bool ViewGenerator::generateview_normal(const Eigen::Vector3d& frontier, float r
         angle_diff = 0;
         // ROS_INFO(" Angle accepted :  %f ! ", vertical_view_angle);
     }
+    view_angle.vert_angle_diff = angle_diff ; 
 
 
     //TO DO : test the uncommented line
