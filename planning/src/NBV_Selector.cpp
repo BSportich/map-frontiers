@@ -1056,22 +1056,22 @@ void NBV_Selector::publish_views(){
 
 void NBV_Selector::select_NBV_method(){
 
-  if( m_nbv == "ours" ){
+  if( m_nbv_method == "ours" ){
     select_next_best_view();
     return;
   }
 
-  if( m_nbv == "closest_frontiers"){
+  if( m_nbv_method == "closest_frontiers"){
     next_best_view_closest_frontier();
     return;
   }
 
-  if( m_nbv == "count_frontiers"){
+  if( m_nbv_method == "count_frontiers"){
     next_best_view_count_frontier();
     return;
   }
 
-  if( m_nbv == "velocity"){
+  if( m_nbv_method == "velocity"){
     next_best_view_velocity();
     return; 
   }
