@@ -1253,7 +1253,7 @@ void NBV_Selector::next_best_view_closest_frontier(){
   std::vector<float> values_views;
   float min_value_nbv = MAXFLOAT ; 
   float temp_value = MAXFLOAT ; 
-  int index_nbv =-1;
+  int index_of_nbv =-1;
   m_current_goal = m_current_pos;
   ROS_INFO_COND(_sys_params.verbose, "EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
@@ -1265,7 +1265,7 @@ void NBV_Selector::next_best_view_closest_frontier(){
     temp_value = (view_vector - current_pos_vector).norm();
     if(temp_value < min_value_nbv){
       min_value_nbv = temp_value;
-      index_nbv = i;
+      index_of_nbv = i;
     }
     
 
@@ -1306,7 +1306,7 @@ void NBV_Selector::next_best_view_count_frontier(){
 
   int temp_nb_frontiers_visible = -1;
   float max_value_nbv = -1 ; 
-  int index_nbv =-1;
+  int index_of_nbv =-1;
 
 
   ROS_INFO_COND(_sys_params.verbose, "EXAMINING %d", views.size());
@@ -1322,7 +1322,7 @@ void NBV_Selector::next_best_view_count_frontier(){
 
     if(temp_nb_frontiers_visible > max_value_nbv){
       max_value_nbv = temp_nb_frontiers_visible ; 
-      index_nbv = i;
+      index_of_nbv = i;
     }
     
 
