@@ -10,7 +10,6 @@ class NodeLauncher:
         rospy.init_node('node_launcher', anonymous=True)
         rospy.loginfo("[node_launcher] Starting node ...")
         self._rate = rospy.Rate(0.1)
-        self._has_called_services = False
 
         # Get parameters
         # Expecting topics as follow. /droneName_NUMBER/serviceName
@@ -51,14 +50,9 @@ class NodeLauncher:
                 client() # Call the service
             except rospy.ServiceException as e:
                 rospy.logerr("Service call failed: %s" % e)
-        self._has_called_services = True
 
     def Spin(self):
         while not rospy.is_shutdown():
-            if self._has_called_services:
-                rospy.loginfo("[node_launcher] Services were called, shutting down the node.")
-                rospy.signal_shutdown("Shutdown initiated from signal.")
-            else:
                 self._rate.sleep()
 
 if __name__ == '__main__':
