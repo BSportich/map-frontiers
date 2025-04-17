@@ -9,7 +9,7 @@
 
 class NBVSelectorParameters {
 private:
-    std::unordered_set<std::string> _views_generation_methods = {"gradient"};
+    std::unordered_set<std::string> _views_generation_methods = {"gradient", "sphere"};
 
 public:
     /////////////// GENERAL

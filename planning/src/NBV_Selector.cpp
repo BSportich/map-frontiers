@@ -34,6 +34,7 @@ private:
     /* data */
     voxblox_map::VoxbloxMap m_map;
     std::string world_frame_;
+    std::string m_nbv_method; 
 
     ViewGenerator m_view_generator;
     std::vector<ViewCandidate> views;
@@ -106,6 +107,11 @@ private:
     // GENERAL BEHAVIOUR
     bool is_started_ = false;
 
+    //MEASURES
+    float total_image ;
+    float total_dist_angle ;
+    int nb_views ;
+
 public:
     NBV_Selector();
     NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private, int team_id, std::vector<int> robot_team);
@@ -128,8 +134,11 @@ public:
     void publish_views();
     void publish_goal();
 
+    void select_NBV_method();
     void select_next_best_view(); 
     void next_best_view_closest_frontier();
+    void next_best_view_count_frontier();
+    void next_best_view_velocity();
 
 
     //Tests functions
@@ -187,6 +196,8 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
     m_view_generator = ViewGenerator(method, _sys_params.distance_min, _sys_params.distance_max, m_map, _sys_params.robot_radius, _sys_params.angle_low, _sys_params.angle_high, _sys_params.bounding_box);
     m_sensor_model = SensorModel( _sys_params.p_ray_length, _sys_params.p_fov_x, _sys_params.p_fov_y, _sys_params.p_resolution_x, _sys_params.p_resolution_y, _sys_params.p_sampling_time);
     m_view_evaluator = ViewEvaluator(m_map, "", m_sensor_model, _sys_params.threshold_known, _sys_params.radius_surface_max, _sys_params.distance_min, _sys_params.distance_max, _sys_params.do_occlusions_check, _sys_params.angle_low, _sys_params.angle_high, _sys_params.bounding_box ); 
+    m_nbv_method = _sys_params.views_selection_method ; 
+
 
     //frontiers
     frontiers_set = std::vector<Eigen::Vector3d>();
@@ -237,6 +248,10 @@ NBV_Selector::NBV_Selector(const ros::NodeHandle& nh, const ros::NodeHandle& nh_
 
     start_server = n.advertiseService("start_NBV_selector", &NBV_Selector::startCallback, this);
     stop_server = n.advertiseService("stop_NBV_selector", &NBV_Selector::stopCallback, this);
+
+    total_image = 0 ;
+    total_dist_angle = 0 ;
+    nb_views = 0;
 
 
     //ros::spin()
@@ -1039,6 +1054,32 @@ void NBV_Selector::publish_views(){
 
 }
 
+void NBV_Selector::select_NBV_method(){
+
+  if( m_nbv == "ours" ){
+    select_next_best_view();
+    return;
+  }
+
+  if( m_nbv == "closest_frontiers"){
+    next_best_view_closest_frontier();
+    return;
+  }
+
+  if( m_nbv == "count_frontiers"){
+    next_best_view_count_frontier();
+    return;
+  }
+
+  if( m_nbv == "velocity"){
+    next_best_view_velocity();
+    return; 
+  }
+  
+
+
+
+}
 
 //Called in poscallback after pose updated
 void NBV_Selector::select_next_best_view(){
@@ -1061,6 +1102,8 @@ void NBV_Selector::select_next_best_view(){
   int max_nb_frontiers_visible = -1;
   int temp_nb_frontiers_visible = -1;
   int index_max_frontiers = -1;
+
+
 
   Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
   Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
@@ -1134,6 +1177,7 @@ void NBV_Selector::select_next_best_view(){
 
     image_values[i] = image_values[i] / max_nb_frontiers_visible ; 
     ROS_INFO_COND(_sys_params.verbose, "IMAGE VALUE of  %d is %f", i, image_values[i]);
+    total_image = total_image + image_values[i];
 
     value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
     ROS_INFO_COND(_sys_params.verbose, "ANGLE COST of  %d is %f", i, value_angular);
@@ -1147,6 +1191,7 @@ void NBV_Selector::select_next_best_view(){
     ROS_INFO_COND(_sys_params.verbose, "ANGLE/DISTANCE VALUE of  %d is %f", i, value_angular);
     // temp_value_angular = ; 
     // ROS_INFO_COND(_sys_params.verbose, "DIST/ANGLE COST VALUE of  %d is %f", i, temp_value_angular);
+    total_dist_angle = total_dist_angle + value_angular;
 
     total_value = _sys_params.image_component_weight * image_values[i] + _sys_params.metrics_component_weight * value_angular ; 
     ROS_INFO_COND(_sys_params.verbose, "TOTAL VALUE OF  %d is %f", i, total_value);
@@ -1159,7 +1204,7 @@ void NBV_Selector::select_next_best_view(){
     }
 
     // break ; 
-
+    nb_views++;
 
   }
 
@@ -1168,6 +1213,9 @@ void NBV_Selector::select_next_best_view(){
   ros::Time total_view_evaluation_end = ros::Time::now();
   ros::Duration duration_total = total_view_evaluation_start - total_view_evaluation_end ; 
   ROS_INFO_COND(_sys_params.timer, "[NBV_Selector][Evaluate View] Total %.4f s", duration_total.toSec());
+
+  ROS_INFO_COND(_sys_params.verbose, "[NBV_Selector][Measure] Image average value %.4f ", total_image/nb_views);
+  ROS_INFO_COND(_sys_params.verbose, "[NBV_Selector][Measure] Dist/angle average value %.4f ", total_dist_angle/nb_views);
 
 
 
@@ -1203,26 +1251,110 @@ void NBV_Selector::next_best_view_closest_frontier(){
 
   //evaluate views
   std::vector<float> values_views;
-  int index_of_nbv = -1 ;
-  float max_value_nbv = -1 ; 
-  float temp_value = -1 ; 
+  float min_value_nbv = MAXFLOAT ; 
+  float temp_value = MAXFLOAT ; 
+  int index_nbv =-1;
   m_current_goal = m_current_pos;
-  float temp_value_angular = 0 ;
-  float max_value_angular = 0 ; 
   ROS_INFO_COND(_sys_params.verbose, "EXAMINING %d", views.size());
   for(int i=0;i< views.size();i++){
 
     ViewCandidate view = views[i] ; 
-    std::vector<Eigen::Vector3d> visible_voxels; 
-    Eigen::Vector3d pos = Eigen::Vector3d( view.x, view.y, view.z);
-
+    Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
     Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
-    Eigen::Vector3d vel( m_vel_x, m_vel_y, m_vel_z);
-    temp_value_angular = m_view_evaluator.evaluate_view_angular( view, current_pos_vector, vel ) ; 
 
+    temp_value = (view_vector - current_pos_vector).norm();
+    if(temp_value < min_value_nbv){
+      min_value_nbv = temp_value;
+      index_nbv = i;
+    }
+    
 
   }
 
+
+
+  if (views.size() > 0){
+    ROS_INFO_COND(_sys_params.verbose, "UPDATING CURRENT GOAL ");
+    ROS_INFO_COND(_sys_params.verbose, "NEW GOAL IS VIEW %d", index_of_nbv);
+    ROS_INFO_COND(_sys_params.verbose, " %f %f %f ", views[index_of_nbv].x , views[index_of_nbv].y , views[index_of_nbv].z );
+    ROS_INFO_COND(_sys_params.verbose, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
+
+    views_history.push_back( views[index_of_nbv]) ;
+
+    //Correct orientation of the goal
+    ViewCandidate goal_corrected = views[index_of_nbv];
+    float temp_number = goal_corrected.z ; 
+    goal_corrected.z = goal_corrected.o_z ; 
+    findOrientation(goal_corrected);
+    goal_corrected.z = temp_number ; 
+
+    //m_current_goal = views[index_of_nbv];
+    m_current_goal = goal_corrected;
+    
+  }
+
+}
+
+
+void NBV_Selector::next_best_view_count_frontier(){
+  ROS_INFO_COND(_sys_params.verbose, "COUNT FRONTIER MODE");
+  
+  // ROS_INFO_COND(_sys_params.verbose, "EMPTY SPACE");
+
+  //evaluate views
+  m_current_goal = m_current_pos;
+
+  int temp_nb_frontiers_visible = -1;
+  float max_value_nbv = -1 ; 
+  int index_nbv =-1;
+
+
+  ROS_INFO_COND(_sys_params.verbose, "EXAMINING %d", views.size());
+
+  for(int i=0;i< views.size();i++){
+
+    ViewCandidate view = views[i] ; 
+    Eigen::Vector3d view_vector = Eigen::Vector3d( view.x, view.y, view.z);
+    Eigen::Vector3d current_pos_vector( m_current_pos.x ,m_current_pos.y , m_current_pos.z );
+
+    m_view_evaluator.inverseRayCast(view, frontiers_set, temp_nb_frontiers_visible ); 
+
+
+    if(temp_nb_frontiers_visible > max_value_nbv){
+      max_value_nbv = temp_nb_frontiers_visible ; 
+      index_nbv = i;
+    }
+    
+
+  }
+
+
+
+  if (views.size() > 0){
+    ROS_INFO_COND(_sys_params.verbose, "UPDATING CURRENT GOAL ");
+    ROS_INFO_COND(_sys_params.verbose, "NEW GOAL IS VIEW %d", index_of_nbv);
+    ROS_INFO_COND(_sys_params.verbose, " %f %f %f ", views[index_of_nbv].x , views[index_of_nbv].y , views[index_of_nbv].z );
+    ROS_INFO_COND(_sys_params.verbose, "CURRENT POS IS %f %f %f", m_current_pos.x, m_current_pos.y, m_current_pos.z);
+
+    views_history.push_back( views[index_of_nbv]) ;
+
+    //Correct orientation of the goal
+    ViewCandidate goal_corrected = views[index_of_nbv];
+    float temp_number = goal_corrected.z ; 
+    goal_corrected.z = goal_corrected.o_z ; 
+    findOrientation(goal_corrected);
+    goal_corrected.z = temp_number ; 
+
+    //m_current_goal = views[index_of_nbv];
+    m_current_goal = goal_corrected;
+    
+  }
+
+}
+
+void::NBV_Selector::next_best_view_velocity(){
+
+  //to implement
 }
 
 

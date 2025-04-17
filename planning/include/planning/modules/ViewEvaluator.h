@@ -365,33 +365,35 @@ float ViewEvaluator::evaluate_view_image(const std::vector<Eigen::Vector3d>& vox
     if( isSurfaceFrontier_TSDF(voxel_test, voxel_unknown) ){
 
           evaluation = evaluation + value_frontier_ ; 
-        }
-    else if ( m_map.getVoxelState_TSDF(voxel_test, 0) == voxblox_map::VoxbloxMap::UNKNOWN ){
+    }
 
-      for(int j= - distance_surface_radius_max_; j<= distance_surface_radius_max_;j++){
-        for(int k= - distance_surface_radius_max_; k<= distance_surface_radius_max_;k++){
-          for(int l= - distance_surface_radius_max_; l<= distance_surface_radius_max_;l++){
+
+    // else if ( m_map.getVoxelState_TSDF(voxel_test, 0) == voxblox_map::VoxbloxMap::UNKNOWN ){
+
+    //   for(int j= - distance_surface_radius_max_; j<= distance_surface_radius_max_;j++){
+    //     for(int k= - distance_surface_radius_max_; k<= distance_surface_radius_max_;k++){
+    //       for(int l= - distance_surface_radius_max_; l<= distance_surface_radius_max_;l++){
             
-            Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
-            if( m_map.getVoxelState_TSDF(  voxel_test + shift, m_threshold_known ) == voxblox_map::VoxbloxMap::OCCUPIED ){
+    //         Eigen::Vector3d shift = Eigen::Vector3d(i,j,k);
+    //         if( m_map.getVoxelState_TSDF(  voxel_test + shift, m_threshold_known ) == voxblox_map::VoxbloxMap::OCCUPIED ){
 
 
-                closer_surface = closer_surface + (1/ dist_to_voxel) ; 
-            }
-          }
-        }
-      }
+    //             closer_surface = closer_surface + (1/ dist_to_voxel) ; 
+    //         }
+    //       }
+    //     }
+    //   }
        
 
 
-    }
+    // }
 
 
     }
 
 
-
-  return evaluation + closer_surface ; 
+    return evaluation;
+  //return evaluation + closer_surface ; 
 
 }
 
