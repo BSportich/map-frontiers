@@ -1,0 +1,42 @@
+# Start from the ROS Noetic base image
+FROM osrf/ros:noetic-desktop-full
+
+# Set the working directory
+WORKDIR /opt/catkin_ws/src
+
+# Install necessary packages
+COPY requirements.txt /tmp/requirements.txt
+RUN apt-get update && \
+    apt-get install -y $(cat /tmp/requirements.txt | cut -d'=' -f1) && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone the repository and get the commit to be checkout at from the docker-compose.yaml file
+ARG BRANCH='merge/px4_nbv_selector'
+ARG BRANCH_COMMIT=$BRANCH # Checkout the last commit per default
+RUN git clone --single-branch --branch $BRANCH https://github.com/BSportich/map-frontiers.git \ 
+    && cd /opt/catkin_ws/src/map-frontiers/ \
+    && echo "The commit to be check out is: $BRANCH_COMMIT" \
+    && git checkout $BRANCH_COMMIT
+
+# Install the package's dependencies
+RUN wstool init . /opt/catkin_ws/src/map-frontiers/voxfield_https.rosinstall \
+&& wstool update
+
+# Go back to the workspace root
+WORKDIR /opt/catkin_ws/
+
+# Initialize and build the Catkin workspace
+RUN catkin config  --extend /opt/ros/noetic \
+    && catkin build voxblox_ros 
+
+# # Hacky hack
+RUN mkdir -p /opt/catkin_ws/devel/.private/voxblox_map/include/ \
+    && mkdir -p /opt/catkin_ws/devel/.private/map_frontiers/include/ \
+    && catkin build map_frontiers
+
+# # Source the setup.bash so that the package is available in the environment
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/catkin_ws/devel/setup.bash" >> ~/.bashrc
+
+# # Set the entrypoint
+CMD ["bash", "-c"]

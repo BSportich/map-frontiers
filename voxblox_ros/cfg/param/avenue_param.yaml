@@ -1,22 +1,10 @@
 # Map 
-voxel_size: &voxel_size 0.2
-voxels_per_side_in_block: &voxels_per_side_in_block 16
-
-occ_voxel_size: *voxel_size
-occ_voxels_per_side: *voxels_per_side_in_block
-
-tsdf_voxel_size: *voxel_size
-tsdf_voxels_per_side: *voxels_per_side_in_block
-
-esdf_voxel_size: *voxel_size
-esdf_voxels_per_side: *voxels_per_side_in_block
-
 truncation_distance: -3.0
 
 # TSDF integration
-method: merged # select from simple, fast and merged
+method: simple # select from simple, fast and merged
 merge_with_clear: true
-max_ray_length_m: 50.0
+# max_ray_length_m: 50.0
 min_ray_length_m: 1.5
 integration_threads: 6
 normal_available: true
@@ -28,6 +16,7 @@ reliable_band_ratio: 2.0
 reliable_normal_ratio_thre: 0.05
 
 # ESDF integration
+use_freespace_pointcloud: true
 local_range_offset_x: 20
 local_range_offset_y: 20
 local_range_offset_z: 5

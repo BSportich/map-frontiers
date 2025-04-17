@@ -38,6 +38,7 @@ set(HEADER_FILES
         include/voxblox_rviz_plugin/voxblox_multi_mesh_display.h
         include/voxblox_rviz_plugin/voxblox_mesh_visual.h
         include/voxblox_rviz_plugin/material_loader.h
+        include/voxblox_rviz_plugin/launch_button.h
         )
 
 set(SRC_FILES
@@ -45,6 +46,7 @@ set(SRC_FILES
         src/voxblox_multi_mesh_display.cc
         src/voxblox_mesh_visual.cc
         src/material_loader.cc
+        src/launch_button.cc
         )
 
 cs_add_library(${PROJECT_NAME}
